@@ -29,7 +29,7 @@ const config: Config = {
     parsePlaceEntities: false,
     mosDataKey: String(process.env.MOS_DATA_KEY),
     timepadKey: String(process.env.TIMEPAD),
-    parseEventsCount: 300
+    parseEventsCount: 59
 }
 
 if (Boolean(process.env.PARSE_ENTITIES)) {
