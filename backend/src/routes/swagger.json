@@ -21,7 +21,6 @@
 					}
 				},
 				"required": [
-					"_id",
 					"name",
 					"svg"
 				],
@@ -55,7 +54,6 @@
 					}
 				},
 				"required": [
-					"_id",
 					"name",
 					"description",
 					"longitude",
@@ -152,7 +150,7 @@
 		},
 		"/categories/all": {
 			"get": {
-				"operationId": "getAll",
+				"operationId": "categoriesGetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -177,7 +175,7 @@
 		},
 		"/event-places/all": {
 			"get": {
-				"operationId": "getAll",
+				"operationId": "eventPlacesGetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -202,7 +200,7 @@
 		},
 		"/event-places/id/{event_id}": {
 			"get": {
-				"operationId": "getById",
+				"operationId": "eventPlacesGetById",
 				"responses": {
 					"200": {
 						"description": "Ok",

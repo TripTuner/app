@@ -7,14 +7,14 @@ import * as EventPlaceService from '../services/event-place.service';
 export class EventPlaces extends Controller {
     @Get('all')
     @Tags("BackendApi")
-    @OperationId('getAll')
+    @OperationId('eventPlacesGetAll')
     public async getAll(): Promise<Array<EventPlace>> {
         return await EventPlaceService.findAll();
     }
     
     @Get(`id/{event_id}`)
     @Tags("BackendApi")
-    @OperationId('getById')
+    @OperationId('eventPlacesGetById')
     public async getById(
         @Path() event_id: number
     ): Promise<EventPlace> {

@@ -6,7 +6,8 @@
     "generators": {
       "v3.0": {
         "generatorName": "typescript-angular",
-        "inputSpec": "./swagger.json",
+        "skipValidateSpec": true,
+        "inputSpec": "swagger.json",
         "output": "./src/generated",
         "additionalProperties": {
           "enumPropertyNaming": "UPPERCASE"

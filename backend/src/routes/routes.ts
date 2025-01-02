@@ -24,7 +24,7 @@ const models: TsoaRoute.Models = {
     "Category": {
         "dataType": "refObject",
         "properties": {
-            "_id": {"dataType":"double","required":true},
+            "_id": {"dataType":"double"},
             "name": {"dataType":"string","required":true},
             "svg": {"dataType":"string","required":true},
         },
@@ -34,7 +34,7 @@ const models: TsoaRoute.Models = {
     "EventPlace": {
         "dataType": "refObject",
         "properties": {
-            "_id": {"dataType":"string","required":true},
+            "_id": {"dataType":"string"},
             "name": {"dataType":"string","required":true},
             "description": {"dataType":"string","required":true},
             "longitude": {"dataType":"double","required":true},

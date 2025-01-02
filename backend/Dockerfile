@@ -1,9 +1,9 @@
 FROM node:20.12.2
 RUN npm i -g tsoa nodemon
 
-COPY . /app
+COPY . /backend
 
-WORKDIR /app
+WORKDIR /backend
 RUN npm install
 RUN tsoa spec-and-routes
 

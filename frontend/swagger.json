@@ -7,179 +7,117 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"UserResponseModel": {
+			"Category": {
 				"properties": {
-					"failed": {
-						"type": "boolean"
+					"_id": {
+						"type": "number",
+						"format": "double"
 					},
+					"name": {
+						"type": "string"
+					},
+					"svg": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"_id",
+					"name",
+					"svg"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"EventPlace": {
+				"properties": {
 					"_id": {
 						"type": "string"
 					},
-					"user_id": {
+					"name": {
+						"type": "string"
+					},
+					"description": {
+						"type": "string"
+					},
+					"longitude": {
 						"type": "number",
 						"format": "double"
 					},
-					"username": {
-						"type": "string"
-					},
-					"first_name": {
-						"type": "string"
-					},
-					"last_name": {
-						"type": "string"
-					},
-					"language_code": {
-						"type": "string"
-					},
-					"is_premium": {
-						"type": "boolean"
-					},
-					"rank": {
+					"latitude": {
 						"type": "number",
 						"format": "double"
 					},
-					"rank_timestamp": {
-						"type": "number",
-						"format": "double"
-					},
-					"credits": {
-						"type": "number",
-						"format": "double"
-					},
-					"is_blocked": {
-						"type": "boolean"
-					},
-					"is_admin": {
-						"type": "boolean"
-					},
-					"has_agreed_with_terms": {
-						"type": "boolean"
-					},
-					"invited_by": {
+					"start_time": {
 						"type": "string"
 					},
-					"from_bot": {
-						"type": "boolean"
-					},
-					"joined": {
+					"finish_time": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"failed",
-					"user_id"
+					"_id",
+					"name",
+					"description",
+					"longitude",
+					"latitude",
+					"start_time",
+					"finish_time"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UserRequestModel": {
+			"UserRegister": {
 				"properties": {
-					"user_id": {
-						"type": "number",
-						"format": "double"
-					},
-					"params": {}
-				},
-				"required": [
-					"user_id"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"UserPostModel": {
-				"properties": {
-					"user_id": {
-						"type": "number",
-						"format": "double"
-					},
-					"first_name": {
+					"email": {
 						"type": "string"
 					},
-					"last_name": {
+					"name": {
 						"type": "string"
 					},
-					"username": {
+					"password": {
 						"type": "string"
-					},
-					"language_code": {
-						"type": "string"
-					},
-					"is_premium": {
-						"type": "boolean"
 					}
 				},
-				"required": [
-					"user_id",
-					"username"
-				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"UserInvitesModel": {
+			"UserLogin": {
 				"properties": {
-					"user_id": {
-						"type": "number",
-						"format": "double"
-					},
-					"username": {
+					"email": {
 						"type": "string"
 					},
-					"first_name": {
-						"type": "string"
-					},
-					"last_name": {
-						"type": "string"
-					},
-					"joined": {
+					"password": {
 						"type": "string"
 					}
 				},
 				"required": [
-					"user_id"
+					"email",
+					"password"
 				],
 				"type": "object",
 				"additionalProperties": false
 			},
-			"NudifyResponseModel": {
+			"UserPublic": {
 				"properties": {
-					"ok": {
-						"type": "boolean"
-					},
-					"valid": {
-						"type": "boolean"
-					},
-					"result": {}
-				},
-				"required": [
-					"ok",
-					"result"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"NudifyRequestModel": {
-				"properties": {
-					"user_id": {
-						"type": "number",
-						"format": "double"
-					},
-					"ai_model": {
+					"id": {
 						"type": "string"
 					},
-					"data": {
+					"email": {
+						"type": "string"
+					},
+					"name": {
 						"type": "string"
 					}
 				},
-				"required": [
-					"user_id",
-					"ai_model",
-					"data"
-				],
 				"type": "object",
 				"additionalProperties": false
 			}
 		},
-		"securitySchemes": {}
+		"securitySchemes": {
+			"auth": {
+				"type": "http"
+			}
+		}
 	},
 	"info": {
 		"title": "backend",
@@ -190,143 +128,12 @@
 		"contact": {}
 	},
 	"paths": {
-		"/users/update": {
-			"put": {
-				"operationId": "updateUser",
-				"responses": {
-					"200": {
-						"description": "Updated",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UserResponseModel"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserRequestModel"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/users/register": {
-			"post": {
-				"operationId": "registerUser",
-				"responses": {
-					"200": {
-						"description": "Received",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UserResponseModel"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserPostModel"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/users/profile": {
-			"post": {
-				"operationId": "getProfile",
-				"responses": {
-					"200": {
-						"description": "Received",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/UserResponseModel"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-				"parameters": [],
-				"requestBody": {
-					"required": true,
-					"content": {
-						"application/json": {
-							"schema": {
-								"$ref": "#/components/schemas/UserPostModel"
-							}
-						}
-					}
-				}
-			}
-		},
-		"/users/getUserInvites/{user_id}": {
+		"/ping/ping": {
 			"get": {
-				"operationId": "getUserInvites",
+				"operationId": "ping",
 				"responses": {
 					"200": {
-						"description": "Received",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/UserInvitesModel"
-									},
-									"type": "array"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "user_id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
-			}
-		},
-		"/users/getUserInvitationLink/{user_id}": {
-			"get": {
-				"operationId": "getUserInvitationLink",
-				"responses": {
-					"200": {
-						"description": "Received",
+						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
@@ -340,10 +147,82 @@
 					"BackendApi"
 				],
 				"security": [],
+				"parameters": []
+			}
+		},
+		"/categories/all": {
+			"get": {
+				"operationId": "getAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Category"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/event-places/all": {
+			"get": {
+				"operationId": "getAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/EventPlace"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/event-places/id/{event_id}": {
+			"get": {
+				"operationId": "getById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/EventPlace"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
 				"parameters": [
 					{
 						"in": "path",
-						"name": "user_id",
+						"name": "event_id",
 						"required": true,
 						"schema": {
 							"format": "double",
@@ -353,16 +232,16 @@
 				]
 			}
 		},
-		"/ai/nudify": {
+		"/auth/register": {
 			"post": {
-				"operationId": "AINudify",
+				"operationId": "register",
 				"responses": {
 					"200": {
-						"description": "Done",
+						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-									"$ref": "#/components/schemas/NudifyResponseModel"
+									"type": "string"
 								}
 							}
 						}
@@ -378,11 +257,69 @@
 					"content": {
 						"application/json": {
 							"schema": {
-								"$ref": "#/components/schemas/NudifyRequestModel"
+								"$ref": "#/components/schemas/UserRegister"
 							}
 						}
 					}
 				}
+			}
+		},
+		"/auth/login": {
+			"post": {
+				"operationId": "login",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserLogin"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/auth/profile": {
+			"get": {
+				"operationId": "profile",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserPublic"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [
+					{
+						"auth": []
+					}
+				],
+				"parameters": []
 			}
 		}
 	},

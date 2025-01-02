@@ -1,5 +1,3 @@
-import shortid from 'shortid'
-
 import { getManager, Repository } from "typeorm";
 import { ServerSideSessionContext } from "../sessions/context";
 import { User } from "../entities/user.entity";
@@ -71,8 +69,7 @@ export const checkIfUserPasswordCorrect = async function (user: User, password: 
  */
 export const createNewUserModel = function (user: UserRegister): User {
     const result: User = new User();
-    
-    result._id = shortid.generate();
+
     result.name = user.name || '';
     result.email = user.email || '';
     result.password = user.password;

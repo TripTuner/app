@@ -7,7 +7,7 @@ import * as CategoryService from '../services/category.service';
 export class CategoryController extends Controller {
     @Get('all')
     @Tags("BackendApi")
-    @OperationId('getAll')
+    @OperationId('categoriesGetAll')
     public async getAll(): Promise<Array<Category>> {
         return await CategoryService.findAll();
     }

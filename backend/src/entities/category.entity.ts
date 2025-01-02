@@ -4,7 +4,7 @@ import { Column, Entity, ObjectIdColumn } from "typeorm";
 @Entity()
 export class Category {
     @ObjectIdColumn()
-    _id!: number
+    _id?: number
     
     @Column({ length: 80 })
     name!: string

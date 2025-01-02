@@ -4,7 +4,7 @@ import { Column, Entity, ObjectIdColumn } from "typeorm";
 @Entity()
 export class EventPlace {
     @ObjectIdColumn()
-    _id!: string
+    _id?: string
     
     @Column({ length: 80 })
     name!: string
