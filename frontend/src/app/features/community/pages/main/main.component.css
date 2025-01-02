@@ -1,0 +1,25 @@
+.container {
+    padding: 24px;
+    width:   100%;
+    display: flex;
+}
+
+.banner {
+    padding-top:    20px;
+    display:        flex;
+    flex-direction: column;
+    gap:            20px;
+
+    h1 {
+        font-family:    var(--ff-jost), sans-serif;
+        font-size:      25px;
+        font-weight:    600;
+        letter-spacing: 1px;
+        color:          var(--text-primary);
+    }
+
+    p {
+        color:     var(--blue-60);
+        font-size: 16px;
+    }
+}

@@ -1,0 +1,394 @@
+{
+	"openapi": "3.0.0",
+	"components": {
+		"examples": {},
+		"headers": {},
+		"parameters": {},
+		"requestBodies": {},
+		"responses": {},
+		"schemas": {
+			"UserResponseModel": {
+				"properties": {
+					"failed": {
+						"type": "boolean"
+					},
+					"_id": {
+						"type": "string"
+					},
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"username": {
+						"type": "string"
+					},
+					"first_name": {
+						"type": "string"
+					},
+					"last_name": {
+						"type": "string"
+					},
+					"language_code": {
+						"type": "string"
+					},
+					"is_premium": {
+						"type": "boolean"
+					},
+					"rank": {
+						"type": "number",
+						"format": "double"
+					},
+					"rank_timestamp": {
+						"type": "number",
+						"format": "double"
+					},
+					"credits": {
+						"type": "number",
+						"format": "double"
+					},
+					"is_blocked": {
+						"type": "boolean"
+					},
+					"is_admin": {
+						"type": "boolean"
+					},
+					"has_agreed_with_terms": {
+						"type": "boolean"
+					},
+					"invited_by": {
+						"type": "string"
+					},
+					"from_bot": {
+						"type": "boolean"
+					},
+					"joined": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"failed",
+					"user_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserRequestModel": {
+				"properties": {
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"params": {}
+				},
+				"required": [
+					"user_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserPostModel": {
+				"properties": {
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"first_name": {
+						"type": "string"
+					},
+					"last_name": {
+						"type": "string"
+					},
+					"username": {
+						"type": "string"
+					},
+					"language_code": {
+						"type": "string"
+					},
+					"is_premium": {
+						"type": "boolean"
+					}
+				},
+				"required": [
+					"user_id",
+					"username"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"UserInvitesModel": {
+				"properties": {
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"username": {
+						"type": "string"
+					},
+					"first_name": {
+						"type": "string"
+					},
+					"last_name": {
+						"type": "string"
+					},
+					"joined": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"user_id"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"NudifyResponseModel": {
+				"properties": {
+					"ok": {
+						"type": "boolean"
+					},
+					"valid": {
+						"type": "boolean"
+					},
+					"result": {}
+				},
+				"required": [
+					"ok",
+					"result"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"NudifyRequestModel": {
+				"properties": {
+					"user_id": {
+						"type": "number",
+						"format": "double"
+					},
+					"ai_model": {
+						"type": "string"
+					},
+					"data": {
+						"type": "string"
+					}
+				},
+				"required": [
+					"user_id",
+					"ai_model",
+					"data"
+				],
+				"type": "object",
+				"additionalProperties": false
+			}
+		},
+		"securitySchemes": {}
+	},
+	"info": {
+		"title": "backend",
+		"version": "1.0.0",
+		"license": {
+			"name": "ISC"
+		},
+		"contact": {}
+	},
+	"paths": {
+		"/users/update": {
+			"put": {
+				"operationId": "updateUser",
+				"responses": {
+					"200": {
+						"description": "Updated",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponseModel"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserRequestModel"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/register": {
+			"post": {
+				"operationId": "registerUser",
+				"responses": {
+					"200": {
+						"description": "Received",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponseModel"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserPostModel"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/profile": {
+			"post": {
+				"operationId": "getProfile",
+				"responses": {
+					"200": {
+						"description": "Received",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/UserResponseModel"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/UserPostModel"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/users/getUserInvites/{user_id}": {
+			"get": {
+				"operationId": "getUserInvites",
+				"responses": {
+					"200": {
+						"description": "Received",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/UserInvitesModel"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "user_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/users/getUserInvitationLink/{user_id}": {
+			"get": {
+				"operationId": "getUserInvitationLink",
+				"responses": {
+					"200": {
+						"description": "Received",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "user_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/ai/nudify": {
+			"post": {
+				"operationId": "AINudify",
+				"responses": {
+					"200": {
+						"description": "Done",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/NudifyResponseModel"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/NudifyRequestModel"
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"servers": [
+		{
+			"url": "/"
+		}
+	]
+}

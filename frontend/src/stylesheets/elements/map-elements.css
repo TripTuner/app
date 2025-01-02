@@ -1,0 +1,28 @@
+.marker-class {
+    width: 25px;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    align-content: center;
+    justify-content: center;
+    border-radius: var(--br-100);
+    background-color: var(--red-50);
+    color: var(--red-50);
+    font-size: 15px;
+    font-weight: 600;
+    position: absolute;
+    z-index: 1;
+
+    &:after {
+        content: '';
+        z-index: -1;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateY(-50%) translateX(-50%);
+        background-color: var(--neutral-0);
+        width: 15px;
+        height: 15px;
+        border-radius: var(--br-100);
+    }
+}
