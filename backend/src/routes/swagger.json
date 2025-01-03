@@ -7,6 +7,48 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+			"PlaceDataInterface": {
+				"properties": {
+					"hasFoodPoint": {
+						"type": "boolean"
+					},
+					"hasChangeRoom": {
+						"type": "boolean"
+					},
+					"hasToilet": {
+						"type": "boolean"
+					},
+					"hasWIFI": {
+						"type": "boolean"
+					},
+					"hasWater": {
+						"type": "boolean"
+					},
+					"hasChild": {
+						"type": "boolean"
+					},
+					"hasSport": {
+						"type": "boolean"
+					},
+					"info": {
+						"type": "string"
+					},
+					"priceInfo": {
+						"type": "string"
+					},
+					"conditions": {
+						"type": "string"
+					},
+					"time": {
+						"type": "string"
+					},
+					"subway": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
 			"Category": {
 				"properties": {
 					"_id": {
@@ -18,11 +60,67 @@
 					},
 					"svg": {
 						"type": "string"
+					},
+					"places": {
+						"items": {
+							"$ref": "#/components/schemas/Place"
+						},
+						"type": "array"
 					}
 				},
 				"required": [
 					"name",
 					"svg"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Place": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "number",
+						"format": "double"
+					},
+					"email": {
+						"type": "string"
+					},
+					"website": {
+						"type": "string"
+					},
+					"phone": {
+						"type": "string"
+					},
+					"schedule": {
+						"type": "string"
+					},
+					"isPaid": {
+						"type": "boolean"
+					},
+					"price": {
+						"type": "string"
+					},
+					"address": {
+						"type": "string"
+					},
+					"data": {
+						"$ref": "#/components/schemas/PlaceDataInterface"
+					},
+					"categories": {
+						"items": {
+							"$ref": "#/components/schemas/Category"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"name",
+					"type"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -109,42 +207,6 @@
 				},
 				"type": "object",
 				"additionalProperties": false
-			},
-			"Place": {
-				"properties": {
-					"_id": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"description": {
-						"type": "string"
-					},
-					"longitude": {
-						"type": "number",
-						"format": "double"
-					},
-					"latitude": {
-						"type": "number",
-						"format": "double"
-					},
-					"categories": {
-						"items": {
-							"$ref": "#/components/schemas/Category"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"description",
-					"longitude",
-					"latitude",
-					"categories"
-				],
-				"type": "object",
-				"additionalProperties": false
 			}
 		},
 		"securitySchemes": {
@@ -162,28 +224,6 @@
 		"contact": {}
 	},
 	"paths": {
-		"/ping/ping": {
-			"get": {
-				"operationId": "ping",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"type": "string"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-				"parameters": []
-			}
-		},
 		"/categories/all": {
 			"get": {
 				"operationId": "categoriesGetAll",
@@ -257,6 +297,120 @@
 					{
 						"in": "path",
 						"name": "event_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/ping/ping": {
+			"get": {
+				"operationId": "ping",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/places/all": {
+			"get": {
+				"operationId": "placesGetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Place"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/places/id/{place_id}": {
+			"get": {
+				"operationId": "placesGetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Place"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "place_id",
+						"required": true,
+						"schema": {
+							"format": "double",
+							"type": "number"
+						}
+					}
+				]
+			}
+		},
+		"/places/id/category/{category_id}": {
+			"get": {
+				"operationId": "placesGetByCategoryId",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Place"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "category_id",
 						"required": true,
 						"schema": {
 							"format": "double",
@@ -354,63 +508,6 @@
 					}
 				],
 				"parameters": []
-			}
-		},
-		"/places/all": {
-			"get": {
-				"operationId": "placesGetAll",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"items": {
-										"$ref": "#/components/schemas/Place"
-									},
-									"type": "array"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-				"parameters": []
-			}
-		},
-		"/places/id/{place_id}": {
-			"get": {
-				"operationId": "placesGetById",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-									"$ref": "#/components/schemas/Place"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-				"parameters": [
-					{
-						"in": "path",
-						"name": "place_id",
-						"required": true,
-						"schema": {
-							"format": "double",
-							"type": "number"
-						}
-					}
-				]
 			}
 		}
 	},

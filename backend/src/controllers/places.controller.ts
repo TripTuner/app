@@ -22,13 +22,14 @@ export class Places extends Controller {
         return await PlaceService.findPlace({ where: { _id: place_id } })
     }
 
-    @Get(`id/{category_id}`)
+    @Get(`id/category/{category_id}`)
     @Tags("BackendApi")
     @OperationId("placesGetByCategoryId")
     public async getByCategory(
         @Path() category_id: number,
     ): Promise<Array<Place>> {
         const category = await CategoryService.findCategory({ where: { _id: category_id } })
-        return category.places
+        //return category.places || []
+        return []
     }
 }

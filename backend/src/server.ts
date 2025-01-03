@@ -1,14 +1,12 @@
-import Koa from "koa";
-import bodyParser from "koa-bodyparser";
-import "reflect-metadata";
-import Router from "@koa/router";
-import cors from "@koa/cors";
+import cors from "@koa/cors"
+import Router from "@koa/router"
+import Koa from "koa"
+import bodyParser from "koa-bodyparser"
+import "reflect-metadata"
+import { config } from "./config"
+import { RedisConfiguration, setupConnection } from "./providers/connections"
 
-import { RegisterRoutes } from "./routes/routes";
-import { RedisConfiguration, setupConnection } from "./providers/connections";
-
-import * as ParseService from './services/parse.service';
-import { config } from "./config";
+import { RegisterRoutes } from "./routes/routes"
 
 const redis = new RedisConfiguration();
 
@@ -45,8 +43,8 @@ const server = async function () {
     app.use(router.routes());
     
     if (config.parsePlaceEntities) {
-        await ParseService.initCategories();
-        await ParseService.initEventPlaces();
+        //await ParseService.initCategories();
+        //await ParseService.initEventPlaces();
     }
     
     app.listen(config.port);

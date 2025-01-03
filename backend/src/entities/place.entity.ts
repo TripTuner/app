@@ -1,5 +1,5 @@
-import { Column, Entity, ManyToMany, ObjectIdColumn } from "typeorm"
-import { Category } from "./category.entity"
+import { Column, Entity, ObjectIdColumn } from "typeorm"
+import { PlaceDataInterface } from "../interfaces/place-data.interface"
 
 
 @Entity()
@@ -11,14 +11,32 @@ export class Place {
     name!: string
 
     @Column()
-    description!: string
+    type!: number
 
     @Column()
-    longitude!: number
+    email?: string
 
     @Column()
-    latitude!: number
+    website?: string
 
-    @ManyToMany(() => Category, category => category.places)
-    categories!: Promise<Array<Category>>
+    @Column()
+    phone?: string
+
+    @Column()
+    schedule?: string
+
+    @Column()
+    isPaid?: boolean
+
+    @Column()
+    price?: string
+
+    @Column()
+    address?: string
+
+    @Column()
+    data?: PlaceDataInterface
+
+    //@ManyToMany(() => Category, category => category.places, { nullable: true })
+    //categories?: Array<Category>
 }

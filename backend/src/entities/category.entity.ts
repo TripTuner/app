@@ -1,5 +1,4 @@
-import { Column, Entity, JoinTable, ManyToMany, ObjectIdColumn } from "typeorm"
-import { Place } from "./place.entity"
+import { Column, Entity, ObjectIdColumn } from "typeorm"
 
 
 @Entity()
@@ -13,7 +12,7 @@ export class Category {
     @Column()
     svg!: string
 
-    @ManyToMany(() => Place, place => place.categories)
-    @JoinTable()
-    places!: Promise<Array<Place>>
+    //@ManyToMany(() => Place, place => place.categories, { nullable: true })
+    //@JoinTable()
+    //places?: Array<Place>
 }
