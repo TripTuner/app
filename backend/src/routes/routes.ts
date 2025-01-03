@@ -1,20 +1,23 @@
 /* tslint:disable */
+import type * as KoaRouter from "@koa/router"
 /* eslint-disable */
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import type { TsoaRoute } from '@tsoa/runtime';
-import { fetchMiddlewares, KoaTemplateService } from '@tsoa/runtime';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { PingController } from './../controllers/ping.controller';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { CategoryController } from './../controllers/category.controller';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { EventPlaces } from './../controllers/event-places.controller';
-// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-import { UserController } from './../controllers/user.controller';
-import { koaAuthentication } from './../sessions/main';
+import type { TsoaRoute } from "@tsoa/runtime"
+import { fetchMiddlewares, KoaTemplateService } from "@tsoa/runtime"
 // @ts-ignore - no great way to install types from subpackage
-import type { Context, Next, Middleware, Request as KRequest, Response as KResponse } from 'koa';
-import type * as KoaRouter from '@koa/router';
+import type { Context, Middleware, Next, Request as KRequest, Response as KResponse } from "koa"
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { CategoryController } from "./../controllers/category.controller"
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { EventPlaces } from "./../controllers/event-places.controller"
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { PingController } from "./../controllers/ping.controller"
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { Places } from "./../controllers/places.controller"
+// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+import { UserController } from "./../controllers/user.controller"
+import { koaAuthentication } from "./../sessions/main"
+
 const koaAuthenticationRecasted = koaAuthentication as (req: KRequest, securityName: string, scopes?: string[], res?: KResponse) => Promise<any>;
 
 
@@ -70,6 +73,23 @@ const models: TsoaRoute.Models = {
             "id": {"dataType":"string"},
             "email": {"dataType":"string"},
             "name": {"dataType":"string"},
+        },
+        "additionalProperties": false,
+    },
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    "Place": {
+        "dataType": "refObject",
+        "properties": {
+            "_id": { "dataType": "string" },
+            "name": { "dataType": "string", "required": true },
+            "description": { "dataType": "string", "required": true },
+            "longitude": { "dataType": "double", "required": true },
+            "latitude": { "dataType": "double", "required": true },
+            "categories": {
+                "dataType": "array",
+                "array": { "dataType": "refObject", "ref": "Category" },
+                "required": true,
+            },
         },
         "additionalProperties": false,
     },
@@ -294,6 +314,64 @@ export function RegisterRoutes(router: KoaRouter) {
               validatedArgs,
               successStatus: undefined,
             });
+            });
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    router.get("/places/all",
+        ...( fetchMiddlewares<Middleware>(Places) ),
+        ...( fetchMiddlewares<Middleware>(Places.prototype.getAll) ),
+
+        async function Places_getAll(context: Context, next: Next) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {}
+
+            let validatedArgs: any[] = []
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, context, next })
+            } catch (err) {
+                const error = err as any
+                error.message ||= JSON.stringify({ fields: error.fields })
+                context.status = error.status
+                context.throw(context.status, error.message, error)
+            }
+
+            const controller = new Places()
+
+            return templateService.apiHandler({
+                methodName: "getAll",
+                controller,
+                context,
+                validatedArgs,
+                successStatus: undefined,
+            })
+        })
+    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+    router.get("/places/id/:place_id",
+        ...( fetchMiddlewares<Middleware>(Places) ),
+        ...( fetchMiddlewares<Middleware>(Places.prototype.getById) ),
+
+        async function Places_getById(context: Context, next: Next) {
+            const args: Record<string, TsoaRoute.ParameterSchema> = {
+                place_id: { "in": "path", "name": "place_id", "required": true, "dataType": "double" },
+            }
+
+            let validatedArgs: any[] = []
+            try {
+                validatedArgs = templateService.getValidatedArgs({ args, context, next })
+            } catch (err) {
+                const error = err as any
+                error.message ||= JSON.stringify({ fields: error.fields })
+                context.status = error.status
+                context.throw(context.status, error.message, error)
+            }
+
+            const controller = new Places()
+
+            return templateService.apiHandler({
+                methodName: "getById",
+                controller,
+                context,
+                validatedArgs,
+                successStatus: undefined,
+            })
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 

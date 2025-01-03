@@ -4,8 +4,7 @@ RUN npm i -g tsoa nodemon
 COPY . /backend
 
 WORKDIR /backend
-RUN npm install
-RUN tsoa spec-and-routes
+RUN npm ci
 
 EXPOSE 3000
 CMD ["nodemon", "--exec", "ts-node", "src/server.ts"]

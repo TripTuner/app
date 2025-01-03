@@ -7,9 +7,6 @@ COPY . /frontend
 
 WORKDIR /frontend
 
-RUN npm install
-
-RUN openapi-generator-cli generate
-RUN npx tailwindcss -i ./src/styles.css -o ./src/output.css
+RUN npm ci
 
 EXPOSE 4200
