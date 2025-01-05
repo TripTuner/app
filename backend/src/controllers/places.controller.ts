@@ -1,8 +1,8 @@
-import { Controller } from "@tsoa/runtime"
-import { Get, OperationId, Path, Route, Tags } from "tsoa"
-import { Place } from "../entities/place.entity"
-import * as CategoryService from "../services/category.service"
-import * as PlaceService from "../services/place.service"
+import { Controller } from "@tsoa/runtime";
+import { Get, OperationId, Path, Route, Tags } from "tsoa";
+import { Place } from "../entities/place.entity";
+import * as CategoryService from "../services/category.service";
+import * as PlaceService from "../services/place.service";
 
 @Route("places")
 export class Places extends Controller {
@@ -29,7 +29,6 @@ export class Places extends Controller {
         @Path() category_id: number,
     ): Promise<Array<Place>> {
         const category = await CategoryService.findCategory({ where: { _id: category_id } })
-        //return category.places || []
-        return []
+        return category.places || [];
     }
 }

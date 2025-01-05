@@ -1,42 +1,43 @@
-import { Column, Entity, ObjectIdColumn } from "typeorm"
-import { PlaceDataInterface } from "../interfaces/place-data.interface"
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { PlaceDataInterface } from "../interfaces/place-data.interface";
+import { Category } from "./category.entity";
 
 
 @Entity()
 export class Place {
-    @ObjectIdColumn()
+    @PrimaryGeneratedColumn()
     _id?: string
 
     @Column({ length: 80 })
     name!: string
 
-    @Column()
+    @Column({ nullable: true })
     type!: number
 
-    @Column()
-    email?: string
+    @Column({ nullable: true })
+    email?: string | null;
 
-    @Column()
-    website?: string
+    @Column({ nullable: true })
+    website?: string | null;
 
-    @Column()
-    phone?: string
+    @Column({ nullable: true })
+    phone?: string | null;
 
-    @Column()
-    schedule?: string
+    @Column({ nullable: true })
+    schedule?: string | null;
 
-    @Column()
-    isPaid?: boolean
+    @Column({ nullable: true })
+    isPaid?: boolean | null;
 
-    @Column()
-    price?: string
+    @Column({ nullable: true })
+    price?: string | null;
 
-    @Column()
-    address?: string
+    @Column({ nullable: true })
+    address?: string | null;
 
-    @Column()
-    data?: PlaceDataInterface
+    @Column({ nullable: true })
+    data?: PlaceDataInterface | null;
 
-    //@ManyToMany(() => Category, category => category.places, { nullable: true })
-    //categories?: Array<Category>
+    @ManyToMany(() => Category, category => category.places, { nullable: true })
+    categories?: Category[] | null;
 }

@@ -1,17 +1,17 @@
-import axios from "axios"
-import { config } from "../config"
-import { Category } from "../entities/category.entity"
-import { EventPlace } from "../entities/event-place.entity"
-import * as errors from "../utils/errors"
-import * as utils from "../utils/utils"
-import * as CategoryService from "./category.service"
-import * as EventPlaceService from "./event-place.service"
+import axios from "axios";
+import { config } from "../config";
+import { Category } from "../entities/category.entity";
+import { EventPlace } from "../entities/event-place.entity";
+import * as errors from "../utils/errors";
+import * as utils from "../utils/utils";
+import * as CategoryService from "./category.service";
+import * as EventPlaceService from "./event-place.service";
 
 /**
  * Initializes all default categories into database
  */
 export const initCategories = async function () {
-    await CategoryService.clearCategoryRepository()
+    await CategoryService.clearCategoryRepository();
 
     const categories: Array<Category> = [
         /* Спорт */
@@ -476,17 +476,21 @@ export const initCategories = async function () {
                 "</defs>\n" +
                 "</svg>\n",
         },
-    ]
+    ];
 
     for (let i = 0; i < categories.length; i++) {
-        await CategoryService.saveNewCategory(categories[i])
+        await CategoryService.saveNewCategory(categories[i]);
     }
-}
+};
 
-/*
-* Creates event from Timepad response and adds it to database*/
+/**
+ * Creates event from Timepad response and adds it to database
+ *
+ * @param { Record<string, any> } headers headers that will be sent to Timepad
+ * @param { Record<string, any> } value value with current event to parse
+ */
 export const addEvent = async function (headers: Record<string, any>, value: Record<string, any>) {
-    const resp = await axios.get(`https://api.timepad.ru/v1/events/${ value.id }`, { headers: headers })
+    const resp = await axios.get(`https://api.timepad.ru/v1/events/${ value.id }`, { headers: headers });
 
     if (resp.data.location.coordinates) {
         const event: EventPlace = {
@@ -496,39 +500,48 @@ export const addEvent = async function (headers: Record<string, any>, value: Rec
             description: resp.data.description_short, /** TODO возможно поменять на description_html */
             finish_time: resp.data.ends_at,
             start_time: resp.data.starts_at,
-        }
+        };
 
-        await EventPlaceService.saveNewEvent(event)
+        await EventPlaceService.saveNewEvent(event);
     }
-}
+};
 
 /**
  * Initializes all today event places to database
  */
 export const initEventPlaces = async function () {
+    await EventPlaceService.clearEventRepository();
+
     const headers = {
         "Authorization": `Bearer ${ config.timepadKey }`,
-    }
+    };
 
-    const limit = 59
-    const maxCount = config.parseEventsCount
+    const limit = 59;
+    const maxCount = config.parseEventsCount;
 
     for (let i = 0; i < Math.ceil(maxCount / limit); i++) {
-        const cities = ["Москва"]
-        const count = maxCount < ( i + 1 ) * limit ? maxCount % limit : limit
-        const starts_at_min = new Date()
-        const starts_at_max = new Date()
-        starts_at_max.setDate(starts_at_max.getDate() + 1)
+        const cities = ["Москва"];
+        const count = maxCount < ( i + 1 ) * limit ? maxCount % limit : limit;
+        const starts_at_min = new Date();
+        const starts_at_max = new Date();
+        starts_at_max.setDate(starts_at_max.getDate() + 1);
 
         try {
-            const resp = await axios.get(`https://api.timepad.ru/v1/events?limit=${ count }&cities=${ cities.join(",") }&starts_at_min=${ starts_at_min.toISOString().split("T")[0] }&starts_at_max=${ starts_at_max.toISOString().split("T")[0] }`, { headers: headers })
-            const data = resp.data
+            const resp = await axios.get(`https://api.timepad.ru/v1/events?limit=${ count }&cities=${ cities.join(",") }&starts_at_min=${ starts_at_min.toISOString().split("T")[0] }&starts_at_max=${ starts_at_max.toISOString().split("T")[0] }`, { headers: headers });
+            const data = resp.data;
             for (const value of data.values)
-                addEvent(headers, value)
+                addEvent(headers, value).then();
         } catch (error) {
-            throw ( new errors.InternalServerError() )
+            throw ( new errors.InternalServerError() );
         }
 
-        await utils.delay(1000 * 60)
+        await utils.delay(1000 * 60);
     }
-}
+};
+
+/**
+ * Initializes all fixed places to database
+ */
+export const initPlaces = async function () {
+
+};
