@@ -1,24 +1,43 @@
-import { Column, Entity, ManyToMany, ObjectIdColumn } from "typeorm"
-import { Category } from "./category.entity"
+import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { PlaceDataInterface } from "../interfaces/place-data.interface";
+import { Category } from "./category.entity";
 
 
 @Entity()
 export class Place {
-    @ObjectIdColumn()
+    @PrimaryGeneratedColumn()
     _id?: string
 
     @Column({ length: 80 })
     name!: string
 
-    @Column()
-    description!: string
+    @Column({ nullable: true })
+    type!: number
 
-    @Column()
-    longitude!: number
+    @Column({ nullable: true })
+    email?: string | null;
 
-    @Column()
-    latitude!: number
+    @Column({ nullable: true })
+    website?: string | null;
 
-    @ManyToMany(() => Category, category => category.places)
-    categories!: Promise<Array<Category>>
+    @Column({ nullable: true })
+    phone?: string | null;
+
+    @Column({ nullable: true })
+    schedule?: string | null;
+
+    @Column({ nullable: true })
+    isPaid?: boolean | null;
+
+    @Column({ nullable: true })
+    price?: string | null;
+
+    @Column({ nullable: true })
+    address?: string | null;
+
+    @Column({ nullable: true })
+    data?: PlaceDataInterface | null;
+
+    @ManyToMany(() => Category, category => category.places, { nullable: true })
+    categories?: Category[] | null;
 }
