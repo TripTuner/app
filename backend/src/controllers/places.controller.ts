@@ -26,9 +26,12 @@ export class Places extends Controller {
     @Tags("BackendApi")
     @OperationId("placesGetByCategoryId")
     public async getByCategory(
-        @Path() category_id: number,
+        @Path() category_id: string,
     ): Promise<Array<Place>> {
         const category = await CategoryService.findCategory({ where: { _id: category_id } })
-        return category.places || [];
+        const places: Place[] = [];
+        for (const placeId of category.places)
+            places.push(await PlaceService.findPlace({ where: { _id: placeId } }));
+        return places;
     }
 }

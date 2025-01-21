@@ -1,6 +1,5 @@
-import { Column, Entity, ManyToMany, ObjectIdColumn } from "typeorm";
+import { Column, Entity, ObjectIdColumn } from "typeorm";
 import { PlaceDataInterface } from "../interfaces/place-data.interface";
-import { Category } from "./category.entity";
 
 
 @Entity()
@@ -44,9 +43,6 @@ export class Place {
     @Column({ nullable: true })
     data?: PlaceDataInterface | null;
 
-    @ManyToMany(
-        () => Category,
-        category => category.places,
-    )
-    categories?: Category[];
+    @Column()
+    categories?: string[];
 }

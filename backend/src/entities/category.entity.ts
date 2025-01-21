@@ -1,5 +1,4 @@
-import { Column, Entity, Index, ManyToMany, ObjectIdColumn } from "typeorm";
-import { Place } from "./place.entity";
+import { Column, Entity, Index, ObjectIdColumn } from "typeorm";
 
 
 @Entity()
@@ -14,8 +13,6 @@ export class Category {
     @Column()
     svg!: string
 
-    @ManyToMany(
-        () => Place,
-    )
-    places!: Place[];
+    @Column()
+    places!: string[];
 }

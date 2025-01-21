@@ -1,6 +1,7 @@
 import { getManager, Repository } from "typeorm";
 import { Category } from "../entities/category.entity";
 import { Place } from "../entities/place.entity";
+import * as CategoryService from "../services/category.service";
 import * as errors from "../utils/errors";
 
 
@@ -74,10 +75,15 @@ export const addCategories = async (place: Place, categoryIds: string[]): Promis
 
     try {
         const categories = await categoriesRepository.findByIds(categoryIds);
-        place.categories = [...categories];
+        if (place.categories === null)
+            place.categories = [];
+        for (const category of categories) {
+            category.places.push(place._id!);
+            await categoriesRepository.save(category);
+            place.categories?.push(category._id!);
+        }
         return await repository.save(place);
     } catch (error) {
-        console.log(error);
         throw ( new errors.InternalServerError() );
     }
 }
@@ -85,10 +91,11 @@ export const addCategories = async (place: Place, categoryIds: string[]): Promis
 /**
  * Clears event database repository
  */
-export const clearEventRepository = async function () {
+export const clearPlacesRepository = async function () {
     const repository: Repository<Place> = getManager().getRepository(Place);
 
     try {
+        await CategoryService.clearPlacesFromCategories();
         await repository.clear();
     } catch (error) {
         throw ( new errors.InternalServerError() );

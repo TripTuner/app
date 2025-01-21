@@ -877,8 +877,9 @@ const convertRecordToPlace = function (json: Record<string, any>): Place {
         schedule: json.schedule,
         isPaid: json.isPaid,
         data: json.data,
-        categories: json.categories,
+        categories: [],
     };
+    json.categories.forEach((category: Category) => place.categories?.push(category._id!));
     return place;
 };
 
@@ -906,16 +907,14 @@ const getPlaceFromAPI = async function (datum: PlaceDataParserInterface): Promis
         for (const place of places) {
             // making Place categories [] to save them later
             let categoryIds: string[] = [];
-            place.categories!.forEach((category) => {
-                categoryIds.push(category._id?.toString()!);
-            });
+            place.categories!.forEach((category) => categoryIds.push(category));
             place.categories = [];
 
             // saving Place to database
             const dbplace = await PlaceService.saveNewEvent(place);
 
-            // TODO adding categories to saved Place
-            //await PlaceService.addCategories(dbplace, categoryIds);
+            // adding categories to saved Place
+            await PlaceService.addCategories(dbplace, categoryIds);
         }
     }
 };
@@ -926,7 +925,7 @@ const getPlaceFromAPI = async function (datum: PlaceDataParserInterface): Promis
 export const initPlaces = async function () {
     console.log("\x1b[36m[parseService] starting initPlaces\x1b[0m");
 
-    await PlaceService.clearEventRepository();
+    await PlaceService.clearPlacesRepository();
 
     try {
         // getting setup information for Places
