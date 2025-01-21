@@ -1,11 +1,12 @@
-import { Column, Entity, ManyToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, Entity, Index, ManyToMany, ObjectIdColumn } from "typeorm";
 import { Place } from "./place.entity";
 
 
 @Entity()
+@Index(["name", "svg"], { unique: true })
 export class Category {
-    @PrimaryGeneratedColumn()
-    _id?: number
+    @ObjectIdColumn()
+    _id?: string;
 
     @Column({ length: 80 })
     name!: string
@@ -13,6 +14,8 @@ export class Category {
     @Column()
     svg!: string
 
-    @ManyToMany(() => Place, place => place.categories, { nullable: true })
-    places?: Place[] | null;
+    @ManyToMany(
+        () => Place,
+    )
+    places!: Place[];
 }

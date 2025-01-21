@@ -1,6 +1,6 @@
 import { getManager, Repository } from "typeorm";
 import { Category } from "../entities/category.entity";
-import * as errors from '../utils/errors'
+import * as errors from "../utils/errors";
 
 
 /**
@@ -51,10 +51,11 @@ export const findCategory = async function (qryObj: Record<string, any>): Promis
  */
 export const saveNewCategory = async function (category: Category): Promise<Category> {
     const repository: Repository<Category> = getManager().getRepository(Category);
-    
+
     try {
         return await repository.save(category);
     } catch (error) {
+        console.log(error);
         throw (new errors.InternalServerError());
     }
 }

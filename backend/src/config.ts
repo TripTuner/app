@@ -1,5 +1,5 @@
-import dotenv from 'dotenv'
-import { Config } from './interfaces/config.interfaces'
+import dotenv from "dotenv";
+import { Config } from "./interfaces/config.interfaces";
 
 dotenv.config({ path: '.env' })
 
@@ -26,8 +26,8 @@ const config: Config = {
     redis: redis,
     databaseUrl: databaseUrl,
     dbEntitiesPath: ['src/entities/**/*.entity.ts'],
-    parsePlaceEntities: false,
-    mosDataKey: String(process.env.MOS_DATA_KEY),
+    parsePlaceEntities: true,
+    mosDataKey: "14c319dc-18f8-4b43-8ced-3d8284e7b255",
     timepadKey: String(process.env.TIMEPAD),
     parseEventsCount: 59
 }

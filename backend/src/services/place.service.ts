@@ -1,6 +1,7 @@
-import { getManager, Repository } from "typeorm"
-import { Place } from "../entities/place.entity"
-import * as errors from "../utils/errors"
+import { getManager, Repository } from "typeorm";
+import { Category } from "../entities/category.entity";
+import { Place } from "../entities/place.entity";
+import * as errors from "../utils/errors";
 
 
 /**
@@ -10,18 +11,18 @@ import * as errors from "../utils/errors"
  * @returns {Promise<Array<Place>>} a promise with the fetched events
  */
 export const findAll = async function (qryObj: Record<string, any> = {}): Promise<Array<Place>> {
-    const repository: Repository<Place> = getManager().getRepository(Place)
+    const repository: Repository<Place> = getManager().getRepository(Place);
 
-    let events = []
+    let events = [];
 
     try {
-        events = await repository.find(qryObj)
+        events = await repository.find(qryObj);
     } catch (error) {
-        throw ( new errors.InternalServerError() )
+        throw ( new errors.InternalServerError() );
     }
 
-    return events
-}
+    return events;
+};
 
 /**
  * Fetches events from database
@@ -30,18 +31,18 @@ export const findAll = async function (qryObj: Record<string, any> = {}): Promis
  * @returns {Promise<Place>} found event, otherwise throws error
  */
 export const findPlace = async function (qryObj: Record<string, any>): Promise<Place> {
-    const repository: Repository<Place> = getManager().getRepository(Place)
+    const repository: Repository<Place> = getManager().getRepository(Place);
 
     try {
-        const found = await repository.findOne(qryObj)
+        const found = await repository.findOne(qryObj);
         if (found !== null)
-            return found
+            return found;
     } catch (error) {
-        throw ( new errors.InternalServerError() )
+        throw ( new errors.InternalServerError() );
     }
 
-    throw ( new errors.NotFound("event place") )
-}
+    throw ( new errors.NotFound("static place") );
+};
 
 /**
  * Adding new event to database
@@ -50,12 +51,34 @@ export const findPlace = async function (qryObj: Record<string, any>): Promise<P
  * @returns {Promise<Place>} saved event if everything ok, otherwise throws error
  */
 export const saveNewEvent = async function (place: Place): Promise<Place> {
-    const repository: Repository<Place> = getManager().getRepository(Place)
+    const repository: Repository<Place> = getManager().getRepository(Place);
 
     try {
-        return await repository.save(place)
+        return await repository.save(place);
     } catch (error) {
-        throw ( new errors.InternalServerError() )
+        console.log(error); // TODO delete
+        throw ( new errors.InternalServerError() );
+    }
+};
+
+/**
+ * Adding categories to place by ids
+ *
+ * @param {Place} place place to add categories to
+ * @param {string[]} categoryIds ids of categories
+ * @retuns {Placce} place with new categories
+ */
+export const addCategories = async (place: Place, categoryIds: string[]): Promise<Place> => {
+    const repository: Repository<Place> = getManager().getRepository(Place);
+    const categoriesRepository: Repository<Category> = getManager().getRepository(Category);
+
+    try {
+        const categories = await categoriesRepository.findByIds(categoryIds);
+        place.categories = [...categories];
+        return await repository.save(place);
+    } catch (error) {
+        console.log(error);
+        throw ( new errors.InternalServerError() );
     }
 }
 
@@ -63,11 +86,11 @@ export const saveNewEvent = async function (place: Place): Promise<Place> {
  * Clears event database repository
  */
 export const clearEventRepository = async function () {
-    const repository: Repository<Place> = getManager().getRepository(Place)
+    const repository: Repository<Place> = getManager().getRepository(Place);
 
     try {
-        await repository.clear()
+        await repository.clear();
     } catch (error) {
-        throw ( new errors.InternalServerError() )
+        throw ( new errors.InternalServerError() );
     }
-}
+};
