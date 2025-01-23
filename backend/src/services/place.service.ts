@@ -57,7 +57,6 @@ export const saveNewEvent = async function (place: Place): Promise<Place> {
     try {
         return await repository.save(place);
     } catch (error) {
-        console.log(error); // TODO delete
         throw ( new errors.InternalServerError() );
     }
 };

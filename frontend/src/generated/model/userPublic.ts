@@ -12,8 +12,8 @@
 
 
 export interface UserPublic {
-  id?: string;
-  email?: string;
-  name?: string;
+	id?: string;
+	email?: string;
+	name?: string;
 }
 

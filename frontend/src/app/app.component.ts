@@ -1,6 +1,6 @@
-import { Component } from '@angular/core';
-import { BottomBarComponent } from "./core/components/bottom-bar.component";
+import { Component } from "@angular/core";
 import { RouterOutlet } from "@angular/router";
+import { BottomBarComponent } from "./core/components/bottom-bar/bottom-bar.component";
 
 @Component({
     selector: 'app-root',

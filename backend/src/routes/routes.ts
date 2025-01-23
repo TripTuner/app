@@ -24,32 +24,49 @@ const koaAuthenticationRecasted = koaAuthentication as (req: KRequest, securityN
 // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
 
 const models: TsoaRoute.Models = {
+	"Category": {
+		"dataType": "refObject",
+		"properties": {
+			"_id": { "dataType": "string" },
+			"name": { "dataType": "string", "required": true },
+			"svg": { "dataType": "string", "required": true },
+			"places": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
+		},
+		"additionalProperties": false,
+	},
+	// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+	"EventPlace": {
+		"dataType": "refObject",
+		"properties": {
+			"_id": { "dataType": "string" },
+			"name": { "dataType": "string", "required": true },
+			"description": { "dataType": "string", "required": true },
+			"longitude": { "dataType": "double", "required": true },
+			"latitude": { "dataType": "double", "required": true },
+			"start_time": { "dataType": "string", "required": true },
+			"finish_time": { "dataType": "string", "required": true },
+		},
+		"additionalProperties": false,
+	},
+	// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "PlaceDataInterface": {
         "dataType": "refObject",
         "properties": {
-            "hasFoodPoint": { "dataType": "boolean" },
-            "hasChangeRoom": { "dataType": "boolean" },
-            "hasToilet": { "dataType": "boolean" },
-            "hasWIFI": { "dataType": "boolean" },
-            "hasWater": { "dataType": "boolean" },
-            "hasChild": { "dataType": "boolean" },
-            "hasSport": { "dataType": "boolean" },
-            "info": { "dataType": "string" },
-            "priceInfo": { "dataType": "string" },
-            "conditions": { "dataType": "string" },
-            "time": { "dataType": "string" },
-            "subway": { "dataType": "string" },
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Category": {
-        "dataType": "refObject",
-        "properties": {
-            "_id": {"dataType":"double"},
-            "name": {"dataType":"string","required":true},
-            "svg": {"dataType":"string","required":true},
-            "places": { "dataType": "array", "array": { "dataType": "refObject", "ref": "Place" } },
+			"hasFoodPoint": { "dataType": "boolean" },
+			"hasChangeRoom": { "dataType": "boolean" },
+			"hasToilet": { "dataType": "boolean" },
+			"hasWIFI": { "dataType": "boolean" },
+			"hasWater": { "dataType": "boolean" },
+			"hasChild": { "dataType": "boolean" },
+			"hasSport": { "dataType": "boolean" },
+			"info": { "dataType": "string" },
+			"priceInfo": { "dataType": "string" },
+			"conditions": { "dataType": "string" },
+			"time": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "array", "array": { "dataType": "any" } }, { "dataType": "string" }],
+			},
+			"subway": { "dataType": "string" },
         },
         "additionalProperties": false,
     },
@@ -57,32 +74,44 @@ const models: TsoaRoute.Models = {
     "Place": {
         "dataType": "refObject",
         "properties": {
-            "_id": { "dataType": "string" },
-            "name": { "dataType": "string", "required": true },
-            "type": { "dataType": "double", "required": true },
-            "email": { "dataType": "string" },
-            "website": { "dataType": "string" },
-            "phone": { "dataType": "string" },
-            "schedule": { "dataType": "string" },
-            "isPaid": { "dataType": "boolean" },
-            "price": { "dataType": "string" },
-            "address": { "dataType": "string" },
-            "data": { "ref": "PlaceDataInterface" },
-            "categories": { "dataType": "array", "array": { "dataType": "refObject", "ref": "Category" } },
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "EventPlace": {
-        "dataType": "refObject",
-        "properties": {
-            "_id": {"dataType":"string"},
-            "name": {"dataType":"string","required":true},
-            "description": {"dataType":"string","required":true},
+			"_id": { "dataType": "string" },
+			"name": { "dataType": "string" },
+			"type": { "dataType": "double", "required": true },
             "longitude": {"dataType":"double","required":true},
             "latitude": {"dataType":"double","required":true},
-            "start_time": {"dataType":"string","required":true},
-            "finish_time": {"dataType":"string","required":true},
+			"email": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "string" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"website": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "string" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"phone": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "string" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"schedule": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "any" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"isPaid": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "boolean" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"price": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "string" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"address": {
+				"dataType": "union",
+				"subSchemas": [{ "dataType": "string" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"data": {
+				"dataType": "union",
+				"subSchemas": [{ "ref": "PlaceDataInterface" }, { "dataType": "enum", "enums": [null] }],
+			},
+			"categories": { "dataType": "array", "array": { "dataType": "string" } },
         },
         "additionalProperties": false,
     },
@@ -130,97 +159,131 @@ export function RegisterRoutes(router: KoaRouter) {
     // ###########################################################################################################
 
 
-    const argsCategoryController_getAll: Record<string, TsoaRoute.ParameterSchema> = {};
-    router.get("/categories/all",
-        ...( fetchMiddlewares<Middleware>(CategoryController) ),
-        ...( fetchMiddlewares<Middleware>(CategoryController.prototype.getAll) ),
+	const argsCategoryController_getAll: Record<string, TsoaRoute.ParameterSchema> = {};
+	router.get("/categories/all",
+		...( fetchMiddlewares<Middleware>(CategoryController) ),
+		...( fetchMiddlewares<Middleware>(CategoryController.prototype.getAll) ),
 
-        async function CategoryController_getAll(context: Context, next: Next) {
-
-            let validatedArgs: any[] = [];
-            try {
-                validatedArgs = templateService.getValidatedArgs({
-                    args: argsCategoryController_getAll,
-                    context,
-                    next,
-                });
-            } catch (err) {
-                const error = err as any;
-                error.message ||= JSON.stringify({ fields: error.fields });
-                context.status = error.status;
-                context.throw(context.status, error.message, error);
-            }
-
-            const controller = new CategoryController();
-
-            return templateService.apiHandler({
-                methodName: "getAll",
-                controller,
-                context,
-                validatedArgs,
-                successStatus: undefined,
-            });
-        });
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsEventPlaces_getAll: Record<string, TsoaRoute.ParameterSchema> = {};
-    router.get("/event-places/all",
-        ...( fetchMiddlewares<Middleware>(EventPlaces) ),
-        ...( fetchMiddlewares<Middleware>(EventPlaces.prototype.getAll) ),
-
-        async function EventPlaces_getAll(context: Context, next: Next) {
+		async function CategoryController_getAll(context: Context, next: Next) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsEventPlaces_getAll, context, next });
+				validatedArgs = templateService.getValidatedArgs({
+					args: argsCategoryController_getAll,
+					context,
+					next,
+				});
+			} catch (err) {
+				const error = err as any;
+				error.message ||= JSON.stringify({ fields: error.fields });
+				context.status = error.status;
+				context.throw(context.status, error.message, error);
+			}
+
+			const controller = new CategoryController();
+
+			return templateService.apiHandler({
+				methodName: "getAll",
+				controller,
+				context,
+				validatedArgs,
+				successStatus: undefined,
+			});
+		});
+	// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+	const argsCategoryController_getByPlaceId: Record<string, TsoaRoute.ParameterSchema> = {
+		place_id: { "in": "path", "name": "place_id", "required": true, "dataType": "string" },
+	};
+	router.get("/categories/id/place/:place_id",
+		...( fetchMiddlewares<Middleware>(CategoryController) ),
+		...( fetchMiddlewares<Middleware>(CategoryController.prototype.getByPlaceId) ),
+
+		async function CategoryController_getByPlaceId(context: Context, next: Next) {
+
+			let validatedArgs: any[] = [];
+			try {
+				validatedArgs = templateService.getValidatedArgs({
+					args: argsCategoryController_getByPlaceId,
+					context,
+					next,
+				});
+			} catch (err) {
+				const error = err as any;
+				error.message ||= JSON.stringify({ fields: error.fields });
+				context.status = error.status;
+				context.throw(context.status, error.message, error);
+			}
+
+			const controller = new CategoryController();
+
+			return templateService.apiHandler({
+				methodName: "getByPlaceId",
+				controller,
+				context,
+				validatedArgs,
+				successStatus: undefined,
+			});
+		});
+	// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+	const argsEventPlaces_getAll: Record<string, TsoaRoute.ParameterSchema> = {};
+	router.get("/event-places/all",
+		...( fetchMiddlewares<Middleware>(EventPlaces) ),
+		...( fetchMiddlewares<Middleware>(EventPlaces.prototype.getAll) ),
+
+		async function EventPlaces_getAll(context: Context, next: Next) {
+
+            let validatedArgs: any[] = [];
+            try {
+				validatedArgs = templateService.getValidatedArgs({ args: argsEventPlaces_getAll, context, next });
             } catch (err) {
-                const error = err as any;
-                error.message ||= JSON.stringify({ fields: error.fields });
-                context.status = error.status;
-                context.throw(context.status, error.message, error);
+				const error = err as any;
+				error.message ||= JSON.stringify({ fields: error.fields });
+				context.status = error.status;
+				context.throw(context.status, error.message, error);
             }
 
             const controller = new EventPlaces();
 
             return templateService.apiHandler({
-                methodName: "getAll",
-                controller,
-                context,
-                validatedArgs,
-                successStatus: undefined,
+				methodName: "getAll",
+				controller,
+				context,
+				validatedArgs,
+				successStatus: undefined,
             });
         });
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsEventPlaces_getById: Record<string, TsoaRoute.ParameterSchema> = {
-        event_id: { "in": "path", "name": "event_id", "required": true, "dataType": "double" },
-    };
-    router.get("/event-places/id/:event_id",
-        ...( fetchMiddlewares<Middleware>(EventPlaces) ),
-        ...( fetchMiddlewares<Middleware>(EventPlaces.prototype.getById) ),
+	// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+	const argsEventPlaces_getById: Record<string, TsoaRoute.ParameterSchema> = {
+		event_id: { "in": "path", "name": "event_id", "required": true, "dataType": "double" },
+	};
+	router.get("/event-places/id/:event_id",
+		...( fetchMiddlewares<Middleware>(EventPlaces) ),
+		...( fetchMiddlewares<Middleware>(EventPlaces.prototype.getById) ),
 
-        async function EventPlaces_getById(context: Context, next: Next) {
+		async function EventPlaces_getById(context: Context, next: Next) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsEventPlaces_getById, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsEventPlaces_getById, context, next });
             } catch (err) {
-                const error = err as any;
-                error.message ||= JSON.stringify({ fields: error.fields });
-                context.status = error.status;
-                context.throw(context.status, error.message, error);
+				const error = err as any;
+				error.message ||= JSON.stringify({ fields: error.fields });
+				context.status = error.status;
+				context.throw(context.status, error.message, error);
             }
 
             const controller = new EventPlaces();
 
             return templateService.apiHandler({
-                methodName: "getById",
-                controller,
-                context,
-                validatedArgs,
-                successStatus: undefined,
+				methodName: "getById",
+				controller,
+				context,
+				validatedArgs,
+				successStatus: undefined,
             });
         });
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsPingController_ping: Record<string, TsoaRoute.ParameterSchema> = {};
+	// WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
+	const argsPingController_ping: Record<string, TsoaRoute.ParameterSchema> = {};
         router.get('/ping/ping',
             ...(fetchMiddlewares<Middleware>(PingController)),
             ...(fetchMiddlewares<Middleware>(PingController.prototype.ping)),
@@ -229,7 +292,7 @@ export function RegisterRoutes(router: KoaRouter) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsPingController_ping, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsPingController_ping, context, next });
             } catch (err) {
               const error = err as any;
               error.message ||= JSON.stringify({ fields: error.fields });
@@ -248,16 +311,16 @@ export function RegisterRoutes(router: KoaRouter) {
             });
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsPlaces_getAll: Record<string, TsoaRoute.ParameterSchema> = {};
-    router.get("/places/all",
-        ...( fetchMiddlewares<Middleware>(Places) ),
-        ...( fetchMiddlewares<Middleware>(Places.prototype.getAll) ),
+	const argsPlaces_getAll: Record<string, TsoaRoute.ParameterSchema> = {};
+	router.get("/places/all",
+		...( fetchMiddlewares<Middleware>(Places) ),
+		...( fetchMiddlewares<Middleware>(Places.prototype.getAll) ),
 
-        async function Places_getAll(context: Context, next: Next) {
+		async function Places_getAll(context: Context, next: Next) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsPlaces_getAll, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsPlaces_getAll, context, next });
             } catch (err) {
               const error = err as any;
               error.message ||= JSON.stringify({ fields: error.fields });
@@ -276,18 +339,18 @@ export function RegisterRoutes(router: KoaRouter) {
             });
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsPlaces_getById: Record<string, TsoaRoute.ParameterSchema> = {
-        place_id: { "in": "path", "name": "place_id", "required": true, "dataType": "double" },
-    };
-    router.get("/places/id/:place_id",
-        ...( fetchMiddlewares<Middleware>(Places) ),
-        ...( fetchMiddlewares<Middleware>(Places.prototype.getById) ),
+	const argsPlaces_getById: Record<string, TsoaRoute.ParameterSchema> = {
+		place_id: { "in": "path", "name": "place_id", "required": true, "dataType": "double" },
+	};
+	router.get("/places/id/:place_id",
+		...( fetchMiddlewares<Middleware>(Places) ),
+		...( fetchMiddlewares<Middleware>(Places.prototype.getById) ),
 
-        async function Places_getById(context: Context, next: Next) {
+		async function Places_getById(context: Context, next: Next) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsPlaces_getById, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsPlaces_getById, context, next });
             } catch (err) {
               const error = err as any;
               error.message ||= JSON.stringify({ fields: error.fields });
@@ -298,7 +361,7 @@ export function RegisterRoutes(router: KoaRouter) {
             const controller = new Places();
 
             return templateService.apiHandler({
-                methodName: "getById",
+				methodName: "getById",
               controller,
               context,
               validatedArgs,
@@ -306,18 +369,18 @@ export function RegisterRoutes(router: KoaRouter) {
             });
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsPlaces_getByCategory: Record<string, TsoaRoute.ParameterSchema> = {
-        category_id: { "in": "path", "name": "category_id", "required": true, "dataType": "double" },
-    };
-    router.get("/places/id/category/:category_id",
-        ...( fetchMiddlewares<Middleware>(Places) ),
-        ...( fetchMiddlewares<Middleware>(Places.prototype.getByCategory) ),
+	const argsPlaces_getByCategory: Record<string, TsoaRoute.ParameterSchema> = {
+		category_id: { "in": "path", "name": "category_id", "required": true, "dataType": "string" },
+	};
+	router.get("/places/id/category/:category_id",
+		...( fetchMiddlewares<Middleware>(Places) ),
+		...( fetchMiddlewares<Middleware>(Places.prototype.getByCategory) ),
 
-        async function Places_getByCategory(context: Context, next: Next) {
+		async function Places_getByCategory(context: Context, next: Next) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsPlaces_getByCategory, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsPlaces_getByCategory, context, next });
             } catch (err) {
               const error = err as any;
               error.message ||= JSON.stringify({ fields: error.fields });
@@ -328,7 +391,7 @@ export function RegisterRoutes(router: KoaRouter) {
             const controller = new Places();
 
             return templateService.apiHandler({
-                methodName: "getByCategory",
+				methodName: "getByCategory",
               controller,
               context,
               validatedArgs,
@@ -336,9 +399,9 @@ export function RegisterRoutes(router: KoaRouter) {
             });
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsUserController_register: Record<string, TsoaRoute.ParameterSchema> = {
-        dto: { "in": "body", "name": "dto", "required": true, "ref": "UserRegister" },
-    };
+	const argsUserController_register: Record<string, TsoaRoute.ParameterSchema> = {
+		dto: { "in": "body", "name": "dto", "required": true, "ref": "UserRegister" },
+	};
         router.post('/auth/register',
             ...(fetchMiddlewares<Middleware>(UserController)),
             ...(fetchMiddlewares<Middleware>(UserController.prototype.register)),
@@ -347,7 +410,7 @@ export function RegisterRoutes(router: KoaRouter) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_register, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsUserController_register, context, next });
             } catch (err) {
               const error = err as any;
               error.message ||= JSON.stringify({ fields: error.fields });
@@ -366,9 +429,9 @@ export function RegisterRoutes(router: KoaRouter) {
             });
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsUserController_login: Record<string, TsoaRoute.ParameterSchema> = {
-        dto: { "in": "body", "name": "dto", "required": true, "ref": "UserLogin" },
-    };
+	const argsUserController_login: Record<string, TsoaRoute.ParameterSchema> = {
+		dto: { "in": "body", "name": "dto", "required": true, "ref": "UserLogin" },
+	};
         router.post('/auth/login',
             ...(fetchMiddlewares<Middleware>(UserController)),
             ...(fetchMiddlewares<Middleware>(UserController.prototype.login)),
@@ -377,7 +440,7 @@ export function RegisterRoutes(router: KoaRouter) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_login, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsUserController_login, context, next });
             } catch (err) {
               const error = err as any;
               error.message ||= JSON.stringify({ fields: error.fields });
@@ -396,9 +459,9 @@ export function RegisterRoutes(router: KoaRouter) {
             });
         });
         // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    const argsUserController_profile: Record<string, TsoaRoute.ParameterSchema> = {
-        request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
-    };
+	const argsUserController_profile: Record<string, TsoaRoute.ParameterSchema> = {
+		request: { "in": "request", "name": "request", "required": true, "dataType": "object" },
+	};
         router.get('/auth/profile',
             authenticateMiddleware([{"auth":[]}]),
             ...(fetchMiddlewares<Middleware>(UserController)),
@@ -408,7 +471,7 @@ export function RegisterRoutes(router: KoaRouter) {
 
             let validatedArgs: any[] = [];
             try {
-                validatedArgs = templateService.getValidatedArgs({ args: argsUserController_profile, context, next });
+				validatedArgs = templateService.getValidatedArgs({ args: argsUserController_profile, context, next });
             } catch (err) {
               const error = err as any;
               error.message ||= JSON.stringify({ fields: error.fields });
