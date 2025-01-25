@@ -1,11 +1,11 @@
-import { Column, Entity, ObjectIdColumn } from "typeorm";
+import {Column, Entity, ObjectId, ObjectIdColumn} from "typeorm";
 import { PlaceDataInterface } from "../interfaces/place-data.interface";
 
 
 @Entity()
 export class Place {
     @ObjectIdColumn()
-    _id?: string
+    _id?: ObjectId
 
     @Column({ length: 80 })
     name?: string
@@ -44,5 +44,5 @@ export class Place {
     data?: PlaceDataInterface | null;
 
     @Column()
-    categories?: string[];
+    categories?: ObjectId[];
 }

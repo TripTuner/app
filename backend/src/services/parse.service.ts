@@ -13,6 +13,7 @@ import * as utils from "../utils/utils";
 import * as CategoryService from "./category.service";
 import * as EventPlaceService from "./event-place.service";
 import * as PlaceService from "./place.service";
+import {ObjectId} from "typeorm";
 
 /**
  * Initializes all default categories into database
@@ -906,7 +907,7 @@ const getPlaceFromAPI = async function (datum: PlaceDataParserInterface): Promis
         // saving places to database
         for (const place of places) {
             // making Place categories [] to save them later
-            let categoryIds: string[] = [];
+            let categoryIds: ObjectId[] = [];
             place.categories!.forEach((category) => categoryIds.push(category));
             place.categories = [];
 

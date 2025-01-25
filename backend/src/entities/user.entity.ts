@@ -1,5 +1,5 @@
 import _ from 'lodash'
-import { Column, Entity, ObjectIdColumn } from "typeorm";
+import {Column, Entity, ObjectId, ObjectIdColumn} from "typeorm";
 import { UserPublic } from "../interfaces/user.interfaces";
 import { bcryptCompareAsync, bcryptHashAsync } from "../utils/crypto";
 
@@ -7,7 +7,7 @@ import { bcryptCompareAsync, bcryptHashAsync } from "../utils/crypto";
 @Entity()
 export class User {
     @ObjectIdColumn()
-    _id!: string
+    _id!: ObjectId
     
     @Column({ length: 80 })
     name!: string
@@ -33,6 +33,6 @@ export class User {
      * @returns {UserPublic} the user object but stripped of sensitive fields
      */
     public(): UserPublic {
-        return _.omit({ id: this._id, ...this }, ['_id', 'password', 'refreshToken'])
+        return _.omit({ id: this._id.toString(), ...this }, ['_id', 'password', 'refreshToken'])
     }
 }

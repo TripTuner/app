@@ -1,10 +1,10 @@
-import { Column, Entity, ObjectIdColumn } from "typeorm";
+import {Column, Entity, ObjectId, ObjectIdColumn} from "typeorm";
 
 
 @Entity()
 export class EventPlace {
     @ObjectIdColumn()
-    _id?: string
+    _id?: ObjectId
     
     @Column({ length: 80 })
     name!: string

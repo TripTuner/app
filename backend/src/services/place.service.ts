@@ -1,4 +1,4 @@
-import { getManager, Repository } from "typeorm";
+import {getManager, ObjectId, Repository} from "typeorm";
 import { Category } from "../entities/category.entity";
 import { Place } from "../entities/place.entity";
 import * as CategoryService from "../services/category.service";
@@ -68,7 +68,7 @@ export const saveNewEvent = async function (place: Place): Promise<Place> {
  * @param {string[]} categoryIds ids of categories
  * @retuns {Placce} place with new categories
  */
-export const addCategories = async (place: Place, categoryIds: string[]): Promise<Place> => {
+export const addCategories = async (place: Place, categoryIds: ObjectId[]): Promise<Place> => {
     const repository: Repository<Place> = getManager().getRepository(Place);
     const categoriesRepository: Repository<Category> = getManager().getRepository(Category);
 

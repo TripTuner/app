@@ -1,11 +1,11 @@
-import { Column, Entity, Index, ObjectIdColumn } from "typeorm";
+import {Column, Entity, Index, ObjectId, ObjectIdColumn} from "typeorm";
 
 
 @Entity()
 @Index(["name", "svg"], { unique: true })
 export class Category {
     @ObjectIdColumn()
-    _id?: string;
+    _id?: ObjectId;
 
     @Column({ length: 80 })
     name!: string
@@ -14,5 +14,5 @@ export class Category {
     svg!: string
 
     @Column()
-    places!: string[];
+    places!: ObjectId[];
 }

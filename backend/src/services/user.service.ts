@@ -86,7 +86,7 @@ export const createNewUserModel = function (user: UserRegister): User {
 export const createNewServerSideUserContext = function (user: User): ServerSideSessionContext {
     const result = new ServerSideSessionContext();
     
-    result.sessionId = user._id;
+    result.sessionId = user._id.toString();
     result.email = user.email;
     
     return result;
