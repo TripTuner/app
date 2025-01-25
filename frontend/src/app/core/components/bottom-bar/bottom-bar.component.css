@@ -1,0 +1,284 @@
+@property --base-top {
+	syntax:        "<length>";
+	inherits:      true;
+	initial-value: 10px;
+}
+
+@property --base-height {
+	syntax:        "<length>";
+	inherits:      true;
+	initial-value: 62px;
+}
+
+@property --base-left {
+	syntax:        "<length>";
+	inherits:      true;
+	initial-value: 10px;
+}
+
+@property --base-height-max {
+	syntax:        "<length>";
+	inherits:      true;
+	initial-value: 100px;
+}
+
+.container {
+	width:          100vw;
+	display:        flex;
+	flex-direction: column;
+	position:       fixed;
+	z-index:        1000;
+	bottom:         0;
+	left:           0;
+	border-radius:  var(--br-16) var(--br-16) 0 0;
+	background:     var(--background-primary);
+	gap:            5px;
+
+	.input-addon {
+		width:               100%;
+		height:              200px;
+		max-height:          0px;
+		display:             none;
+		position:            absolute;
+		z-index:             1002;
+		top:                 calc(-200px + 16px);
+		transition-duration: .3s;
+		border-radius:       var(--br-16) var(--br-16) 0 0;
+		background:          var(--background-secondary);
+
+		.scroll-container {
+			height:     100%;
+			overflow-y: scroll;
+			padding:    16px 0;
+		}
+
+		.scroll-content {
+			height:         fit-content;
+			display:        flex;
+			flex-direction: column;
+
+			p {
+				width:               100%;
+				padding:             10px;
+				/* display:             -webkit-box; */
+				/* -webkit-box-orient:  vertical; */
+				/* -webkit-line-clamp:  1; */
+				/* overflow:            hidden; */
+				cursor:              pointer;
+				transition-duration: .3s;
+				white-space:         pre-wrap;
+				word-break:          break-word;
+				background:          #ffffff00;
+				word-break-wrap:     break-word;
+
+				&:hover {
+					background: #ffffff30;
+				}
+			}
+		}
+	}
+
+	.map-addon {
+		width:               100%;
+		height:              fit-content;
+		max-height:          0;
+		display:             flex;
+		flex-direction:      column;
+		overflow-y:          hidden;
+		padding:             10px 24px;
+		transition-duration: .3s;
+		border-radius:       var(--br-16);
+		background:          var(--background-secondary);
+		gap:                 5px;
+
+		.fold-mark-container {
+			width:    100%;
+			height:   10px;
+			position: relative;
+
+			.fold-mark {
+				width:           30px;
+				height:          60px;
+				display:         flex;
+				flex-direction:  row;
+				justify-content: center;
+				position:        absolute;
+				z-index:         1;
+				top:             0;
+				left:            50%;
+				transform:       translateX(-50%);
+
+				path {
+					d: path("M0 1.5C0 0.671573 0.671573 0 1.5 0H28.5C29.3284 0 30 0.671573 30 1.5V1.5C30 2.32843 29.3284 3 28.5 3H1.5C0.671573 3 0 2.32843 0 1.5V1.5Z");
+				}
+			}
+		}
+
+		.content {
+			width:          100%;
+			display:        flex;
+			flex-direction: column;
+			gap:            10px;
+
+			.prompt-input-container {
+				width:         100%;
+				height:        fit-content;
+				min-height:    var(--base-height);
+
+				position:      relative;
+				border-radius: var(--br-16);
+				background:    var(--background-primary);
+				--base-top:    20px;
+				--base-height: 22px;
+				--base-left:   15px;
+
+				.prompt-input-scroll {
+					width:      100%;
+					/* height: var(--base-height); */
+					overflow-x: hidden;
+					overflow-y: scroll;
+					box-sizing: content-box;
+					padding:    var(--base-top) 0;
+				}
+
+				.message-placeholder {
+					position:            absolute;
+					top:                 var(--base-top);
+					left:                var(--base-left);
+					transition-duration: .3s;
+					transform:           translateX(0);
+					opacity:             1;
+				}
+
+				.input {
+					width:              100%;
+					max-width:          100%;
+					height:             fit-content;
+					line-height:        1.375;
+					overflow:           hidden;
+					padding:            0 var(--base-left);
+					text-align:         initial;
+					white-space:        pre-wrap;
+					word-break:         break-word;
+					border:             none;
+					outline:            none;
+					unicode-bidi:       plaintext;
+					caret-color:        var(--text-primary);
+					-webkit-appearance: none;
+
+					.place {
+						padding: 0 10px;
+
+
+					}
+				}
+			}
+		}
+	}
+
+	.main {
+		width:           100%;
+		height:          var(--bottom-bar-height);
+		display:         flex;
+		align-items:     flex-start;
+		flex-direction:  row;
+		justify-content: space-between;
+		position:        relative;
+		z-index:         1;
+		overflow-y:      hidden;
+		padding:         20px 24px 0;
+		transition:      max-height .3s;
+		border-radius:   var(--br-16) var(--br-16) 0 0;
+		background:      var(--background-secondary);
+
+		p {
+			font-family: var(--ff-lato), sans-serif;
+			font-size:   10px;
+			line-height: 20px;
+		}
+
+		.child {
+			width:           60px;
+			display:         flex;
+			align-items:     center;
+			flex-direction:  column;
+			justify-content: center;
+			padding:         3px 4px;
+
+			svg {
+				transition: fill 3s;
+				fill:       var(--text-secondary);
+			}
+
+			p {
+				transition: fill 3s;
+				color:      var(--text-secondary);
+			}
+		}
+
+		.active {
+			animation: new-animation .3s forwards linear;
+		}
+
+		.main-child {
+			width:           48px;
+			height:          48px;
+			display:         flex;
+			align-items:     center;
+			justify-content: center;
+			border-radius:   var(--br-100);
+			background:      var(--interaction-primary);
+		}
+
+		.roller {
+			width:               5px;
+			height:              3px;
+			display:             none;
+			position:            absolute;
+			z-index:             -1;
+			top:                 58px;
+			left:                10px;
+			transition-duration: .3s;
+			border-radius:       var(--br-100);
+			background:          var(--neutral-0);
+		}
+	}
+}
+
+.stick-position-marker {
+	width:            50px;
+	height:           50px;
+	display:          flex;
+	align-items:      center;
+	justify-content:  center;
+	position:         absolute;
+	right:            10px;
+	bottom:           238px;
+	transition:       opacity .3s, background-color .3s;
+	transition-delay: 0s;
+	opacity:          0;
+	border:           none;
+	border-radius:    var(--br-16);
+	background:       var(--neutral-1);
+
+	svg {
+		fill: var(--neutral-0);
+	}
+}
+
+@keyframes new-animation {
+	from {
+		transform: translateY(-4px);
+
+		svg { fill: var(--text-secondary); }
+
+		p { color: var(--text-secondary); }
+	}
+	to {
+		transform: translateY(-4px);
+
+		svg { fill: var(--text-primary); }
+
+		p { color: var(--text-primary); }
+	}
+}

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input } from "@angular/core";
 import CategoryModel from "../models/category.model";
 import { MapInteractionsService } from "../services/map-interactions.service";
 
@@ -8,6 +8,7 @@ import { MapInteractionsService } from "../services/map-interactions.service";
     imports: [],
     styles: `
         .container {
+            display:    block;
             width:      100%;
             overflow-x: scroll;
         }
@@ -20,22 +21,23 @@ import { MapInteractionsService } from "../services/map-interactions.service";
         }
 
         .card {
-            width:          max-content;
-            padding:        5px 10px;
-            display:        flex;
-            flex-direction: row;
-            gap:            5px;
-            align-items:    center;
-            border-radius:  var(--br-100);
-            border:         1px solid var(--text-primary);
-            color:          var(--text-primary);
-            filter:         brightness(.7);
+            cursor:              pointer;
+            width:               max-content;
+            padding:             5px 10px;
+            display:             flex;
+            flex-direction:      row;
+            gap:                 5px;
+            align-items:         center;
+            border-radius:       var(--br-100);
+            border:              1px solid var(--text-primary);
+            color:               var(--text-primary);
+            filter:              brightness(.7);
             transition-duration: .3s;
         }
-        
+
         .active {
-            filter: brightness(1);
-            background: var(--blue-60);
+            filter:       brightness(1);
+            background:   var(--blue-60);
             border-color: var(--blue-60);
         }
     `,
@@ -61,11 +63,11 @@ import { MapInteractionsService } from "../services/map-interactions.service";
 export class SlideCategoriesComponent {
     /** @param {boolean} flexWrap is parma that is responsible for content to be flex wrapped <br> - `true` - we wrap the content <br> - `false` - content is inline*/
     @Input({ alias: 'flexWrap' }) flexWrap: boolean = false;
-    
+
     constructor(
         public mapInteractions: MapInteractionsService
     ) {}
-    
+
     /** @function
      * @description function that changes chosenCategory in `map-integration service`*/
     categoryClickHandler(newCategory: CategoryModel) {

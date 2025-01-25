@@ -9,15 +9,23 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { Category } from './category'
+import { PlaceDataInterface } from "./placeDataInterface";
 
 
 export interface Place {
-  _id?: string;
-  name: string;
-  description: string;
-  longitude: number;
-  latitude: number;
-  categories: Array<Category>;
+	_id?: string;
+	name?: string;
+	type: number;
+	longitude: number;
+	latitude: number;
+	email?: string | null;
+	website?: string | null;
+	phone?: string | null;
+	schedule?: any | null;
+	isPaid?: boolean | null;
+	price?: string | null;
+	address?: string | null;
+	data?: PlaceDataInterface | null;
+	categories?: Array<string>;
 }
 

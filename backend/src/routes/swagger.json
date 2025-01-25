@@ -7,53 +7,10 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-			"PlaceDataInterface": {
-				"properties": {
-					"hasFoodPoint": {
-						"type": "boolean"
-					},
-					"hasChangeRoom": {
-						"type": "boolean"
-					},
-					"hasToilet": {
-						"type": "boolean"
-					},
-					"hasWIFI": {
-						"type": "boolean"
-					},
-					"hasWater": {
-						"type": "boolean"
-					},
-					"hasChild": {
-						"type": "boolean"
-					},
-					"hasSport": {
-						"type": "boolean"
-					},
-					"info": {
-						"type": "string"
-					},
-					"priceInfo": {
-						"type": "string"
-					},
-					"conditions": {
-						"type": "string"
-					},
-					"time": {
-						"type": "string"
-					},
-					"subway": {
-						"type": "string"
-					}
-				},
-				"type": "object",
-				"additionalProperties": false
-			},
 			"Category": {
 				"properties": {
 					"_id": {
-						"type": "number",
-						"format": "double"
+						"type": "string"
 					},
 					"name": {
 						"type": "string"
@@ -63,64 +20,15 @@
 					},
 					"places": {
 						"items": {
-							"$ref": "#/components/schemas/Place"
+							"type": "string"
 						},
 						"type": "array"
 					}
 				},
 				"required": [
 					"name",
-					"svg"
-				],
-				"type": "object",
-				"additionalProperties": false
-			},
-			"Place": {
-				"properties": {
-					"_id": {
-						"type": "string"
-					},
-					"name": {
-						"type": "string"
-					},
-					"type": {
-						"type": "number",
-						"format": "double"
-					},
-					"email": {
-						"type": "string"
-					},
-					"website": {
-						"type": "string"
-					},
-					"phone": {
-						"type": "string"
-					},
-					"schedule": {
-						"type": "string"
-					},
-					"isPaid": {
-						"type": "boolean"
-					},
-					"price": {
-						"type": "string"
-					},
-					"address": {
-						"type": "string"
-					},
-					"data": {
-						"$ref": "#/components/schemas/PlaceDataInterface"
-					},
-					"categories": {
-						"items": {
-							"$ref": "#/components/schemas/Category"
-						},
-						"type": "array"
-					}
-				},
-				"required": [
-					"name",
-					"type"
+					"svg",
+					"places"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -158,6 +66,126 @@
 					"latitude",
 					"start_time",
 					"finish_time"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PlaceDataInterface": {
+				"properties": {
+					"hasFoodPoint": {
+						"type": "boolean"
+					},
+					"hasChangeRoom": {
+						"type": "boolean"
+					},
+					"hasToilet": {
+						"type": "boolean"
+					},
+					"hasWIFI": {
+						"type": "boolean"
+					},
+					"hasWater": {
+						"type": "boolean"
+					},
+					"hasChild": {
+						"type": "boolean"
+					},
+					"hasSport": {
+						"type": "boolean"
+					},
+					"info": {
+						"type": "string"
+					},
+					"priceInfo": {
+						"type": "string"
+					},
+					"conditions": {
+						"type": "string"
+					},
+					"time": {
+						"anyOf": [
+							{
+								"items": {},
+								"type": "array"
+							},
+							{
+								"type": "string"
+							}
+						]
+					},
+					"subway": {
+						"type": "string"
+					}
+				},
+				"type": "object",
+				"additionalProperties": false
+			},
+			"Place": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"name": {
+						"type": "string"
+					},
+					"type": {
+						"type": "number",
+						"format": "double"
+					},
+					"longitude": {
+						"type": "number",
+						"format": "double"
+					},
+					"latitude": {
+						"type": "number",
+						"format": "double"
+					},
+					"email": {
+						"type": "string",
+						"nullable": true
+					},
+					"website": {
+						"type": "string",
+						"nullable": true
+					},
+					"phone": {
+						"type": "string",
+						"nullable": true
+					},
+					"schedule": {
+						"nullable": true
+					},
+					"isPaid": {
+						"type": "boolean",
+						"nullable": true
+					},
+					"price": {
+						"type": "string",
+						"nullable": true
+					},
+					"address": {
+						"type": "string",
+						"nullable": true
+					},
+					"data": {
+						"allOf": [
+							{
+								"$ref": "#/components/schemas/PlaceDataInterface"
+							}
+						],
+						"nullable": true
+					},
+					"categories": {
+						"items": {
+							"type": "string"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"type",
+					"longitude",
+					"latitude"
 				],
 				"type": "object",
 				"additionalProperties": false
@@ -247,6 +275,40 @@
 				],
 				"security": [],
 				"parameters": []
+			}
+		},
+		"/categories/id/place/{place_id}": {
+			"get": {
+				"operationId": "categoriesGetByPlaceId",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Category"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "place_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
 			}
 		},
 		"/event-places/all": {
@@ -413,8 +475,7 @@
 						"name": "category_id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]

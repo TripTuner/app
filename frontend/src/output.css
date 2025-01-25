@@ -511,13 +511,13 @@ template {
   box-sizing:      border-box;
   margin:          0;
   padding:         0;
-  color:           inherit;
   text-decoration: none;
+  color:           inherit;
 }
 
 *::-webkit-scrollbar {
-  display: none;
   width:   0;
+  display: none;
 }
 
 html, body {
@@ -528,52 +528,84 @@ html, body {
 }
 
 body {
-  background:  var(--background-primary);
-  color:       var(--text-primary);
   font-family: var(--ff-roboto), sans-serif;
   overflow-y:  scroll !important;
+  color:       var(--text-primary);
+  background:  var(--background-primary);
 }
 
 input, button, select {
-  outline-offset: 0;
   outline:        0;
+  outline-offset: 0;
 }
 
 img {
-  user-drag:           none;
-  -webkit-user-drag:   none;
-  user-select:         none;
   -moz-user-select:    none;
   -webkit-user-select: none;
-  -ms-user-select:     none;
+  user-select:         none;
+  user-drag:           none;
+  -webkit-user-drag:   none;
 }
 
-.marker-class {
-  width: 25px;
-  height: 25px;
-  display: flex;
-  align-items: center;
-  align-content: center;
+.allow-selection {
+  -webkit-user-select: text;
+  -moz-user-select:         text;
+       user-select:         text;
+}
+
+.user-map-marker {
+  /* Стили для контейнера маркера */
+  width:           50px;
+  /* Ширина маркера */
+  height:          50px;
+  /* Высота маркера */
+  display:         flex;
+  align-items:     center;
   justify-content: center;
-  border-radius: var(--br-100);
-  background-color: var(--red-50);
-  color: var(--red-50);
-  font-size: 15px;
-  font-weight: 600;
-  position: absolute;
-  z-index: 1;
-  &:after {
-    content: '';
-    z-index: -1;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translateY(-50%) translateX(-50%);
-    background-color: var(--neutral-0);
-    width: 15px;
-    height: 15px;
-    border-radius: var(--br-100);
+  font-size:       20px;
+  /* Размер текста */
+  font-weight:     bold;
+  /* Жирный текст */
+  position:        relative;
+  transition:      transform 0.3s;
+  /* Плавный эффект при наведении */
+  color:           white;
+  /* Цвет текста */
+  border-radius:   50%;
+  /* Закругленные углы для создания круга */
+  background:      linear-gradient(135deg, #ff4081, #ff6f20);
+  /* Яркий градиентный фон */
+  box-shadow:      0 8px 15px rgba(0, 0, 0, 0.4);
+  /* Тень для глубины */
+  /* Стиль для внутреннего круга */
+  .inner-circle {
+    width:           30px;
+    /* Внутренний круг */
+    height:          30px;
+    display:         flex;
+    align-items:     center;
+    justify-content: center;
+    font-size:       16px;
+    /* Размер текста внутри */
+    font-weight:     bold;
+    /* Жирный текст */
+    position:        absolute;
+    color:           #ff4081;
+    /* Цвет текста внутри */
+    border-radius:   50%;
+    /* Закругленные углы */
+    background:      white;
+    /* Цвет внутреннего круга */
   }
+}
+
+.selected-prompt-place-map-marker {
+  width:         30px;
+  height:        30px;
+  position:      relative;
+  border:        3px solid white;
+  border-radius: 50%;
+  background:    linear-gradient(45deg, #ff0066, #ffcc00);
 }
 
 *, ::before, ::after{
@@ -1164,6 +1196,10 @@ video {
   }
 }
 
+.collapse{
+  visibility:   collapse;
+}
+
 .static{
   position:   static;
 }
@@ -1218,10 +1254,6 @@ video {
 
 .border{
   border-width:   1px;
-}
-
-.outline{
-  outline-style:   solid;
 }
 
 .filter{

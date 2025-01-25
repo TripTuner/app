@@ -9,6 +9,6 @@ export interface PlaceDataInterface {
     info?: string
     priceInfo?: string
     conditions?: string
-    time?: string
+    time?: Array<any> | string;
     subway?: string
 }

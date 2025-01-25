@@ -1,28 +1,41 @@
-.marker-class {
-    width: 25px;
-    height: 25px;
-    display: flex;
-    align-items: center;
-    align-content: center;
-    justify-content: center;
-    border-radius: var(--br-100);
-    background-color: var(--red-50);
-    color: var(--red-50);
-    font-size: 15px;
-    font-weight: 600;
-    position: absolute;
-    z-index: 1;
+.user-map-marker {
+	/* Стили для контейнера маркера */
+	width:           50px; /* Ширина маркера */
+	height:          50px; /* Высота маркера */
+	display:         flex;
+	align-items:     center;
+	justify-content: center;
+	font-size:       20px; /* Размер текста */
+	font-weight:     bold; /* Жирный текст */
+	position:        relative;
+	transition:      transform 0.3s; /* Плавный эффект при наведении */
+	color:           white; /* Цвет текста */
+	border-radius:   50%; /* Закругленные углы для создания круга */
+	background:      linear-gradient(135deg, #ff4081, #ff6f20); /* Яркий градиентный фон */
+	box-shadow:      0 8px 15px rgba(0, 0, 0, 0.4); /* Тень для глубины */
 
-    &:after {
-        content: '';
-        z-index: -1;
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translateY(-50%) translateX(-50%);
-        background-color: var(--neutral-0);
-        width: 15px;
-        height: 15px;
-        border-radius: var(--br-100);
-    }
+	/* Стиль для внутреннего круга */
+
+	.inner-circle {
+		width:           30px; /* Внутренний круг */
+		height:          30px;
+		display:         flex;
+		align-items:     center;
+		justify-content: center;
+		font-size:       16px; /* Размер текста внутри */
+		font-weight:     bold; /* Жирный текст */
+		position:        absolute;
+		color:           #ff4081; /* Цвет текста внутри */
+		border-radius:   50%; /* Закругленные углы */
+		background:      white; /* Цвет внутреннего круга */
+	}
+}
+
+.selected-prompt-place-map-marker {
+	width:         30px;
+	height:        30px;
+	position:      relative;
+	border:        3px solid white;
+	border-radius: 50%;
+	background:    linear-gradient(45deg, #ff0066, #ffcc00);
 }

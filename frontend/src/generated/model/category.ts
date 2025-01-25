@@ -12,8 +12,9 @@
 
 
 export interface Category {
-  _id?: number;
-  name: string;
-  svg: string;
+	_id?: string;
+	name: string;
+	svg: string;
+	places: Array<string>;
 }
 

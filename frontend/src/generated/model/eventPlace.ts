@@ -12,12 +12,12 @@
 
 
 export interface EventPlace {
-  _id?: string;
-  name: string;
-  description: string;
-  longitude: number;
-  latitude: number;
-  start_time: string;
-  finish_time: string;
+	_id?: string;
+	name: string;
+	description: string;
+	longitude: number;
+	latitude: number;
+	start_time: string;
+	finish_time: string;
 }
 

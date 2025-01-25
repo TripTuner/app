@@ -45,7 +45,8 @@ const server = async function () {
 
     if (config.parsePlaceEntities) {
         await ParseService.initCategories();
-        await ParseService.initEventPlaces();
+        //await ParseService.initEventPlaces();
+        await ParseService.initPlaces();
     }
 
     app.listen(config.port);

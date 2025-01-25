@@ -12,6 +12,8 @@ model/category.ts
 model/eventPlace.ts
 model/models.ts
 model/place.ts
+model/placeDataInterface.ts
+model/placeDataInterfaceTime.ts
 model/userLogin.ts
 model/userPublic.ts
 model/userRegister.ts
