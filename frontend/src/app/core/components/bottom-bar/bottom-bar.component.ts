@@ -17,7 +17,14 @@ import { ApiService } from "../../services/api.service";
 import { MapInteractionsService } from "../../services/map-interactions.service";
 import { SlideCategoriesComponent } from "../slide-categories.component";
 
-function splitTextByLastOccurrence(text: string, char: string) {
+/**
+ * Function that splits string by last index of char in text
+ *
+ * @param {string} text text that should be split
+ * @param {string} char char for splitting
+ * @returns {string[]} string array with two strings
+ */
+function splitTextByLastOccurrence(text: string, char: string): string[] {
 	const lastIndex = text.lastIndexOf(char);
 	if (lastIndex === -1) {
 		return [text, ""]; // Возвращает весь текст и пустую строку, если символ не найден
@@ -27,6 +34,12 @@ function splitTextByLastOccurrence(text: string, char: string) {
 	return [part1, part2];
 }
 
+/**
+ * Function that checks that object is type of Category
+ *
+ * @param {any} obj object that should be checked
+ * @returns {boolean} is objected type of Category
+ */
 function isInstanceOfCategory(obj: any): obj is Category {
 	return (
 		typeof obj === "object" &&
@@ -39,10 +52,15 @@ function isInstanceOfCategory(obj: any): obj is Category {
 	);
 }
 
-function placeCaretAtEnd(el: HTMLDivElement) {
-	el.focus();
+/**
+ * Function that places Caret to the end of the editor
+ *
+ * @param {HTMLDivElement} editor editor in which caret shoudl be placed
+ */
+function placeCaretAtEnd(editor: HTMLDivElement) {
+	editor.focus();
 	const range = document.createRange();
-	range.selectNodeContents(el);
+	range.selectNodeContents(editor);
 	range.collapse(false);
 	const sel = window.getSelection()!;
 	sel.removeAllRanges();
@@ -64,8 +82,10 @@ function placeCaretAtEnd(el: HTMLDivElement) {
 			<div class="input-addon" #inputAddon>
 				<div class="scroll-container">
 					<div class="scroll-content">
-						@for (item of searchArray() | placeSearch:this.searchText; track apiService.places) {
+						@for (item of searchArray() | placeSearch:this.searchText; track mapInteractionService.places) {
 							<p (click)="handlePromptSearchBoxClick(item)">{{ item.name }}</p>
+						} @empty {
+							<p>Ничего не найдено</p>
 						}
 					</div>
 				</div>
@@ -81,7 +101,7 @@ function placeCaretAtEnd(el: HTMLDivElement) {
 				<div class="content">
 					<div class="prompt-input-container">
 						<div class="prompt-input-scroll" #promptInputScroll>
-							<div dir="auto" tabindex="0" class="input allow-selection" (input)="handlePromptInput()" role="textbox" contenteditable="true" #promptInput>
+							<div dir="auto" tabindex="0" class="input allow-selection" (keydown)="handleKeyDownPromptInput($event)" (input)="handlePromptInput($event)" role="textbox" contenteditable="true" #promptInput>
 							</div>
 							<span class="message-placeholder" #promptPlaceholder>Prompt...</span>
 						</div>
@@ -167,22 +187,27 @@ export class BottomBarComponent implements AfterViewInit {
 
 	@ViewChild("container") container!: ElementRef<HTMLDivElement>; // Main container of all elements
 
-	@ViewChild("mainContainer") mainContainer!: ElementRef<HTMLDivElement>; //
-	@ViewChild("mapAddonContainer") mainAddonContainer!: ElementRef<HTMLDivElement>;
-	@ViewChild("foldMark") foldMark!: ElementRef<SVGPathElement>;
+	@ViewChild("mainContainer") mainContainer!: ElementRef<HTMLDivElement>; // container with routing parts
+	@ViewChild("mapAddonContainer") mainAddonContainer!: ElementRef<HTMLDivElement>; // container with prompt input
+	@ViewChild("foldMark") foldMark!: ElementRef<SVGPathElement>; // mark for folding the container when we are on the /home route
 
-	@ViewChild("stickPositionButton") stickPositionButton!: ElementRef<HTMLButtonElement>;
+	@ViewChild("stickPositionButton") stickPositionButton!: ElementRef<HTMLButtonElement>; // button that sticks our position to geolocation
 
-	@ViewChild("inputAddon") inputAddonContainer!: ElementRef<HTMLDivElement>;
-	@ViewChild("promptInput") promptInput!: ElementRef<HTMLInputElement>;
-	@ViewChild("promptPlaceholder") promptPlaceholder!: ElementRef<HTMLSpanElement>;
-	@ViewChild("promptInputScroll") promptInputScroll!: ElementRef<HTMLDivElement>;
+	@ViewChild("inputAddon") inputAddonContainer!: ElementRef<HTMLDivElement>; // container with prompt input
+	@ViewChild("promptInput") promptInput!: ElementRef<HTMLInputElement>; // prompt input element
+	@ViewChild("promptPlaceholder") promptPlaceholder!: ElementRef<HTMLSpanElement>; // prompt input placeholder
+	@ViewChild("promptInputScroll") promptInputScroll!: ElementRef<HTMLDivElement>; // prompt input scroll container
 
+	/** Array with search values */
 	searchArray = signal<Array<any>>([]);
+	/** Search text for searching pipe */
 	searchText: string = "";
-
+	/** Bool param if last typed button to prompt input is valid */
+	validKeyInput: boolean = true;
+	/** Prompt text */
 	promptText: string = "";
 
+	/** Curernt menu size */
 	menuSize: number = 228;
 
 	constructor(
@@ -209,10 +234,7 @@ export class BottomBarComponent implements AfterViewInit {
 		).subscribe(() => this.routeChangeHandler());
 	}
 
-	/**
-	 * @function
-	 * @description Function that listens to route change
-	 */
+	/** Function that listens to route change */
 	routeChangeHandler() {
 		this.mainContainer.nativeElement.style.maxHeight = "100vh";
 
@@ -247,10 +269,7 @@ export class BottomBarComponent implements AfterViewInit {
 		}
 	}
 
-	/**
-	 * @function
-	 * @description Function that tracks `foldMark` dragging
-	 */
+	/** Function that tracks `foldMark` dragging */
 	foldMarkDragHandler(event: TouchEvent) {
 		// setting mainContainerState to 0
 		this.mapInteractionService.mainContainerState.set(0);
@@ -282,74 +301,87 @@ export class BottomBarComponent implements AfterViewInit {
 		addEventListener("touchend", touchEndHandler);
 	}
 
-	/**
-	 * @function
-	 * @description Function that **hides** `mainContainer`
-	 */
+	/** Function that hides `mainContainer` */
 	hideMainContainer() {
 		if (this.mainContainer === undefined) return;
 		this.stickPositionButton.nativeElement.style.transition = "opacity .3s, background-color .3s, bottom .3s";
 		setTimeout(() => {
-			this.stickPositionButton.nativeElement.style.bottom = `calc(${ 0.6 * this.menuSize }px + 10px)`;
 			this.mainContainer.nativeElement.style.maxHeight = "20px";
 			this.foldMark.nativeElement.style.d = "path('M0 6.02566C0 6.99695 0.951572 7.68281 1.87302 7.37566L15 3L28.127 7.37566C29.0484 7.68281 30 6.99695 30 6.02566C30 5.41315 29.6081 4.86935 29.027 4.67566L15 0L0.973024 4.67566C0.391943 4.86935 0 5.41315 0 6.02566Z')";
 		});
-		setTimeout(() => this.stickPositionButton.nativeElement.style.transition = "opacity .3s, background-color .3s", 300);
+		setTimeout(() => {
+			this.stickPositionButton.nativeElement.style.transition = "opacity .3s, background-color .3s";
+			this.updateStickPositionButton();
+		}, 300);
 	}
 
-	/**
-	 * @function
-	 * @description Function that **shows** `mainContainer`
-	 */
+	/** Function that shows `mainContainer` */
 	showMainContainer() {
 		if (this.mainContainer === undefined) return;
 		this.stickPositionButton.nativeElement.style.transition = "opacity .3s, background-color .3s, bottom .3s";
 		setTimeout(() => {
-			this.stickPositionButton.nativeElement.style.bottom = `calc(${ this.menuSize }px + 10px)`;
 			this.foldMark.nativeElement.style.d = "path('M0 1.5C0 0.671573 0.671573 0 1.5 0H28.5C29.3284 0 30 0.671573 30 1.5V1.5C30 2.32843 29.3284 3 28.5 3H1.5C0.671573 3 0 2.32843 0 1.5V1.5Z')";
 			this.mainContainer.nativeElement.style.maxHeight = "100vh";
 		});
-		setTimeout(() => this.stickPositionButton.nativeElement.style.transition = "opacity .3s, background-color .3s", 300);
+		setTimeout(() => {
+			this.stickPositionButton.nativeElement.style.transition = "opacity .3s, background-color .3s";
+			this.updateStickPositionButton();
+		}, 300);
 	}
 
+	/** Function that updates position of the stick position button during to new menuSize */
+	updateStickPositionButton() {
+		this.menuSize = this.container.nativeElement.getBoundingClientRect().height!;
+		this.stickPositionButton.nativeElement.style.bottom = `calc(${ this.menuSize }px + 10px)`;
+	}
+
+	/** Function that shows the search box */
 	showSearchBox() {
 		this.inputAddonContainer.nativeElement.style.display = "flex";
 		setTimeout(() => this.inputAddonContainer.nativeElement.style.maxHeight = "200px");
 	}
 
+	/** Function that hides the search box */
 	hideSearchBox() {
 		this.inputAddonContainer.nativeElement.style.maxHeight = "0px";
 		setTimeout(() => this.inputAddonContainer.nativeElement.style.display = "none", 300);
 	}
 
+	/** Function that shows the prompt placeholder */
 	showPromptPlaceholder() {
 		this.promptPlaceholder.nativeElement.style.opacity = "1";
 		this.promptPlaceholder.nativeElement.style.transform = "translateX(0)";
 	}
 
+	/** Function that hides the prompt placeholder */
 	hidePromptPlaceholder() {
 		this.promptPlaceholder.nativeElement.style.opacity = "0";
 		this.promptPlaceholder.nativeElement.style.transform = "translateX(50px)";
 	}
 
+	/** Handler for prompt search box click event */
 	handlePromptSearchBoxClick(target: Place | Category | EventPlace) {
+		// after the click search box should be hidden
 		this.hideSearchBox();
-		const editor = this.promptInput.nativeElement;
-		const text = editor.innerText;
-		const split_char = ( isInstanceOfCategory(target) ? "@" : "#" );
+
+		const editor = this.promptInput.nativeElement; // editor container
+		const text = editor.innerText; // text from the editor
+		const split_char = ( isInstanceOfCategory(target) ? "@" : "#" ); // char on which text should be split
+		// splitting the text with char and getting text before the typed name
 		let [current_value, search_value] = splitTextByLastOccurrence(text, split_char);
 		current_value += "#" + String(target.name) + "#";
 
-		console.log(current_value);
-
 		let regex;
-		regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'()-:]+)#/g;
+		// searching and highlighting Places with regular expression
+		regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)#/g;
 		current_value = current_value.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
-		regex = /@([A-Za-zа-яА-ЯёЁ0-9\s«»,."'()-:]+)@/g;
+		// searching and highlighting Categories with regular expression
+		regex = /@([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)@/g;
 		current_value = current_value.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">@$1@</span>");
-
+		// setting new value to editor
 		editor.innerHTML = current_value;
 
+		// if we are not choosing Category we should show it on the map
 		if (!isInstanceOfCategory(target)) {
 			const selectedPoint: MapClickEntityModel = {
 				id: "1",
@@ -361,50 +393,81 @@ export class BottomBarComponent implements AfterViewInit {
 					name: target.name,
 				},
 			};
-			console.log(selectedPoint);
 			this.mapInteractionService.selectedPointOnPromptInput.set(selectedPoint);
+			this.mapInteractionService.mapScrolled.set(1);
 		}
 
+		// check if we should add new line on the div and add to scroll-container size
+		const current_input_height: number = this.promptInput.nativeElement.getBoundingClientRect().height!;
+		this.promptInputScroll.nativeElement.style.height = `clamp(var(--base-height), ${ current_input_height }px, var(--base-height-max))`;
+		this.updateStickPositionButton();
+		// placing caret on the end of the editor
 		placeCaretAtEnd(editor);
 	}
 
-	handlePromptInput() {
+	/** Handler for prompt input key button down event */
+	handleKeyDownPromptInput(event: any) {
+		// the only invalid key is Enter
+		this.validKeyInput = event.key !== "Enter";
+	}
+
+	/** Handler for prompt input event */
+	handlePromptInput(event: any) {
+		/** Function that counts the amount of specific chars in the string */
 		function countChars(str: string, char: string) {
 			return str.split(char).length - 1;
 		}
 
-		const editor = this.promptInput.nativeElement;
-		const text = editor.innerText;
+		const editor = this.promptInput.nativeElement; // editor container
+		let text = editor.innerText; // text from editor
 
-		const regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'()-:]+)#/g;
-		const highlightedText = text.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
+		// checking if last typed the valid key to input
+		if (!this.validKeyInput) {
+			event.preventDefault();
+			text = this.promptText;
+			return;
+		}
+
+		this.promptText = text; // updating prompt text to the last state
+
+		let regex, highlightedText = text;
+		// searching and highlighting places in the text
+		regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)#/g;
+		highlightedText = highlightedText.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
+		// searching and hightlighting categories in the text
+		regex = /@([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)@/g;
+		highlightedText = highlightedText.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
+		// placing highlighted text to the editor
 		editor.innerHTML = highlightedText;
-		placeCaretAtEnd(editor);
 
-		if (text === "\n") {
-			this.promptText = "";
+		if (text === "\n" || text === "") { // checking if text is empty
 			this.showPromptPlaceholder();
+			this.hideSearchBox();
+			this.promptText = "";
 			editor.innerHTML = "";
 		} else {
 			this.hidePromptPlaceholder();
 
+			// counting hashes and ats and checking that we are typing name of place or category
 			const count_hash = countChars(text, "#");
 			const count_at = countChars(text, "@");
-			let split_char = "";
+			let split_char = ""; // char with which text will be split
 
 			if (count_hash % 2 == 1) { // now we are searching Places with #
 				split_char = "#";
-				this.searchArray = this.apiService.places;
+				this.searchArray = this.mapInteractionService.places;
 			} else if (count_at % 2 == 1) { // now we are searching Categories with @
 				split_char = "@";
-				this.searchArray = this.apiService.places; // TODO change to categories array
+				this.searchArray = this.mapInteractionService.places; // TODO change to categories array
 			}
 
-			if (split_char !== "") {
+			if (split_char !== "") { // we are typing Category or Place name
 				this.showSearchBox();
+				// getting split values with split_char
 				const [current_value, search_value] = splitTextByLastOccurrence(text, split_char);
+				// updating search text with new typed value
 				this.searchText = search_value;
-			} else {
+			} else { // we are not typing neither Category nor Place name
 				this.hideSearchBox();
 			}
 		}
@@ -414,5 +477,6 @@ export class BottomBarComponent implements AfterViewInit {
 		// check if we should add new line on the div and add to scroll-container size
 		const current_input_height: number = this.promptInput.nativeElement.getBoundingClientRect().height!;
 		this.promptInputScroll.nativeElement.style.height = `clamp(var(--base-height), ${ current_input_height }px, var(--base-height-max))`;
+		this.updateStickPositionButton();
 	}
 }

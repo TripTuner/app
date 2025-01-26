@@ -1,8 +1,10 @@
-import CategoryModel from "./category.model";
+import { Category } from "../../../generated";
 
 export default interface MapPointModel {
     name: string;
-    categories: CategoryModel[];
+	categories: Category[];
     description: string;
+	latitude: number;
+	longitude: number;
     isLiked: boolean;
 }

@@ -1,0 +1,181 @@
+.container {
+	width:          100vw;
+	height:         fit-content;
+	max-height:     0;
+	display:        none;
+	flex-direction: column;
+	position:       fixed;
+	z-index:        1001;
+	bottom:         0;
+	left:           0;
+	overflow-y:     hidden;
+	padding:        10px 24px 30px;
+	transition:     all .3s;
+	border-radius:  var(--br-16);
+	background:     var(--background-secondary);
+	gap:            20px;
+
+	.fold-mark-container {
+		width:    100%;
+		height:   10px;
+		position: relative;
+
+		.fold-mark {
+			width:           30px;
+			height:          60px;
+			display:         flex;
+			flex-direction:  row;
+			justify-content: center;
+			position:        absolute;
+			z-index:         1;
+			top:             0;
+			left:            50%;
+			transform:       translateX(-50%);
+
+			path {
+				d: path("M0 1.5C0 0.671573 0.671573 0 1.5 0H28.5C29.3284 0 30 0.671573 30 1.5V1.5C30 2.32843 29.3284 3 28.5 3H1.5C0.671573 3 0 2.32843 0 1.5V1.5Z");
+			}
+		}
+	}
+
+	.name {
+		font-size:   30px;
+		font-weight: 600;
+		color:       var(--blue-60);
+	}
+
+	.slide-categories {
+		width:      100%;
+		overflow-x: scroll;
+
+		.content {
+			width:          max-content;
+			display:        flex;
+			flex-direction: row;
+			gap:            10px;
+
+			.card {
+				display:        flex;
+				align-items:    center;
+				flex-direction: row;
+				gap:            10px;
+				filter:         brightness(.7);
+			}
+		}
+	}
+
+	.info {
+		width:          100%;
+		height:         fit-content;
+		display:        flex;
+		flex-direction: row;
+		padding:        15px;
+		border-radius:  var(--br-16);
+		background:     var(--neutral-20);
+		gap:            10px;
+
+		.text-container {
+			width:          calc(100% - 110px);
+			display:        flex;
+			flex-direction: column;
+			gap:            5px;
+
+			.title {
+				font-family: var(--ff-inter), sans-serif;
+				font-size:   15px;
+				font-weight: 600;
+				color:       var(--neutral-1);
+			}
+
+			.text {
+				font-family: var(--ff-inter), sans-serif;
+				font-size:   10px;
+				font-weight: 500;
+				color:       var(--background-neutral);
+			}
+		}
+
+		.images-container {
+			width:       100px;
+			height:      100%;
+			position:    relative;
+			caret-color: transparent;
+
+			.image {
+				width:               60px;
+				height:              100px;
+				position:            absolute;
+				z-index:             2;
+				top:                 50%;
+				left:                50%;
+				overflow:            hidden;
+				transition-duration: .3s;
+				transform:           translateX(calc(-50% - 10px)) translateY(0%);
+				border-radius:       var(--br-8);
+
+				svg {
+					position:   absolute;
+					top:        50%;
+					left:       50%;
+					transform:  translateX(-50%) translateY(-50%);
+					box-shadow: 0px 2px 3px #000000;
+				}
+			}
+
+			.back-image {
+				z-index:   1;
+				transform: translateX(calc(-50% + 15px)) translateY(calc(6px)) rotate(30deg);
+
+				img {
+					filter: brightness(.7);
+				}
+			}
+
+			&:hover {
+				.image {
+					transform: translateX(calc(-50% - 15px)) translateY(0%) rotate(-10deg) scale(1.1);
+				}
+
+				.back-image {
+					transform: translateX(calc(-50% + 20px)) translateY(calc(0px)) rotate(40deg) scale(1.1);
+				}
+			}
+		}
+	}
+
+	.buttons {
+		display:        flex;
+		align-items:    center;
+		flex-direction: row;
+		gap:            10px;
+
+		.add-btn {
+			width:          fit-content;
+			height:         40px;
+			display:        flex;
+			align-items:    center;
+			flex-direction: row;
+			padding:        0 30px;
+			color:          var(--neutral-0);
+			border-radius:  var(--br-8);
+			background:     var(--blue-60);
+			stroke:         var(--neutral-0);
+			gap:            5px;
+
+			* { height: fit-content; }
+
+			p { line-height: 100%; }
+		}
+
+		.btn {
+			width:           40px;
+			height:          40px;
+			display:         flex;
+			align-items:     center;
+			justify-content: center;
+			border-radius:   var(--br-8);
+			background:      var(--neutral-0);
+			stroke:          vaR(--blue-60);
+		}
+	}
+}

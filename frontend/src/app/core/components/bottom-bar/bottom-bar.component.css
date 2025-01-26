@@ -253,7 +253,7 @@
 	justify-content:  center;
 	position:         absolute;
 	right:            10px;
-	bottom:           238px;
+	bottom: 236px;
 	transition:       opacity .3s, background-color .3s;
 	transition-delay: 0s;
 	opacity:          0;
