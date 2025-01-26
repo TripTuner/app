@@ -4,8 +4,8 @@ services:
   mongo:
     container_name: mongodb
     restart: unless-stopped
-    expose:
-      - 27017
+    ports:
+      - 27017:27017
     logging:
       options:
         max-size: 1g
@@ -42,38 +42,40 @@ services:
       interval: 30s
       timeout: 10s
       retries: 5
+    ports:
+      - 6379:6379
     restart: unless-stopped
 
-  backend:
-    build: ./backend
-    environment:
-      DATABASE_URL: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/apidb?authSource=admin&directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.2"
-      REDIS_URL: "redis:6379"
-    restart: unless-stopped
-    env_file:
-      - path: .env
-        required: false
-      - path: .prod_env
-        required: false
-    depends_on:
-      - mongo
-      - redis
-    ports:
-      - "3000:3000"
-
-  frontend:
-    build: ./frontend
-    restart: unless-stopped
-    depends_on:
-      - backend
-    command:
-      sh -c '
-        ng serve --host 0.0.0.0
-      '
-    ports:
-      - "4200:4200"
-    volumes:
-      - "./frontend:/frontend"
+#  backend:
+#    build: ./backend
+#    environment:
+#      DATABASE_URL: "mongodb://${MONGO_USER}:${MONGO_PASSWORD}@mongo:27017/apidb?authSource=admin&directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.2"
+#      REDIS_URL: "redis:6379"
+#    restart: unless-stopped
+#    env_file:
+#      - path: .env
+#        required: false
+#      - path: .prod_env
+#        required: false
+#    depends_on:
+#      - mongo
+#      - redis
+#    ports:
+#      - "3000:3000"
+#
+#  frontend:
+#    build: ./frontend
+#    restart: unless-stopped
+#    depends_on:
+#      - backend
+#    command:
+#      sh -c '
+#        ng serve --host 0.0.0.0
+#      '
+#    ports:
+#      - "4200:4200"
+#    volumes:
+#      - "./frontend:/frontend"
 
 volumes:
   mongo-data:

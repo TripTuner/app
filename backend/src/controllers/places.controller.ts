@@ -17,7 +17,7 @@ export class Places extends Controller {
     @Tags("BackendApi")
     @OperationId("placesGetById")
     public async getById(
-        @Path() place_id: number,
+        @Path() place_id: string,
     ): Promise<Place> {
         return await PlaceService.findPlace({ where: { _id: place_id } })
     }

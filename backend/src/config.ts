@@ -32,7 +32,7 @@ const config: Config = {
     parseEventsCount: 59
 }
 
-if (Boolean(process.env.PARSE_ENTITIES)) {
+if (process.env.PARSE_ENTITIES === "true") {
     config.parsePlaceEntities = true;
 }
 
