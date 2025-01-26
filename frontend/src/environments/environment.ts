@@ -3,10 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false,
+	production: false,
 	apiBaseUrl: "http://localhost:3000",
-  CAPACITOR_ANDROID_STUDIO_PATH: "/opt/android-studio-2024.1.2/android-studio/bin/studio.sh",
-  YandexMapKey: "e1af837b-87eb-4521-9ee9-7f99139464ed",
+	CAPACITOR_ANDROID_STUDIO_PATH: "/opt/android-studio-2024.1.2/android-studio/bin/studio.sh",
+	YandexMapKey: "e1af837b-87eb-4521-9ee9-7f99139464ed",
+	RouteKey: "5b3ce3597851110001cf624802956a14161143ef819dd7705d851de0",
 };
 
 /*

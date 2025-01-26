@@ -1,7 +1,7 @@
 .user-map-marker {
 	/* Стили для контейнера маркера */
-	width:           50px; /* Ширина маркера */
-	height:          50px; /* Высота маркера */
+	width:  30px; /* Ширина маркера */
+	height: 30px; /* Высота маркера */
 	display:         flex;
 	align-items:     center;
 	justify-content: center;
@@ -17,8 +17,8 @@
 	/* Стиль для внутреннего круга */
 
 	.inner-circle {
-		width:           30px; /* Внутренний круг */
-		height:          30px;
+		width:  20px; /* Внутренний круг */
+		height: 20px;
 		display:         flex;
 		align-items:     center;
 		justify-content: center;
@@ -34,6 +34,10 @@
 .selected-prompt-place-map-marker {
 	width:         30px;
 	height:        30px;
+	display:         flex;
+	align-items:     center;
+	flex-direction:  row;
+	justify-content: center;
 	position:      relative;
 	border:        3px solid white;
 	border-radius: 50%;

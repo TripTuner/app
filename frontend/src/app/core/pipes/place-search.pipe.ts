@@ -11,18 +11,18 @@ export class PlaceSearchPipe implements PipeTransform {
 			return str.split(/[^a-zA-Zа-яА-ЯёЁ0-9]+/).filter(Boolean); // Filter removes empty strings
 		}
 
-		function checkString(value: string, find: string) {
+		function checkString(value: string, find: string, maxMistake: number = 0) {
 			let differs: number = 0;
 			for (let i = 0; i < Math.min(value.length, find.length); i++)
 				if (value[i] !== find[i])
 					differs++;
 			differs += Math.max(0, find.length - value.length);
 			if (value.length < 3) return differs === 0;
-			if (value.length < 5) return differs <= 1;
-			return differs <= 2;
+			if (value.length < 5) return differs === Math.min(maxMistake, 1);
+			return differs === Math.min(maxMistake, 2);
 		}
 
-		function checkArrays(value: string, search: string) {
+		function checkArrays(value: string, search: string, maxMistake: number = 0) {
 			const value_arr = splitByNonLetters(value);
 			const search_arr = splitByNonLetters(search);
 
@@ -30,7 +30,7 @@ export class PlaceSearchPipe implements PipeTransform {
 			for (const item of value_arr) {
 				if (right === search_arr.length)
 					return true;
-				if (checkString(item, search_arr[right]))
+				if (checkString(item, search_arr[right], maxMistake))
 					right++;
 			}
 
@@ -40,12 +40,14 @@ export class PlaceSearchPipe implements PipeTransform {
 		let result: Place[] = [];
 
 		search = search.toLowerCase();
-		for (const place of places) {
-			if (checkArrays(( place.name || "" ).toLowerCase(), search))
-				result.push(place);
+		for (let mistake = 0; mistake <= 2; mistake++)
+			for (const place of places) {
+				if (checkArrays(( place.name || "" ).toLowerCase(), search, mistake))
+					result.push(place);
 
-			if (result.length >= 10) break;
-		}
+				if (result.length >= 10)
+					return result;
+			}
 
 		return result;
 	}

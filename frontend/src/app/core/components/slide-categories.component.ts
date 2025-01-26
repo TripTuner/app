@@ -1,5 +1,5 @@
 import { Component, Input } from "@angular/core";
-import CategoryModel from "../models/category.model";
+import { Category } from "../../../generated";
 import { MapInteractionsService } from "../services/map-interactions.service";
 
 @Component({
@@ -47,12 +47,12 @@ import { MapInteractionsService } from "../services/map-interactions.service";
                  [style.width]="flexWrap ? '100%' : 'fit-content'"
                  [style.flex-wrap]="flexWrap ? 'wrap':'nowrap'"
             >
-                @for (category of mapInteractions.categories; track null) {
+				@for (category of mapInteractions.categories(); track mapInteractions.categories()) {
                     <div (click)="categoryClickHandler(category)"
                          [class.active]="mapInteractions.checkCategoryChosen(category)"
                          class="card"
                     >
-                        <img [src]="'categories/'+category.src+'.svg'" alt="">
+						<div [innerHTML]="category.svg"></div>
                         <p>{{ category.name }}</p>
                     </div>
                 }
@@ -61,16 +61,20 @@ import { MapInteractionsService } from "../services/map-interactions.service";
     `
 })
 export class SlideCategoriesComponent {
-    /** @param {boolean} flexWrap is parma that is responsible for content to be flex wrapped <br> - `true` - we wrap the content <br> - `false` - content is inline*/
+	/** variable that is responsible for content to be flex wrapped
+	 * `true` - we wrap the content
+	 * `false` - content is inline */
     @Input({ alias: 'flexWrap' }) flexWrap: boolean = false;
 
     constructor(
         public mapInteractions: MapInteractionsService
     ) {}
 
-    /** @function
-     * @description function that changes chosenCategory in `map-integration service`*/
-    categoryClickHandler(newCategory: CategoryModel) {
+	/**
+	 * Function that changes chosenCategory in `map-integration service`
+	 * @param {Category} newCategory category to change state
+	 */
+	categoryClickHandler(newCategory: Category) {
         let currentValue = this.mapInteractions.chosenCategories();
         if (this.mapInteractions.checkCategoryChosen(newCategory))
             currentValue.splice(currentValue.indexOf(newCategory), 1);
