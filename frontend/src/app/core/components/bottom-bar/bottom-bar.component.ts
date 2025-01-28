@@ -227,7 +227,6 @@ export class BottomBarComponent implements AfterViewInit {
 		});
 		// Listener for path information container opening
 		this.mapInteractionService.pathInformationState.subscribe(state => {
-			console.log(this.mapInteractionService.chosenMapPoint.value);
 			if (state === 1) {
 				this.closeMainContainer();
 			} else if (state === -2 && this.mapInteractionService.chosenMapPoint.value === null) {
