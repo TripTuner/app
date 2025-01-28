@@ -2,6 +2,8 @@ export interface MapClickEntityModel {
     geometry: MapClickEntityGeometryModel,
     id: string;
     properties: MapClickEntityPropertiesModel;
+	_props?: any;
+	element?: any;
 }
 
 export interface MapClickEntityGeometryModel {

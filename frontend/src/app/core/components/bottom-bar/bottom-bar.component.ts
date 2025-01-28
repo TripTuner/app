@@ -207,7 +207,7 @@ export class BottomBarComponent implements AfterViewInit {
 	/** Prompt text */
 	promptText: string = "";
 
-	/** Curernt menu size */
+	/** Current menu size */
 	menuSize: number = 228;
 
 	constructor(
@@ -225,6 +225,15 @@ export class BottomBarComponent implements AfterViewInit {
 			if (this.mapInteractionService.mapScrolled() !== 0)
 				this.mapInteractionService.mainContainerState.set(-1 * this.mapInteractionService.mapScrolled());
 		});
+		// Listener for path information container opening
+		this.mapInteractionService.pathInformationState.subscribe(state => {
+			console.log(this.mapInteractionService.chosenMapPoint.value);
+			if (state === 1) {
+				this.closeMainContainer();
+			} else if (state === -2 && this.mapInteractionService.chosenMapPoint.value === null) {
+				this.openMainContainer();
+			}
+		});
 	}
 
 	ngAfterViewInit() {
@@ -232,6 +241,28 @@ export class BottomBarComponent implements AfterViewInit {
 		this.router.events.pipe(
 			filter((event: any) => event instanceof NavigationEnd),
 		).subscribe(() => this.routeChangeHandler());
+	}
+
+	closeMainContainer() {
+		this.container.nativeElement.style.transitionDuration = ".3s";
+		setTimeout(() => {
+			this.container.nativeElement.style.maxHeight = "0";
+		}, 100);
+		setTimeout(() => {
+			this.container.nativeElement.style.display = "none";
+			this.container.nativeElement.style.transitionDuration = "0s";
+		}, 400);
+	}
+
+	openMainContainer() {
+		this.container.nativeElement.style.transitionDuration = ".3s";
+		this.container.nativeElement.style.display = "flex";
+		setTimeout(() => {
+			this.container.nativeElement.style.maxHeight = "100vh";
+		}, 100);
+		setTimeout(() => {
+			this.container.nativeElement.style.transitionDuration = "0s";
+		}, 400);
 	}
 
 	/** Function that listens to route change */

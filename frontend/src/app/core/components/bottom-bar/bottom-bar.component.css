@@ -24,12 +24,14 @@
 
 .container {
 	width:          100vw;
+	max-height: 100vh;
 	display:        flex;
 	flex-direction: column;
 	position:       fixed;
 	z-index:        1000;
 	bottom:         0;
 	left:           0;
+	overflow-y: hidden;
 	border-radius:  var(--br-16) var(--br-16) 0 0;
 	background:     var(--background-primary);
 	gap:            5px;
