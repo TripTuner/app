@@ -4,6 +4,7 @@ import { EventPlace, Place } from "../../../../../generated";
 import {
 	MapPointInformationComponent,
 } from "../../../../core/components/map-point-information/map-point-information.component";
+import { NotificationsComponent } from "../../../../core/components/notifications/notifications.component";
 import { PathInformationComponent } from "../../../../core/components/path-information/path-information.component";
 import { MapClickEntityModel } from "../../../../core/models/map-click-entity.model";
 import { MapClickEventModel } from "../../../../core/models/map-click-event.model";
@@ -18,6 +19,7 @@ declare var ymaps3: any;
 	imports: [
 		MapPointInformationComponent,
 		PathInformationComponent,
+		NotificationsComponent,
 	],
 	templateUrl: "./main.component.html",
 	styleUrl: "./main.component.css",

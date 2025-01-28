@@ -2,7 +2,9 @@ import { Component, ElementRef, ViewChild } from "@angular/core";
 import { environment } from "../../../../environments/environment";
 import { EventPlace, Place } from "../../../../generated";
 import MapPointModel from "../../models/map-point.model";
+import { NotificationModel } from "../../models/notification.model";
 import { MapInteractionsService } from "../../services/map-interactions.service";
+import { NotificationsService } from "../../services/notifications.service";
 import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
 
 @Component({
@@ -112,6 +114,7 @@ export class PathInformationComponent {
 	protected readonly isInstanceOfPlace = isInstanceOfPlace;
 
 	constructor(
+		private notificationsService: NotificationsService,
 		private mapInteractionsService: MapInteractionsService,
 	) {
 		/** Listener for path Points change */
@@ -294,6 +297,14 @@ export class PathInformationComponent {
 	/** Closes path point */
 	close() {
 		this.mapInteractionsService.pathInformationState.next(-1);
+		const callback = (service: MapInteractionsService, path: any) => {
+			service.pathPoints.next(path);
+		};
+		this.notificationsService.addNotification({
+			timeOut: 5000,
+			message: "Маршрут закрыт",
+			callback: callback.bind({}, this.mapInteractionsService, this.path),
+		} as NotificationModel);
 		setTimeout(() => {
 			this.mapInteractionsService.pathPoints.next(null);
 		}, 400);
