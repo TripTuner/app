@@ -1,7 +1,10 @@
 import { AfterViewInit, Component, effect, ElementRef, OnDestroy, ViewChild } from "@angular/core";
 import { environment } from "../../../../../environments/environment";
 import { EventPlace, Place } from "../../../../../generated";
-import { MapPointInformationComponent } from "../../../../core/components/map-point-information.component";
+import {
+	MapPointInformationComponent,
+} from "../../../../core/components/map-point-information/map-point-information.component";
+import { NotificationsComponent } from "../../../../core/components/notifications/notifications.component";
 import { PathInformationComponent } from "../../../../core/components/path-information/path-information.component";
 import { MapClickEntityModel } from "../../../../core/models/map-click-entity.model";
 import { MapClickEventModel } from "../../../../core/models/map-click-event.model";
@@ -16,6 +19,7 @@ declare var ymaps3: any;
 	imports: [
 		MapPointInformationComponent,
 		PathInformationComponent,
+		NotificationsComponent,
 	],
 	templateUrl: "./main.component.html",
 	styleUrl: "./main.component.css",
@@ -61,9 +65,21 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 		});
 		/** Adding Listener for route points change */
 		this.mapInteractionService.pathPoints.subscribe(path => {
-			console.log("path Points changes: ", this.mapInteractionService.pathPoints.value);
 			if (this.map !== null)
 				this.displayPathPoints().then();
+		});
+		/** Listener for chosen point changes */
+		this.mapInteractionService.chosenMapPoint.subscribe(point => {
+			if (point === null) return;
+			const coords = [point.latitude, point.longitude];
+			// moves map camera to marker
+			this.map.update({
+				location: {
+					center: coords,
+					zoom: 16,
+					...this.DEFAULT_LOCATION_SETTINGS,
+				},
+			});
 		});
 	}
 
@@ -166,16 +182,25 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 	 * Handler for map click event
 	 * @param {MapClickEventModel | undefined} event map click event
 	 */
-	private handleMapClick(event: MapClickEventModel | undefined) {
-		if (event && event.entity.properties.name)
-			this.mapInteractionService.chosenMapPoint.set({
+	private async handleMapClick(event: MapClickEventModel | undefined) {
+		if (event?.type === "marker") { // we clicked on the marker on the map
+			const element = event.entity.element;
+			const text = element.innerText;
+			if (text === "Я") return;
+			else {
+				const index = Number(text) - 1;
+				const point = this.mapInteractionService.pathPoints.value![index];
+				this.mapInteractionService.chosenMapPoint.next(point);
+			}
+		} else if (event && event.entity.properties.name) {
+			this.mapInteractionService.chosenMapPoint.next({
 				name: event.entity.properties.name!,
-				description: "Большой театр — это выдающееся культурное учреждение, олицетворяющее величие русской классической музыки и танца. Здесь проходят великолепные спектакли, которые захватывают дух и оставляют незабываемые эмоции.",
 				categories: [],
 				latitude: event.entity.geometry.coordinates[0],
 				longitude: event.entity.geometry.coordinates[1],
 				isLiked: false,
 			});
+		}
 	}
 
 	/** Function that displays path on the map */
@@ -271,7 +296,6 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 			});
 			return response.json();
 		} catch (error) {
-			console.log(error);
 			return error;
 		}
 	}

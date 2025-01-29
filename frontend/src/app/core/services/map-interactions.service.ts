@@ -40,7 +40,7 @@ export class MapInteractionsService {
 	chosenCategories = signal<Category[]>([]);
 
 	/** chosen point on the map or **null** if user hadn't chosen anything */
-	chosenMapPoint = signal<MapPointModel | null>(null);
+	chosenMapPoint = new BehaviorSubject<Place | EventPlace | MapPointModel | null>(null);
 
 	/** variable that responsible for the last position of the user marker <br> **null** - map was not loaded yet and last position doesn't exist <br> **GeolocationModel** - prev position of the user marker */
 	userPosition = signal<GeolocationModel>({ longitude: 55, latitude: 37 });

@@ -4,7 +4,6 @@
 	initial-value: 0px;
 }
 
-
 .container {
 	width:         100vw;
 	height:        fit-content;
@@ -45,15 +44,25 @@
 .small-info {
 	width:      100%;
 	height:     fit-content;
-	overflow-x: scroll;
+	display:         flex;
+	align-items:     center;
+	flex-direction:  row;
+	justify-content: space-between;
 	padding:    0 var(--base-padding);
+	gap:             10px;
 
 	.content {
-		width:          100%;
-		display:        flex;
-		flex-direction: row;
-		all:            unset;
-		gap:            15px;
+		width:      100%;
+		overflow-x: scroll;
+		all:        unset;
+
+		div {
+			width:          fit-content;
+			display:        flex;
+			align-items:    center;
+			flex-direction: row;
+			gap:            15px;
+		}
 
 		svg {
 			fill: var(--text-secondary) !important;
@@ -62,6 +71,11 @@
 				fill: var(--text-secondary) !important;
 			}
 		}
+	}
+
+	.hide-icon {
+		cursor: pointer;
+		fill:   var(--text-secondary);
 	}
 }
 
@@ -74,9 +88,15 @@
 	padding:        0 var(--base-padding);
 
 	.card {
-		width:        100%;
-		padding-left: var(--base-padding);
-		border-left:  3px solid var(--blue-60);
+		width:               100%;
+		padding-left:        var(--base-padding);
+		cursor:              pointer;
+		transition-duration: .3s;
+		border-left:         3px solid var(--blue-60);
+
+		&:hover {
+			background: var(--neutral-0);
+		}
 	}
 
 	.way-block {

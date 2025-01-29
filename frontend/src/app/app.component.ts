@@ -5,10 +5,11 @@ import { BottomBarComponent } from "./core/components/bottom-bar/bottom-bar.comp
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [
-        BottomBarComponent,
-        RouterOutlet
-    ],
+	imports: [
+		BottomBarComponent,
+		RouterOutlet,
+
+	],
     styles: `
         .container {
             width: 100vw;
