@@ -123,8 +123,13 @@ export class PathInformationComponent {
 			this.travelLengthBetweenPoints.length = 0;
 			this.arrivalTimeToPoints.length = 0;
 
-			if (path === null) this.Hide();
-			else this.Show();
+			if (path === null) {
+				if (this.mapInteractionsService.pathInformationState.value !== -1)
+					this.mapInteractionsService.pathInformationState.next(-1);
+			} else {
+				if (this.mapInteractionsService.pathInformationState.value !== 1)
+					this.mapInteractionsService.pathInformationState.next(1);
+			}
 			this.path = path;
 			if (this.path !== null)
 				this.getPathInfo().then();

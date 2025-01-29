@@ -60,7 +60,6 @@ export class NotificationsComponent {
 		const container = this.container.nativeElement;
 		for (let i = 0; i < container.children.length; i++) {
 			const child = container.children.item(i)!;
-			console.log(child);
 			if (child.getAttribute("notification-id") === notification.id) {
 				//@ts-ignore
 				child.style.transform = "translateX(100%)";
