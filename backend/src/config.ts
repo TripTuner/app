@@ -29,7 +29,8 @@ const config: Config = {
     parsePlaceEntities: false,
     mosDataKey: "14c319dc-18f8-4b43-8ced-3d8284e7b255",
     timepadKey: String(process.env.TIMEPAD),
-    parseEventsCount: 59
+    parseEventsCount: 59,
+    RouterKey: String(process.env.ROUTE_KEY),
 }
 
 if (process.env.PARSE_ENTITIES === "true") {
