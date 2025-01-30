@@ -362,12 +362,25 @@ export class AlgorithmService {
 	}
 
 	/** Function that parses prompt into Array<PromptItem> */
-	private async parsePrompt() {
+	private async parsePrompt(): Promise<PromptElement[]> {
 		const prompted = await openai.chat.completions.create({
 			messages: [{ role: 'user', content: BASE_PROMPT.replace("{USER_INPUT}", this.prompt)}],
 			model: 'deepseek-reasoner',
 		});
-		return JSON.parse(prompted.choices[0].message.content!);
+		let content = JSON.parse(prompted.choices[0].message.content!);
+
+		let parsed: PromptElement[] = [];
+		content.forEach((el: PromptElement) => {
+			if (el.type == "route") {
+				el.parsed_elements!.forEach((par: PromptElement) => {
+					parsed.push(par)
+				})
+			} else {
+				parsed.push(el)
+			}
+		});
+
+		return parsed;
 
 	}
 
