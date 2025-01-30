@@ -139,6 +139,16 @@ export class AlgorithmService {
 			}
 		}
 
+		// calculating distance indicator
+		let distance_indicator = 0;
+		for (let i = 1; i < items.length; i++) {
+			distance_indicator += this.distancesMatrix[i - 1][items[i - 1].index][this.items[i - 1].length + items[i].index];
+		}
+		if (distance_indicator !== 0)
+			distance_indicator = 1e6 / ( distance_indicator );
+		else
+			throw ( new errors.InternalServerError("distance indicator is 0") );
+
 		// calculating price indicator
 		let price_indicator = 1; // TODO
 
@@ -151,25 +161,28 @@ export class AlgorithmService {
 			if (this.keys[index].type === "category")
 				beauty += items[index].categoriesSum!;
 			else if (this.keys[index].type === "fixed" || this.keys[index].type === "event")
-				beauty += 1;
+				beauty += 100;
 		}
 
+		if (isNaN(beauty))
+			throw ( new errors.InternalServerError("beauty is NaN") );
+
 		// calculating error from existing parts
-		error = beauty * price_indicator * duration_indicator;
+		error = beauty * price_indicator * duration_indicator * distance_indicator;
 
 		// returns result depending on is_time_frames_valid
 		if (is_time_frames_valid === 1)
-			return 1e6 * error;
+			return 1e4 * error;
 		if (is_time_frames_valid === 0)
-			return 1e6 / error;
-		if (is_time_frames_valid === -1)
 			return 1e4 / error;
+		if (is_time_frames_valid === -1)
+			return 1e1 / error;
 		return 1;
 	}
 
 	/** Function that makes random changes to path */
 	private randomChangePlacement(placement: Array<LocationItem>): Array<LocationItem> {
-		let result: Array<LocationItem> = [];
+		let result: Array<LocationItem> = placement;
 
 		for (let i = 1; i <= Math.min(result.length, this.CHANGES_COUNT); i++) {
 			// generating random index of item in result to change
@@ -294,6 +307,9 @@ export class AlgorithmService {
 
 	/** Finds all distances between each pair of points in this.items */
 	private async calculateDistances() {
+		this.distancesMatrix = [];
+		this.durationsMatrix = [];
+
 		for (let i = 1; i < this.items.length; i++) {
 			// set up location Array<[latitude, longitude]>
 			const locations: number[][] = [];
@@ -315,11 +331,11 @@ export class AlgorithmService {
 				}),
 			});
 			const data = await response.json();
-			this.durationsMatrix = data.durations;
-			this.distancesMatrix = data.distances;
+			this.durationsMatrix.push(data.durations);
+			this.distancesMatrix.push(data.distances);
 		}
 
-		// validating matrixes
+		// validating matrices
 		for (const distancesMatrix1 of this.distancesMatrix)
 			if (distancesMatrix1 === undefined)
 				throw ( new errors.InternalServerError("durations matrix is undefined") );
@@ -449,6 +465,7 @@ export class AlgorithmService {
 					this.items[index].push({
 						location: place.place,
 						index: 0,
+						categoriesSum: place.categoriesSum,
 					});
 
 				console.log(`\x1b[36m[algorithm]\x1b[0m \x1b[35m[findPointsForPrompt]\x1b[0m \x1b[34m[${ index } iteration]\x1b[0m finished: `, ( Date.now() - start ), "ms"); // TODO remove after testing
