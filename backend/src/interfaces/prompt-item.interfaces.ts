@@ -9,4 +9,6 @@ export interface PromptElement {
 
 	generated_prompt?: string;
 	parsed_elements?: PromptElement[];
+
+	time?: number; // TODO delete
 }
