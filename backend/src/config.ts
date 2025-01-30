@@ -32,6 +32,7 @@ const config: Config = {
     parseEventsCount: 59,
 	RouterKey: "5b3ce3597851110001cf6248ef4c3cd6319742bea51882e8e0124440",
 	RouterUrl: "https://api.openrouteservice.org",
+    openaiAPIKey: String(process.env.OPENAI_API_KEY),
 }
 
 if (process.env.PARSE_ENTITIES === "true") {

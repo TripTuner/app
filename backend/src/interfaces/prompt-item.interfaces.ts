@@ -1,9 +1,12 @@
 export interface PromptElement {
 	type: "fixed" | "embedding" | "category" | "event" | "route";
+	raw_prompt?: string;
 	coords?: number[];
-	time?: number; // number of hours will be spent in this place
-	start_time?: string; // time in format HH:MM
-	end_time?: string; // time in format HH:MM
-	categories?: Record<string, number>; // percentage of each category
+
 	name?: string;
+	categories?: Record<string, number>; // percentage of each category
+	isPivotPoint?: boolean;
+
+	generated_prompt?: string;
+	parsed_elements?: PromptElement[];
 }
