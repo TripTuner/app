@@ -12,12 +12,12 @@
 import { PlaceDataInterface } from "./placeDataInterface";
 
 
-export interface Place {
+export interface LocationItem {
 	/**
 	 * A class representation of the BSON ObjectId type.
 	 */
 	_id?: string;
-	name?: string;
+	name: string;
 	type: number;
 	longitude: number;
 	latitude: number;
@@ -30,5 +30,8 @@ export interface Place {
 	address?: string | null;
 	data?: PlaceDataInterface | null;
 	categories?: Array<string>;
+	description: string;
+	start_time: string;
+	finish_time: string;
 }
 

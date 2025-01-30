@@ -455,6 +455,9 @@ export class BottomBarComponent implements AfterViewInit {
 		if (!this.validKeyInput) {
 			event.preventDefault();
 			text = this.promptText;
+
+			this.mapInteractionService.generatePath(this.promptText);
+
 			return;
 		}
 

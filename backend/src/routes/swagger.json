@@ -7,10 +7,14 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
+          "ObjectId": {
+            "type": "string",
+            "description": "A class representation of the BSON ObjectId type."
+          },
 			"Category": {
 				"properties": {
 					"_id": {
-						"type": "string"
+                      "$ref": "#/components/schemas/ObjectId"
 					},
 					"name": {
 						"type": "string"
@@ -20,7 +24,7 @@
 					},
 					"places": {
 						"items": {
-							"type": "string"
+                          "$ref": "#/components/schemas/ObjectId"
 						},
 						"type": "array"
 					}
@@ -36,7 +40,7 @@
 			"EventPlace": {
 				"properties": {
 					"_id": {
-						"type": "string"
+                      "$ref": "#/components/schemas/ObjectId"
 					},
 					"name": {
 						"type": "string"
@@ -123,7 +127,7 @@
 			"Place": {
 				"properties": {
 					"_id": {
-						"type": "string"
+                      "$ref": "#/components/schemas/ObjectId"
 					},
 					"name": {
 						"type": "string"
@@ -177,7 +181,7 @@
 					},
 					"categories": {
 						"items": {
-							"type": "string"
+                          "$ref": "#/components/schemas/ObjectId"
 						},
 						"type": "array"
 					}
@@ -190,6 +194,141 @@
 				"type": "object",
 				"additionalProperties": false
 			},
+          "Path": {
+            "properties": {
+              "_id": {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              "user": {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              "segments": {
+                "items": {
+                  "$ref": "#/components/schemas/ObjectId"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "segments"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "PathSegment": {
+            "properties": {
+              "_id": {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              "path": {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              "place": {
+                "$ref": "#/components/schemas/ObjectId"
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "fixed",
+                  "embedding",
+                  "category",
+                  "event",
+                  "route"
+                ]
+              }
+            },
+            "required": [
+              "path",
+              "place",
+              "type"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "LocationItem": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Place"
+              },
+              {
+                "$ref": "#/components/schemas/EventPlace"
+              }
+            ]
+          },
+          "Record_string.number_": {
+            "properties": {},
+            "additionalProperties": {
+              "type": "number",
+              "format": "double"
+            },
+            "type": "object",
+            "description": "Construct a type with a set of properties K of type T"
+          },
+          "PromptElement": {
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "fixed",
+                  "embedding",
+                  "category",
+                  "event",
+                  "route"
+                ]
+              },
+              "coords": {
+                "items": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "type": "array"
+              },
+              "time": {
+                "type": "number",
+                "format": "double"
+              },
+              "start_time": {
+                "type": "string"
+              },
+              "end_time": {
+                "type": "string"
+              },
+              "categories": {
+                "$ref": "#/components/schemas/Record_string.number_"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
+          "CreatePathModel": {
+            "properties": {
+              "prompt": {
+                "items": {
+                  "$ref": "#/components/schemas/PromptElement"
+                },
+                "type": "array"
+              },
+              "startPosition": {
+                "items": {
+                  "type": "number",
+                  "format": "double"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "prompt",
+              "startPosition"
+            ],
+            "type": "object",
+            "additionalProperties": false
+          },
 			"UserRegister": {
 				"properties": {
 					"email": {
@@ -440,8 +579,7 @@
 						"name": "place_id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+                          "type": "string"
 						}
 					}
 				]
@@ -481,6 +619,131 @@
 				]
 			}
 		},
+      "/path/all": {
+        "get": {
+          "operationId": "placesGetAll",
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "items": {
+                      "$ref": "#/components/schemas/Path"
+                    },
+                    "type": "array"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            "BackendApi"
+          ],
+          "security": [],
+          "parameters": []
+        }
+      },
+      "/path/{path_id}": {
+        "get": {
+          "operationId": "pathGetById",
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Path"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            "BackendApi"
+          ],
+          "security": [],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "path_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      "/path/{path_id}/segments": {
+        "get": {
+          "operationId": "pathSegmentsGetById",
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "items": {
+                      "$ref": "#/components/schemas/PathSegment"
+                    },
+                    "type": "array"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            "BackendApi"
+          ],
+          "security": [],
+          "parameters": [
+            {
+              "in": "path",
+              "name": "path_id",
+              "required": true,
+              "schema": {
+                "type": "string"
+              }
+            }
+          ]
+        }
+      },
+      "/path/create": {
+        "post": {
+          "operationId": "pathCreate",
+          "responses": {
+            "200": {
+              "description": "Ok",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "items": {
+                      "$ref": "#/components/schemas/LocationItem"
+                    },
+                    "type": "array"
+                  }
+                }
+              }
+            }
+          },
+          "tags": [
+            "BackendApi"
+          ],
+          "security": [],
+          "parameters": [],
+          "requestBody": {
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatePathModel"
+                }
+              }
+            }
+          }
+        }
+      },
 		"/auth/register": {
 			"post": {
 				"operationId": "register",

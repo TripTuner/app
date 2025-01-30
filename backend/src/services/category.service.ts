@@ -1,7 +1,7 @@
-import { getManager, ObjectId, Repository } from "typeorm";
+import { ObjectId } from "mongodb";
+import { getManager, Repository } from "typeorm";
 import { Category } from "../entities/category.entity";
 import * as errors from "../utils/errors";
-
 
 /**
  * Fetches all categories from database
@@ -100,10 +100,13 @@ export const getAllByIds = async function (ids: ObjectId[]): Promise<Array<Categ
 
 	try {
 		const categories = [];
-		for (const id of ids)
-			categories.push(await findCategory({ where: { id: id } }));
+		for (const id of ids) {
+			console.log(id.toString());
+			categories.push(await findCategory({ where: { id: new ObjectId(id.toString()) } }));
+		}
 		return categories;
 	} catch (error) {
+		console.log(error);
 		throw ( new errors.InternalServerError() );
 	}
 };

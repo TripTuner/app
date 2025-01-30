@@ -6,7 +6,7 @@ import * as CategoryService from "./category.service";
 import * as EventService from "./event-place.service";
 import * as PlaceService from "./place.service";
 
-type LocationItem = Place | EventPlace;
+export type LocationItem = Place | EventPlace;
 
 export class AlgorithmService {
 	/** raw prompt */
@@ -30,8 +30,8 @@ export class AlgorithmService {
 	/**  */
 	private readonly CHANGES_COUNT = 1;
 
-	constructor(prompt: string, startPosition: number[]) {
-		this.prompt = prompt;
+	constructor(prompt: PromptElement[], startPosition: number[]) {
+		this.keys = prompt; // TODO change after testing
 		this.startPosition = startPosition;
 	}
 
@@ -215,7 +215,7 @@ export class AlgorithmService {
 		let prev_index = -1;
 		for (let index = 0; index < categoryIndex; index++) {
 			if (this.keys[index].type !== "fixed") continue;
-			prev_position = this.keys[index].coords;
+			prev_position = this.keys[index].coords!;
 			prev_index = index;
 		}
 
@@ -228,7 +228,7 @@ export class AlgorithmService {
 		let next_index = this.keys.length;
 		for (let index = this.keys.length - 1; index > categoryIndex; index--) {
 			if (this.keys[index].type !== "fixed") continue;
-			prev_position = this.keys[index].coords;
+			prev_position = this.keys[index].coords!;
 			prev_index = index;
 		}
 
@@ -257,7 +257,7 @@ export class AlgorithmService {
 
 				const events = await EventService.findAll({ where: { name: this.keys[index].name } });
 				for (const event of events) // checking that event lat, lon are similar to key
-					if (event.latitude === this.keys[index].coords[0] && event.longitude === this.keys[index].coords[1])
+					if (event.latitude === this.keys[index].coords![0] && event.longitude === this.keys[index].coords![1])
 						this.items[index].push(event);
 			}
 			if (this.keys[index].type === "fixed") {
@@ -266,7 +266,7 @@ export class AlgorithmService {
 
 				const places = await PlaceService.findAll({ where: { name: this.keys[index].name } });
 				for (const place of places) // checking that event lat, lon are similar to key
-					if (place.latitude === this.keys[index].coords[0] && place.longitude === this.keys[index].coords[1]) {
+					if (place.latitude === this.keys[index].coords![0] && place.longitude === this.keys[index].coords![1]) {
 						this.items[index].push(place);
 						break;
 					}

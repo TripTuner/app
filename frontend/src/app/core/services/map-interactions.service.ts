@@ -67,8 +67,6 @@ export class MapInteractionsService {
 		this.apiService.getAllCategories().then(categories => this.categories.set(categories));
 		this.apiService.getAllPlaces().then(places => {
 			this.places.set(places);
-			this.pathPoints.next([this.places()[0], this.places()[1], this.places()[2]]);
-			this.pathInformationState.next(1);
 		});
 	}
 
@@ -98,6 +96,12 @@ export class MapInteractionsService {
 	 * @param {Array<Place | EventPlace | MapPointModel> | null} path new value of path
 	 */
 	setNewPath(path: Array<Place | EventPlace | MapPointModel> | null) {
+		this.pathPoints.next(path);
+	}
+
+	async generatePath(promptText: string) {
+		const position = this.userPosition();
+		const path = await this.apiService.createPath(promptText, [position.latitude, position.longitude]);
 		this.pathPoints.next(path);
 	}
 }

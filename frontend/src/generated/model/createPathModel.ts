@@ -9,15 +9,11 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
+import { PromptElement } from "./promptElement";
 
 
-export interface Category {
-	/**
-	 * A class representation of the BSON ObjectId type.
-	 */
-	_id?: string;
-	name: string;
-	svg: string;
-	places: Array<string>;
+export interface CreatePathModel {
+	prompt: Array<PromptElement>;
+	startPosition: Array<number>;
 }
 
