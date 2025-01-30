@@ -15,4 +15,5 @@ export interface Config {
     timepadKey: string
     parseEventsCount: number
     RouterKey: string;
+	RouterUrl: string;
 }

@@ -1,16 +1,18 @@
 import { Controller } from "@tsoa/runtime";
 import { Body, Get, OperationId, Path, Post, Route, Tags } from "tsoa";
+import { EventPlace } from "../entities/event-place.entity";
 import { PathSegment } from "../entities/path-segment.entity";
 import * as PathEntity from "../entities/path.entity";
+import { Place } from "../entities/place.entity";
 import { CreatePathModel } from "../interfaces/path.interfaces";
-import { AlgorithmService, LocationItem } from "../services/algorithm.service";
+import { AlgorithmService } from "../services/algorithm.service";
 import * as PathService from "../services/path.service";
 
 @Route("path")
-export class Pathes extends Controller {
+export class Paths extends Controller {
 	@Get("all")
 	@Tags("BackendApi")
-	@OperationId("placesGetAll")
+	@OperationId("pathsGetAll")
 	public async getAll(): Promise<Array<PathEntity.Path>> {
 		return await PathService.findAll();
 	}
@@ -39,7 +41,7 @@ export class Pathes extends Controller {
 	@OperationId("pathCreate")
 	public async createPath(
 		@Body() dto: CreatePathModel,
-	): Promise<LocationItem[]> {
+	): Promise<Array<Place | EventPlace>> {
 		const algorithm = new AlgorithmService(dto.prompt, dto.startPosition);
 
 		return await algorithm.generate();

@@ -172,7 +172,7 @@ export class PathInformationComponent {
 			];
 
 			// fetches info from OSM
-			const response = await fetch("https://api.openrouteservice.org/v2/directions/foot-walking/geojson", {
+			const response = await fetch(`${ environment.RouteUrl }/v2/directions/foot-walking/geojson`, {
 				method: "POST",
 				headers: {
 					"Authorization": environment.RouteKey,

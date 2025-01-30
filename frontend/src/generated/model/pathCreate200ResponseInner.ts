@@ -14,7 +14,7 @@ import { EventPlace } from "./eventPlace";
 import { Place } from "./place";
 
 
-export interface LocationItem {
+export interface PathCreate200ResponseInner {
 	/**
 	 * A class representation of the BSON ObjectId type.
 	 */

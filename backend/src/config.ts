@@ -30,7 +30,8 @@ const config: Config = {
     mosDataKey: "14c319dc-18f8-4b43-8ced-3d8284e7b255",
     timepadKey: String(process.env.TIMEPAD),
     parseEventsCount: 59,
-	RouterKey: "5b3ce3597851110001cf624802956a14161143ef819dd7705d851de0",
+	RouterKey: "5b3ce3597851110001cf6248ef4c3cd6319742bea51882e8e0124440",
+	RouterUrl: "https://api.openrouteservice.org",
 }
 
 if (process.env.PARSE_ENTITIES === "true") {
