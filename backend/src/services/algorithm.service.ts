@@ -144,9 +144,7 @@ export class AlgorithmService {
 		for (let i = 1; i < items.length; i++) {
 			distance_indicator += this.distancesMatrix[i - 1][items[i - 1].index][this.items[i - 1].length + items[i].index];
 		}
-		if (distance_indicator !== 0)
-			distance_indicator = 1e6 / ( distance_indicator );
-		else
+		if (distance_indicator === 0)
 			throw ( new errors.InternalServerError("distance indicator is 0") );
 
 		// calculating price indicator
@@ -168,7 +166,8 @@ export class AlgorithmService {
 			throw ( new errors.InternalServerError("beauty is NaN") );
 
 		// calculating error from existing parts
-		error = beauty * price_indicator * duration_indicator * distance_indicator;
+		error = beauty * 1e6 / ( ( distance_indicator / 100 ) * ( distance_indicator / 100 ) );
+		console.log(error);
 
 		// returns result depending on is_time_frames_valid
 		if (is_time_frames_valid === 1)
