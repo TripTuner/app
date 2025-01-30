@@ -30,7 +30,7 @@ const config: Config = {
     mosDataKey: "14c319dc-18f8-4b43-8ced-3d8284e7b255",
     timepadKey: String(process.env.TIMEPAD),
     parseEventsCount: 59,
-    RouterKey: String(process.env.ROUTE_KEY),
+	RouterKey: "5b3ce3597851110001cf624802956a14161143ef819dd7705d851de0",
 }
 
 if (process.env.PARSE_ENTITIES === "true") {

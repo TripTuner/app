@@ -10,6 +10,8 @@
  * Do not edit the class manually.
  */
 import { PlaceDataInterface } from "./placeDataInterface";
+import { EventPlace } from "./eventPlace";
+import { Place } from "./place";
 
 
 export interface LocationItem {

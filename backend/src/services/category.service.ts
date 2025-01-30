@@ -101,12 +101,10 @@ export const getAllByIds = async function (ids: ObjectId[]): Promise<Array<Categ
 	try {
 		const categories = [];
 		for (const id of ids) {
-			console.log(id.toString());
-			categories.push(await findCategory({ where: { id: new ObjectId(id.toString()) } }));
+			categories.push(await findCategory({ where: { _id: new ObjectId(id.toString()) } }));
 		}
 		return categories;
 	} catch (error) {
-		console.log(error);
 		throw ( new errors.InternalServerError() );
 	}
 };

@@ -23,7 +23,6 @@ export interface PromptElement {
 	categories?: { [key: string]: number; };
 	name?: string;
 }
-
 export namespace PromptElement {
 	export type TypeEnum = "fixed" | "embedding" | "category" | "event" | "route";
 	export const TypeEnum = {

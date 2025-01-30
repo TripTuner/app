@@ -101,7 +101,7 @@ export class MapInteractionsService {
 
 	async generatePath(promptText: string) {
 		const position = this.userPosition();
-		const path = await this.apiService.createPath(promptText, [position.latitude, position.longitude]);
+		const path = await this.apiService.createPath(promptText, [37.626225, 55.753236]);
 		this.pathPoints.next(path);
 	}
 }

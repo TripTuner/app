@@ -26,7 +26,6 @@ export interface PathSegment {
 	place: string;
 	type: PathSegment.TypeEnum;
 }
-
 export namespace PathSegment {
 	export type TypeEnum = "fixed" | "embedding" | "category" | "event" | "route";
 	export const TypeEnum = {
