@@ -185,8 +185,9 @@ export class AlgorithmService {
 	/**  */
 	private readonly CHANGES_COUNT = 1;
 
-	constructor(prompt: PromptElement[], startPosition: number[]) {
-		this.keys = prompt; // TODO change after testing
+	constructor(prompt: string, startPosition: number[]) {
+		this.prompt = prompt;
+		console.log(this.prompt);
 		this.startPosition = startPosition;
 	}
 
@@ -199,9 +200,9 @@ export class AlgorithmService {
 		console.log("\x1b[36m[algorithm]\x1b[0m generation has been started: ", ( Date.now() - start ), "ms");
 		start = Date.now();
 
-		//await this.parsePrompt();
-		//console.log("\x1b[36m[algorithm]\x1b[0m prompt has been parsed: ", ( Date.now() - start ), "ms");
-		//start = Date.now();
+		await this.parsePrompt();
+		console.log("\x1b[36m[algorithm]\x1b[0m prompt has been parsed: ", ( Date.now() - start ), "ms");
+		start = Date.now();
 
 		await this.findPointsForPrompt();
 		console.log("\x1b[36m[algorithm]\x1b[0m points for prompt were found: ", ( Date.now() - start ), "ms");

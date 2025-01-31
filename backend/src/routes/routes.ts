@@ -157,48 +157,10 @@ const models: TsoaRoute.Models = {
         "additionalProperties": false,
     },
     // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "Record_string.number_": {
-        "dataType": "refAlias",
-		"type": {
-			"dataType": "nestedObjectLiteral",
-			"nestedProperties": {},
-			"additionalProperties": { "dataType": "double" },
-			"validators": {},
-		},
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
-    "PromptElement": {
-        "dataType": "refObject",
-        "properties": {
-			"type": {
-				"dataType": "union",
-				"subSchemas": [{ "dataType": "enum", "enums": ["fixed"] }, {
-					"dataType": "enum",
-					"enums": ["embedding"],
-				}, { "dataType": "enum", "enums": ["category"] }, {
-					"dataType": "enum",
-					"enums": ["event"],
-				}, { "dataType": "enum", "enums": ["route"] }],
-				"required": true,
-			},
-			"coords": { "dataType": "array", "array": { "dataType": "double" } },
-			"time": { "dataType": "double" },
-			"start_time": { "dataType": "string" },
-			"end_time": { "dataType": "string" },
-			"categories": { "ref": "Record_string.number_" },
-			"name": { "dataType": "string" },
-        },
-        "additionalProperties": false,
-    },
-    // WARNING: This file was auto-generated with tsoa. Please do not modify it. Re-run tsoa to re-generate this file: https://github.com/lukeautry/tsoa
     "CreatePathModel": {
         "dataType": "refObject",
         "properties": {
-			"prompt": {
-				"dataType": "array",
-				"array": { "dataType": "refObject", "ref": "PromptElement" },
-				"required": true,
-			},
+			"prompt": { "dataType": "string", "required": true },
 			"startPosition": { "dataType": "array", "array": { "dataType": "double" }, "required": true },
         },
         "additionalProperties": false,

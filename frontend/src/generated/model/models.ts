@@ -7,7 +7,6 @@ export * from "./pathSegment";
 export * from "./place";
 export * from "./placeDataInterface";
 export * from "./placeDataInterfaceTime";
-export * from "./promptElement";
 export * from "./userLogin";
 export * from "./userPublic";
 export * from "./userRegister";

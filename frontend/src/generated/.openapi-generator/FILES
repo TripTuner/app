@@ -18,7 +18,6 @@ model/pathSegment.ts
 model/place.ts
 model/placeDataInterface.ts
 model/placeDataInterfaceTime.ts
-model/promptElement.ts
 model/userLogin.ts
 model/userPublic.ts
 model/userRegister.ts

@@ -245,64 +245,10 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-          "Record_string.number_": {
-            "properties": {},
-            "additionalProperties": {
-              "type": "number",
-              "format": "double"
-            },
-            "type": "object",
-            "description": "Construct a type with a set of properties K of type T"
-          },
-          "PromptElement": {
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "fixed",
-                  "embedding",
-                  "category",
-                  "event",
-                  "route"
-                ]
-              },
-              "coords": {
-                "items": {
-                  "type": "number",
-                  "format": "double"
-                },
-                "type": "array"
-              },
-              "time": {
-                "type": "number",
-                "format": "double"
-              },
-              "start_time": {
-                "type": "string"
-              },
-              "end_time": {
-                "type": "string"
-              },
-              "categories": {
-                "$ref": "#/components/schemas/Record_string.number_"
-              },
-              "name": {
-                "type": "string"
-              }
-            },
-            "required": [
-              "type"
-            ],
-            "type": "object",
-            "additionalProperties": false
-          },
           "CreatePathModel": {
             "properties": {
               "prompt": {
-                "items": {
-                  "$ref": "#/components/schemas/PromptElement"
-                },
-                "type": "array"
+                "type": "string"
               },
               "startPosition": {
                 "items": {

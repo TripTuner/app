@@ -9,11 +9,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-import { PromptElement } from "./promptElement";
 
 
 export interface CreatePathModel {
-	prompt: Array<PromptElement>;
+	prompt: string;
 	startPosition: Array<number>;
 }
 
