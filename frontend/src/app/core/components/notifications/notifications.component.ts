@@ -32,7 +32,34 @@ export class NotificationsComponent {
 	}
 
 	addNotification(notification: NotificationModel) {
+		let touchPosition: null | number[] = null;
+
+		const containerTouchStart = (event: TouchEvent) => {
+			container.style.opacity = ".5";
+			touchPosition = [event.touches[0].clientX, event.touches[0].clientY];
+			addEventListener("touchend", touchEnd);
+			addEventListener("touchmove", touchMove);
+		};
+		const touchMove = (event: TouchEvent) => {
+			touchPosition = [event.touches[0].clientX, event.touches[0].clientY];
+		};
+		const touchEnd = () => {
+			container.style.opacity = "1";
+			removeEventListener("touchend", touchEnd);
+			removeEventListener("touchmove", touchMove);
+
+			const bounds = container.getBoundingClientRect();
+			if (touchPosition === null) return;
+			if (bounds.top <= touchPosition[1] && touchPosition[1] <= bounds.bottom && bounds.left <= touchPosition[0] && touchPosition[0] <= bounds.right)
+				this.removeNotification(notification);
+		};
+
 		const container = document.createElement("div");
+		container.ontouchstart = containerTouchStart;
+
+		if (notification.type === "error") {
+			container.style.background = "rgb(255,0,0)";
+		}
 
 		const message = document.createElement("p");
 		message.innerText = notification.message;
@@ -42,7 +69,11 @@ export class NotificationsComponent {
 		cancel.innerText = "Отмена";
 		cancel.onclick = this.clickHandler.bind({}, this, notification);
 
-		container.appendChild(cancel);
+		if (notification.callback !== undefined)
+			container.appendChild(cancel);
+
+		const progressBar = document.createElement("div");
+		container.appendChild(progressBar);
 
 		container.setAttribute("notification-id", notification.id!);
 
@@ -51,6 +82,10 @@ export class NotificationsComponent {
 		setTimeout(() => {
 			container.style.transform = "translateX(0%)";
 			container.style.opacity = "1";
+			progressBar.style.transitionDuration = `${ notification.timeOut }ms`;
+			setTimeout(() => {
+				progressBar.style.width = "100%";
+			});
 		});
 
 		setTimeout(() => this.removeNotification(notification), notification.timeOut);

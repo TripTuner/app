@@ -2,7 +2,6 @@ import { Component, ElementRef, ViewChild } from "@angular/core";
 import { environment } from "../../../../environments/environment";
 import { EventPlace, Place } from "../../../../generated";
 import MapPointModel from "../../models/map-point.model";
-import { NotificationModel } from "../../models/notification.model";
 import { MapInteractionsService } from "../../services/map-interactions.service";
 import { NotificationsService } from "../../services/notifications.service";
 import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
@@ -308,8 +307,9 @@ export class PathInformationComponent {
 		this.notificationsService.addNotification({
 			timeOut: 5000,
 			message: "Маршрут закрыт",
+			type: "info",
 			callback: callback.bind({}, this.mapInteractionsService, this.path),
-		} as NotificationModel);
+		});
 		setTimeout(() => {
 			this.mapInteractionsService.pathPoints.next(null);
 		}, 400);

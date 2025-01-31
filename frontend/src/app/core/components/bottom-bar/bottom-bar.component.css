@@ -24,14 +24,13 @@
 
 .container {
 	width:          100vw;
-	max-height: 100vh;
 	display:        flex;
 	flex-direction: column;
 	position:       fixed;
 	z-index:        1000;
 	bottom:         0;
 	left:           0;
-	overflow-y: hidden;
+	transform: translateY(0%);
 	border-radius:  var(--br-16) var(--br-16) 0 0;
 	background:     var(--background-primary);
 	gap:            5px;
@@ -254,8 +253,8 @@
 	align-items:      center;
 	justify-content:  center;
 	position:         absolute;
-	right:            10px;
-	bottom: 236px;
+	top:   calc(100vh - 226px - 43px);
+	right: calc(-100vw + 10px);
 	transition:       opacity .3s, background-color .3s;
 	transition-delay: 0s;
 	opacity:          0;

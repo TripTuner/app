@@ -13,8 +13,8 @@ import { filter } from "rxjs";
 import { Category, EventPlace, Place } from "../../../../generated";
 import { MapClickEntityModel } from "../../models/map-click-entity.model";
 import { PlaceSearchPipe } from "../../pipes/place-search.pipe";
-import { ApiService } from "../../services/api.service";
 import { MapInteractionsService } from "../../services/map-interactions.service";
+import { NotificationsService } from "../../services/notifications.service";
 import { SlideCategoriesComponent } from "../slide-categories.component";
 
 /**
@@ -109,16 +109,6 @@ function placeCaretAtEnd(editor: HTMLDivElement) {
 
 					<CategoriesSlider/>
 				</div>
-
-				<button (click)="this.mapInteractionService.mapScrolled.set(-1)"
-						class="stick-position-marker"
-						[style.background-color]="mapInteractionService.mapScrolled() === -1 ? 'var(--blue-60)' : 'var(--neutral-1)'"
-						#stickPositionButton
-				>
-					<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
-						<path d="M19.37 15.7965C19.2479 15.7479 19.1174 15.7239 18.9859 15.7257C18.8545 15.7276 18.7247 15.7553 18.604 15.8073C18.4833 15.8593 18.374 15.9345 18.2824 16.0288C18.1908 16.123 18.1186 16.2344 18.07 16.3565C18.0214 16.4786 17.9974 16.6091 17.9992 16.7406C18.001 16.872 18.0288 17.0018 18.0808 17.1225C18.1328 17.2432 18.208 17.3525 18.3023 17.4441C18.3965 17.5358 18.5079 17.6079 18.63 17.6565C20.09 18.2365 21 19.1365 21 20.0065C21 21.4265 18.54 23.0065 15 23.0065C11.46 23.0065 9 21.4265 9 20.0065C9 19.1365 9.91 18.2365 11.37 17.6565C11.6166 17.5584 11.8142 17.3663 11.9192 17.1225C12.0243 16.8787 12.0281 16.6032 11.93 16.3565C11.8319 16.1099 11.6398 15.9123 11.396 15.8073C11.1522 15.7023 10.8767 15.6984 10.63 15.7965C8.36 16.6965 7 18.2665 7 20.0065C7 22.8065 10.51 25.0065 15 25.0065C19.49 25.0065 23 22.8065 23 20.0065C23 18.2665 21.64 16.6965 19.37 15.7965ZM14 12.8665V20.0065C14 20.2717 14.1054 20.5261 14.2929 20.7136C14.4804 20.9012 14.7348 21.0065 15 21.0065C15.2652 21.0065 15.5196 20.9012 15.7071 20.7136C15.8946 20.5261 16 20.2717 16 20.0065V12.8665C16.9427 12.6231 17.7642 12.0443 18.3106 11.2385C18.857 10.4327 19.0908 9.45533 18.9681 8.48951C18.8454 7.5237 18.3747 6.63578 17.6442 5.99219C16.9137 5.3486 15.9736 4.99353 15 4.99353C14.0264 4.99353 13.0863 5.3486 12.3558 5.99219C11.6253 6.63578 11.1546 7.5237 11.0319 8.48951C10.9092 9.45533 11.143 10.4327 11.6894 11.2385C12.2358 12.0443 13.0573 12.6231 14 12.8665ZM15 7.00651C15.3956 7.00651 15.7822 7.12381 16.1111 7.34357C16.44 7.56334 16.6964 7.87569 16.8478 8.24115C16.9991 8.6066 17.0387 9.00873 16.9616 9.39669C16.8844 9.78466 16.6939 10.141 16.4142 10.4207C16.1345 10.7004 15.7781 10.8909 15.3902 10.9681C15.0022 11.0453 14.6001 11.0057 14.2346 10.8543C13.8692 10.7029 13.5568 10.4466 13.3371 10.1177C13.1173 9.78876 13 9.40208 13 9.00651C13 8.47608 13.2107 7.96737 13.5858 7.5923C13.9609 7.21723 14.4696 7.00651 15 7.00651Z"/>
-					</svg>
-				</button>
 			</div>
 
 			<div class="main" #mainContainer>
@@ -179,6 +169,16 @@ function placeCaretAtEnd(editor: HTMLDivElement) {
 				</a>
 			</div>
 		</div>
+
+		<button (click)="this.mapInteractionService.mapScrolled.set(-1)"
+				class="stick-position-marker"
+				[style.background-color]="mapInteractionService.mapScrolled() === -1 ? 'var(--blue-60)' : 'var(--neutral-1)'"
+				#stickPositionButton
+		>
+			<svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
+				<path d="M19.37 15.7965C19.2479 15.7479 19.1174 15.7239 18.9859 15.7257C18.8545 15.7276 18.7247 15.7553 18.604 15.8073C18.4833 15.8593 18.374 15.9345 18.2824 16.0288C18.1908 16.123 18.1186 16.2344 18.07 16.3565C18.0214 16.4786 17.9974 16.6091 17.9992 16.7406C18.001 16.872 18.0288 17.0018 18.0808 17.1225C18.1328 17.2432 18.208 17.3525 18.3023 17.4441C18.3965 17.5358 18.5079 17.6079 18.63 17.6565C20.09 18.2365 21 19.1365 21 20.0065C21 21.4265 18.54 23.0065 15 23.0065C11.46 23.0065 9 21.4265 9 20.0065C9 19.1365 9.91 18.2365 11.37 17.6565C11.6166 17.5584 11.8142 17.3663 11.9192 17.1225C12.0243 16.8787 12.0281 16.6032 11.93 16.3565C11.8319 16.1099 11.6398 15.9123 11.396 15.8073C11.1522 15.7023 10.8767 15.6984 10.63 15.7965C8.36 16.6965 7 18.2665 7 20.0065C7 22.8065 10.51 25.0065 15 25.0065C19.49 25.0065 23 22.8065 23 20.0065C23 18.2665 21.64 16.6965 19.37 15.7965ZM14 12.8665V20.0065C14 20.2717 14.1054 20.5261 14.2929 20.7136C14.4804 20.9012 14.7348 21.0065 15 21.0065C15.2652 21.0065 15.5196 20.9012 15.7071 20.7136C15.8946 20.5261 16 20.2717 16 20.0065V12.8665C16.9427 12.6231 17.7642 12.0443 18.3106 11.2385C18.857 10.4327 19.0908 9.45533 18.9681 8.48951C18.8454 7.5237 18.3747 6.63578 17.6442 5.99219C16.9137 5.3486 15.9736 4.99353 15 4.99353C14.0264 4.99353 13.0863 5.3486 12.3558 5.99219C11.6253 6.63578 11.1546 7.5237 11.0319 8.48951C10.9092 9.45533 11.143 10.4327 11.6894 11.2385C12.2358 12.0443 13.0573 12.6231 14 12.8665ZM15 7.00651C15.3956 7.00651 15.7822 7.12381 16.1111 7.34357C16.44 7.56334 16.6964 7.87569 16.8478 8.24115C16.9991 8.6066 17.0387 9.00873 16.9616 9.39669C16.8844 9.78466 16.6939 10.141 16.4142 10.4207C16.1345 10.7004 15.7781 10.8909 15.3902 10.9681C15.0022 11.0453 14.6001 11.0057 14.2346 10.8543C13.8692 10.7029 13.5568 10.4466 13.3371 10.1177C13.1173 9.78876 13 9.40208 13 9.00651C13 8.47608 13.2107 7.96737 13.5858 7.5923C13.9609 7.21723 14.4696 7.00651 15 7.00651Z"/>
+			</svg>
+		</button>
 	`,
 })
 export class BottomBarComponent implements AfterViewInit {
@@ -207,12 +207,15 @@ export class BottomBarComponent implements AfterViewInit {
 	/** Prompt text */
 	promptText: string = "";
 
+	chosenPlaces: Array<Place | EventPlace> = [];
+	chosenCategories: Array<Category> = [];
+
 	/** Current menu size */
 	menuSize: number = 228;
 
 	constructor(
-		public apiService: ApiService,
 		private router: Router,
+		private readonly notificationsService: NotificationsService,
 		public readonly mapInteractionService: MapInteractionsService,
 	) {
 		// effect for mapInteractionService.mainContainerState
@@ -245,7 +248,7 @@ export class BottomBarComponent implements AfterViewInit {
 	closeMainContainer() {
 		this.container.nativeElement.style.transitionDuration = ".3s";
 		setTimeout(() => {
-			this.container.nativeElement.style.maxHeight = "0";
+			this.container.nativeElement.style.transform = "translateY(100%)";
 		}, 100);
 		setTimeout(() => {
 			this.container.nativeElement.style.display = "none";
@@ -257,10 +260,11 @@ export class BottomBarComponent implements AfterViewInit {
 		this.container.nativeElement.style.transitionDuration = ".3s";
 		this.container.nativeElement.style.display = "flex";
 		setTimeout(() => {
-			this.container.nativeElement.style.maxHeight = "100vh";
+			this.container.nativeElement.style.transform = "translateY(0%)";
 		}, 100);
 		setTimeout(() => {
 			this.container.nativeElement.style.transitionDuration = "0s";
+			this.stickPositionButton.nativeElement.style.top = `${ window.innerHeight - this.menuSize - 43 }px`;
 		}, 400);
 	}
 
@@ -314,7 +318,7 @@ export class BottomBarComponent implements AfterViewInit {
 			currentHeight = Math.min(maxHeight, Math.max(20, currentHeight));
 			lastY = e.touches[0].clientY;
 			this.mainContainer.nativeElement.style.maxHeight = `${ currentHeight }px`;
-			this.stickPositionButton.nativeElement.style.bottom = `${ this.container.nativeElement.getBoundingClientRect().height + 10 }px`;
+			this.stickPositionButton.nativeElement.style.top = `${ window.innerHeight - this.container.nativeElement.getBoundingClientRect().height - 43 }px`;
 		};
 		// handler for touch end events
 		const touchEndHandler = (e: TouchEvent) => {
@@ -362,7 +366,7 @@ export class BottomBarComponent implements AfterViewInit {
 	/** Function that updates position of the stick position button during to new menuSize */
 	updateStickPositionButton() {
 		this.menuSize = this.container.nativeElement.getBoundingClientRect().height!;
-		this.stickPositionButton.nativeElement.style.bottom = `calc(${ this.menuSize }px + 10px)`;
+		this.stickPositionButton.nativeElement.style.top = `${ window.innerHeight - this.menuSize - 43 }px`;
 	}
 
 	/** Function that shows the search box */
@@ -400,6 +404,7 @@ export class BottomBarComponent implements AfterViewInit {
 		// splitting the text with char and getting text before the typed name
 		let [current_value, search_value] = splitTextByLastOccurrence(text, split_char);
 		current_value += "#" + String(target.name) + "#";
+		this.promptText = current_value;
 
 		let regex;
 		// searching and highlighting Places with regular expression
@@ -433,6 +438,11 @@ export class BottomBarComponent implements AfterViewInit {
 		this.updateStickPositionButton();
 		// placing caret on the end of the editor
 		placeCaretAtEnd(editor);
+
+		if (isInstanceOfCategory(target))
+			this.chosenCategories.push(target);
+		else
+			this.chosenPlaces.push(target);
 	}
 
 	/** Handler for prompt input key button down event */
@@ -455,10 +465,6 @@ export class BottomBarComponent implements AfterViewInit {
 		if (!this.validKeyInput) {
 			event.preventDefault();
 			text = this.promptText;
-
-			this.mapInteractionService.generatePath(this.promptText);
-
-			return;
 		}
 
 		this.promptText = text; // updating prompt text to the last state
@@ -472,6 +478,30 @@ export class BottomBarComponent implements AfterViewInit {
 		highlightedText = highlightedText.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
 		// placing highlighted text to the editor
 		editor.innerHTML = highlightedText;
+
+		if (!this.validKeyInput) {
+			// we should check that we have same amount categories in prompt as in the chosen Categories
+			if (this.promptText.split("#").length !== this.chosenPlaces.length * 2) {
+				this.notificationsService.addNotification({
+					message: "Указано некорректное место",
+					timeOut: 5000,
+					type: "error",
+				});
+				return;
+			}
+			// we should check that we have same amount place || event places in prompt as in the chosenPlaces
+			if (this.promptText.split("@").length !== this.chosenCategories.length * 2) {
+				this.notificationsService.addNotification({
+					message: "Указано некорректная категория",
+					timeOut: 5000,
+					type: "error",
+				});
+				return;
+			}
+
+			this.mapInteractionService.generatePath(this.promptText);
+			return;
+		}
 
 		if (text === "\n" || text === "") { // checking if text is empty
 			this.showPromptPlaceholder();
