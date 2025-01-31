@@ -15,6 +15,7 @@ import { MapClickEntityModel } from "../../models/map-click-entity.model";
 import { PlaceSearchPipe } from "../../pipes/place-search.pipe";
 import { MapInteractionsService } from "../../services/map-interactions.service";
 import { NotificationsService } from "../../services/notifications.service";
+import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
 import { SlideCategoriesComponent } from "../slide-categories.component";
 
 /**
@@ -83,7 +84,12 @@ function placeCaretAtEnd(editor: HTMLDivElement) {
 				<div class="scroll-container">
 					<div class="scroll-content">
 						@for (item of searchArray() | placeSearch:this.searchText; track mapInteractionService.places) {
-							<p (click)="handlePromptSearchBoxClick(item)">{{ item.name }}</p>
+							<div class="card" (click)="handlePromptSearchBoxClick(item)">
+								<p class="name">{{ item.name }}</p>
+								@if (item.address !== null) {
+									<p class="address">{{ item.address }}</p>
+								}
+							</div>
 						} @empty {
 							<p>Ничего не найдено</p>
 						}
@@ -207,8 +213,8 @@ export class BottomBarComponent implements AfterViewInit {
 	/** Prompt text */
 	promptText: string = "";
 
-	chosenPlaces: Array<Place | EventPlace> = [];
-	chosenCategories: Array<Category> = [];
+	chosenPlaces: Array<Place> = [];
+	chosenEvents: Array<EventPlace> = [];
 
 	/** Current menu size */
 	menuSize: number = 228;
@@ -394,13 +400,13 @@ export class BottomBarComponent implements AfterViewInit {
 	}
 
 	/** Handler for prompt search box click event */
-	handlePromptSearchBoxClick(target: Place | Category | EventPlace) {
+	handlePromptSearchBoxClick(target: Place | EventPlace) {
 		// after the click search box should be hidden
 		this.hideSearchBox();
 
 		const editor = this.promptInput.nativeElement; // editor container
 		const text = editor.innerText; // text from the editor
-		const split_char = ( isInstanceOfCategory(target) ? "@" : "#" ); // char on which text should be split
+		const split_char = ( isInstanceOfEventPlace(target) ? "@" : "#" ); // char on which text should be split
 		// splitting the text with char and getting text before the typed name
 		let [current_value, search_value] = splitTextByLastOccurrence(text, split_char);
 		current_value += "#" + String(target.name) + "#";
@@ -410,14 +416,14 @@ export class BottomBarComponent implements AfterViewInit {
 		// searching and highlighting Places with regular expression
 		regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)#/g;
 		current_value = current_value.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
-		// searching and highlighting Categories with regular expression
+		// searching and highlighting Events with regular expression
 		regex = /@([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)@/g;
 		current_value = current_value.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">@$1@</span>");
 		// setting new value to editor
 		editor.innerHTML = current_value;
 
-		// if we are not choosing Category we should show it on the map
-		if (!isInstanceOfCategory(target)) {
+		// if we are not choosing Embedding we should show it on the map
+		if (isInstanceOfPlace(target) || isInstanceOfEventPlace(target)) {
 			const selectedPoint: MapClickEntityModel = {
 				id: "1",
 				geometry: {
@@ -439,8 +445,8 @@ export class BottomBarComponent implements AfterViewInit {
 		// placing caret on the end of the editor
 		placeCaretAtEnd(editor);
 
-		if (isInstanceOfCategory(target))
-			this.chosenCategories.push(target);
+		if (isInstanceOfEventPlace(target))
+			this.chosenEvents.push(target);
 		else
 			this.chosenPlaces.push(target);
 	}
@@ -473,15 +479,18 @@ export class BottomBarComponent implements AfterViewInit {
 		// searching and highlighting places in the text
 		regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)#/g;
 		highlightedText = highlightedText.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
-		// searching and hightlighting categories in the text
+		// searching and highlighting events in the text
 		regex = /@([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)@/g;
 		highlightedText = highlightedText.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
 		// placing highlighted text to the editor
 		editor.innerHTML = highlightedText;
 
 		if (!this.validKeyInput) {
-			// we should check that we have same amount categories in prompt as in the chosen Categories
-			if (this.promptText.split("#").length !== this.chosenPlaces.length * 2) {
+			let promptText = this.promptText;
+
+			// we should check that we have same amount places in prompt as in the chosen chosenPlaces
+			let split_text = promptText.split("#");
+			if (split_text.length !== this.chosenPlaces.length * 2 && split_text.length !== this.chosenPlaces.length * 2 + 1) {
 				this.notificationsService.addNotification({
 					message: "Указано некорректное место",
 					timeOut: 5000,
@@ -489,17 +498,36 @@ export class BottomBarComponent implements AfterViewInit {
 				});
 				return;
 			}
-			// we should check that we have same amount place || event places in prompt as in the chosenPlaces
-			if (this.promptText.split("@").length !== this.chosenCategories.length * 2) {
+
+			for (let i = 1; i < split_text.length; i += 2) {
+				const place = this.chosenPlaces[Math.floor(i / 2)];
+				if (isInstanceOfPlace(place))
+					split_text[i] = `<#fixed:${ place._id }:${ place.name }`;
+				else
+					split_text[i] = `<#embedding:${ place }:${ place }`; // TODO
+			}
+
+			promptText = split_text.join("");
+
+			// we should check that we have same amount place || event events in prompt as in the chosenEvents
+			split_text = promptText.split("@");
+			if (split_text.length !== this.chosenEvents.length * 2 && split_text.length !== this.chosenEvents.length * 2 + 1) {
 				this.notificationsService.addNotification({
-					message: "Указано некорректная категория",
+					message: "Указано некорректное событие",
 					timeOut: 5000,
 					type: "error",
 				});
 				return;
 			}
 
-			this.mapInteractionService.generatePath(this.promptText);
+			for (let i = 1; i < split_text.length; i += 2) {
+				const event = this.chosenEvents[Math.floor(i / 2)];
+				split_text[i] = `<@event:${ event._id }`;
+			}
+
+			promptText = split_text.join("");
+
+			this.mapInteractionService.generatePath(promptText);
 			return;
 		}
 
@@ -511,7 +539,7 @@ export class BottomBarComponent implements AfterViewInit {
 		} else {
 			this.hidePromptPlaceholder();
 
-			// counting hashes and ats and checking that we are typing name of place or category
+			// counting hashes and ats and checking that we are typing name of place or event
 			const count_hash = countChars(text, "#");
 			const count_at = countChars(text, "@");
 			let split_char = ""; // char with which text will be split
@@ -519,18 +547,18 @@ export class BottomBarComponent implements AfterViewInit {
 			if (count_hash % 2 == 1) { // now we are searching Places with #
 				split_char = "#";
 				this.searchArray = this.mapInteractionService.places;
-			} else if (count_at % 2 == 1) { // now we are searching Categories with @
+			} else if (count_at % 2 == 1) { // now we are searching Events with @
 				split_char = "@";
-				this.searchArray = this.mapInteractionService.places; // TODO change to categories array
+				this.searchArray = this.mapInteractionService.places; // TODO change to events array
 			}
 
-			if (split_char !== "") { // we are typing Category or Place name
+			if (split_char !== "") { // we are typing Event or Place name
 				this.showSearchBox();
 				// getting split values with split_char
 				const [current_value, search_value] = splitTextByLastOccurrence(text, split_char);
 				// updating search text with new typed value
 				this.searchText = search_value;
-			} else { // we are not typing neither Category nor Place name
+			} else { // we are not typing neither Event nor Place name
 				this.hideSearchBox();
 			}
 		}

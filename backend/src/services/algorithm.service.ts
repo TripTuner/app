@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+import OpenAI from "openai";
 
 import { config } from "../config";
 import { Category } from "../entities/category.entity";
@@ -199,9 +199,9 @@ export class AlgorithmService {
 		console.log("\x1b[36m[algorithm]\x1b[0m generation has been started: ", ( Date.now() - start ), "ms");
 		start = Date.now();
 
-		await this.parsePrompt();
-		console.log("\x1b[36m[algorithm]\x1b[0m prompt has been parsed: ", ( Date.now() - start ), "ms");
-		start = Date.now();
+		//await this.parsePrompt();
+		//console.log("\x1b[36m[algorithm]\x1b[0m prompt has been parsed: ", ( Date.now() - start ), "ms");
+		//start = Date.now();
 
 		await this.findPointsForPrompt();
 		console.log("\x1b[36m[algorithm]\x1b[0m points for prompt were found: ", ( Date.now() - start ), "ms");
@@ -380,7 +380,6 @@ export class AlgorithmService {
 		});
 
 		return parsed;
-
 	}
 
 	/** Function that calculates error of current placement of elements */

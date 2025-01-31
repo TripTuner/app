@@ -47,6 +47,7 @@ export class ApiService {
 			{ type: "fixed", coords: [37.626225, 55.753236], name: "«Галерея-мастерская Варшавка»", time: 90 },
 			{ type: "category", categories: { "Парк": 76, "Каток": 45, "Ботанический сад": 30, "Пикник": 67 } },
 		]; // TODO remove after testing
+		console.log(prompt);
 		try {
 			return await firstValueFrom(this.api.pathCreate({ prompt: testPrompt, startPosition: startPosition }));
 		} catch (error) {

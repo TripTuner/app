@@ -52,9 +52,13 @@
 
 		p:nth-child(1) {
 			width: 100%;
+			min-width:   calc(var(--notification-width) - 60px - 32px);
+			white-space: nowrap;
+			word-break:  keep-all;
 		}
 
 		p:nth-child(2) {
+			width: fit-content;
 			height:          100%;
 			display:         flex;
 			flex-direction:  column;
