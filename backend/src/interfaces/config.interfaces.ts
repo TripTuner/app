@@ -16,4 +16,5 @@ export interface Config {
     parseEventsCount: number
     RouterKey: string;
 	RouterUrl: string;
+    openaiAPIKey: string
 }

@@ -46,6 +46,21 @@ services:
       - 6379:6379
     restart: unless-stopped
 
+  ors-app:
+    container_name: ors-app
+    ports:
+      - "8080:8082"
+      - "9001:9001"
+    image: openrouteservice/openrouteservice:latest
+    volumes:
+      - ors-data:/home/ors
+    environment:
+      REBUILD_GRAPHS: False
+      CONTAINER_LOG_LEVEL: INFO
+      XMS: 1g
+      XMX: 2g
+      ADDITIONAL_JAVA_OPTS: ""
+
 #  backend:
 #    build: ./backend
 #    environment:
@@ -80,3 +95,4 @@ services:
 volumes:
   mongo-data:
   redis-data:
+  ors-data:
