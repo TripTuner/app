@@ -31,9 +31,9 @@ export class AlgorithmService {
 	durationsMatrix: number[][][] = [];
 
 	/** Maximum iterations of annealing algorithm */
-	private readonly ITERATIONS = 1e5;
+	private readonly ITERATIONS = 1e6;
 	/** Annealing temperature multiplier */
-	private readonly TEMPERATURE_MULTIPLIER = 0.099;
+	private readonly TEMPERATURE_MULTIPLIER = 0.9;
 	/** max elements count in items[i] */
 	private readonly MAX_ITEMS_COUNT = 50;
 	/** maximum count of items after pre similarity calculation */
@@ -100,83 +100,82 @@ export class AlgorithmService {
 		return result;
 	}
 
-	/** Function that calculates error of current placement of elements */
-	private async errorFunction(items: Array<LocationItem>): Promise<number> {
-		let error = 0;
-		let is_time_frames_valid = 1; // if path time frames are valid
+	/** Calculates similarities without distances */
+	public async calculatePreSimilarity(
+		item: {
+			place: Place,
+			index: number
+		},
+		categoryIndex: number,
+	): Promise<number[]> {
+		function getDistances(coords: number[][]): number[] {
+			for (let coord of coords)
+				for (let number of coord)
+					number = Math.ceil(number * 1000);
+			const pythagoreanDistance = Math.sqrt(( coords[0][0] - coords[1][0] ) * ( coords[0][0] - coords[1][0] ) + ( coords[0][1] - coords[1][1] ) * ( coords[0][1] - coords[1][1] ));
+			const manhattanDistance = Math.abs(coords[0][0] - coords[1][0]) + Math.abs(coords[0][1] - coords[1][1]);
+			return [pythagoreanDistance, manhattanDistance];
+		}
 
-		// checking time frames
-		let current_time = new Date(); // duration where we will stay in point this.keys[index].time
-		let faster_time = new Date(); // duration without staying in points
-		for (let index = 0; index < items.length; index++) {
-			let duration = 0;
-			if (index != 0) {
-				// getting duration between prev and this points in minutes
-				duration = Math.floor(this.durationsMatrix[index - 1][items[index - 1].index][items[index].index] / 60);
-			}
-			faster_time.setMinutes(faster_time.getMinutes() + duration);
-			current_time.setMinutes(current_time.getMinutes() + duration);
+		let similarity = 0, categoriesSum = 0;
+		const promptElement = this.keys[categoryIndex];
 
-			if ("start time" in items[index].location && "end time" in items[index].location) { // it is event with certain time frames
-				//@ts-ignore there will always be start time as we checked it in the statement
-				const start: Date = items[index].location["start time"];
-				//@ts-ignore
-				const end: Date = items[index].location["end time"];
-
-				if (start < faster_time) {
-					is_time_frames_valid = -1;
+		/** calculating categories similarity */
+			// getting all user categories
+		const itemCategories: string[] = [];
+		for (const objectId of item.place.categories!) {
+			const id = objectId.toString();
+			for (const category of this.categories)
+				if (category._id?.toString() === id) {
+					itemCategories.push(category.name);
 					break;
 				}
+		}
 
-				if (start < current_time) {
-					is_time_frames_valid = 0;
-					break;
-				}
-
-				current_time = faster_time = end;
-			} else { // it is not a point with certain time frames so we only set
-				current_time.setMinutes(current_time.getMinutes() + ( this.keys[index].time || 0 ));
+		// adding percentage to similarity
+		for (const key of Object.keys(promptElement.categories!)) {
+			// if found we should add this category percentage
+			if (itemCategories.includes(key)) {
+				similarity += promptElement.categories![key];
+				categoriesSum += promptElement.categories![key];
 			}
 		}
 
-		// calculating distance indicator
-		let distance_indicator = 0;
-		for (let i = 1; i < items.length; i++) {
-			distance_indicator += this.distancesMatrix[i - 1][items[i - 1].index][this.items[i - 1].length + items[i].index];
+		/** calculating the Pythagorean and Manhattan distances to the previous fixed point */
+		let pythagoreanPrevDistance = 0;
+		let manhattanPrevDistance = 0;
+		let prev_index = -1;
+		for (let index = 0; index < categoryIndex; index++) {
+			if (this.keys[index].type !== "fixed") continue;
+			prev_index = index;
 		}
-		if (distance_indicator === 0)
-			throw ( new errors.InternalServerError("distance indicator is 0") );
-
-		// calculating price indicator
-		let price_indicator = 1; // TODO
-
-		// calculating duration indicator
-		let duration_indicator = 1; // TODO
-
-		// calculating beauty of the path
-		let beauty = 0;
-		for (let index = 0; index < items.length; index++) {
-			if (this.keys[index].type === "category")
-				beauty += items[index].categoriesSum!;
-			else if (this.keys[index].type === "fixed" || this.keys[index].type === "event")
-				beauty += 100;
+		// if we found previous fixed point
+		if (prev_index !== -1) {
+			const coords = [[item.place.latitude, item.place.longitude], [this.items[prev_index][0].location.latitude, this.items[prev_index][0].location.longitude]];
+			[pythagoreanPrevDistance, manhattanPrevDistance] = getDistances(coords);
 		}
 
-		if (isNaN(beauty))
-			throw ( new errors.InternalServerError("beauty is NaN") );
+		/** calculating the Pythagorean and Manhattan distances to the next fixed point */
+		let next_index = -1;
+		let pythagoreanNextDistance = 0;
+		let manhattanNextDistance = 0;
+		for (let index = this.keys.length - 1; index > categoryIndex; index--) {
+			if (this.keys[index].type !== "fixed") continue;
+			next_index = this.items[index][0].index;
+		}
+		// if next point exists
+		if (next_index !== -1) {
+			const coords = [[item.place.latitude, item.place.longitude], [this.items[next_index][0].location.latitude, this.items[next_index][0].location.longitude]];
+			[pythagoreanNextDistance, manhattanNextDistance] = getDistances(coords);
+		}
 
-		// calculating error from existing parts
-		error = beauty * 1e6 / ( ( distance_indicator / 100 ) * ( distance_indicator / 100 ) );
-		console.log(error);
+		/** adding Pythagorean and Manhattan distances to answer */
+		const prevDistance = ( pythagoreanPrevDistance + manhattanPrevDistance ) / 2;
+		const nextDistance = ( pythagoreanNextDistance + manhattanNextDistance ) / 2;
+		similarity = similarity * ( 1e5 / ( prevDistance + nextDistance ) );
 
-		// returns result depending on is_time_frames_valid
-		if (is_time_frames_valid === 1)
-			return 1e4 * error;
-		if (is_time_frames_valid === 0)
-			return 1e4 / error;
-		if (is_time_frames_valid === -1)
-			return 1e1 / error;
-		return 1;
+		// returning the answer;
+		return [similarity, categoriesSum];
 	}
 
 	/** Function that makes random changes to path */
@@ -224,37 +223,90 @@ export class AlgorithmService {
 		// TODO
 	}
 
-	/** Calculates similarities without distances */
-	public async calculatePreSimilarity(
-		item: {
-			place: Place,
-			index: number
-		},
-		categoryIndex: number,
-	) {
-		let similarity = 0;
-		const promptElement = this.keys[categoryIndex];
+	/** Function that calculates error of current placement of elements */
+	private async errorFunction(items: Array<LocationItem>): Promise<number> {
+		let error = 0;
+		let is_time_frames_valid = 1; // if path time frames are valid
 
-		// getting all user categories
-		const itemCategories: string[] = [];
-		for (const objectId of item.place.categories!) {
-			const id = objectId.toString();
-			for (const category of this.categories)
-				if (category._id?.toString() === id) {
-					itemCategories.push(category.name);
+		// checking time frames
+		let current_time = new Date(); // duration where we will stay in point this.keys[index].time
+		let faster_time = new Date(); // duration without staying in points
+		for (let index = 0; index < items.length; index++) {
+			let duration = 0;
+			if (index != 0) {
+				// getting duration between prev and this points in minutes
+				duration = Math.floor(this.durationsMatrix[index - 1][items[index - 1].index][items[index].index] / 60);
+			}
+			faster_time.setMinutes(faster_time.getMinutes() + duration);
+			current_time.setMinutes(current_time.getMinutes() + duration);
+
+			if ("start time" in items[index].location && "end time" in items[index].location) { // it is event with certain time frames
+				//@ts-ignore there will always be start time as we checked it in the statement
+				const start: Date = items[index].location["start time"];
+				//@ts-ignore
+				const end: Date = items[index].location["end time"];
+
+				if (start < faster_time) {
+					is_time_frames_valid = -1;
 					break;
 				}
+
+				if (start < current_time) {
+					is_time_frames_valid = 0;
+					break;
+				}
+
+				current_time = faster_time = end;
+			} else { // it is not a point with certain time frames so we only set
+				current_time.setMinutes(current_time.getMinutes() + ( this.keys[index].time || 0 ));
+			}
 		}
 
-		// adding percentage to similarity
-		for (const key of Object.keys(promptElement.categories!)) {
-			// if found we should add this category percentage
-			if (itemCategories.includes(key))
-				similarity += promptElement.categories![key];
+		// calculating distance indicator
+		let average_distance = 0;
+		let min_distance = 1e9;
+		let max_distance = 0;
+		for (let i = 1; i < items.length; i++) {
+			const meters = this.distancesMatrix[i - 1][items[i - 1].index][this.items[i - 1].length + items[i].index];
+			const kilometers = Math.max(Math.ceil(meters / 1000));
+			average_distance += kilometers;
+			min_distance = Math.min(min_distance, kilometers);
+			max_distance = Math.max(max_distance, kilometers);
+		}
+		average_distance /= ( items.length - 1 );
+		const distance_indicator = average_distance * Math.max(1, max_distance - min_distance);
+		if (distance_indicator === 0)
+			throw ( new errors.InternalServerError("distance indicator is 0") );
+
+		// calculating price indicator
+		let price_indicator = 1; // TODO
+
+		// calculating duration indicator
+		let duration_indicator = 1; // TODO
+
+		// calculating beauty of the path
+		let beauty = 0;
+		for (let index = 0; index < items.length; index++) {
+			if (this.keys[index].type === "category")
+				beauty += items[index].categoriesSum!;
+			else if (this.keys[index].type === "fixed" || this.keys[index].type === "event")
+				beauty += 100;
 		}
 
-		// returning the answer;
-		return similarity;
+		if (isNaN(beauty))
+			throw ( new errors.InternalServerError("beauty is NaN") );
+
+		// calculating error from existing parts
+		error = beauty * ( 1e4 / distance_indicator );
+
+		// returns result depending on is_time_frames_valid
+		if (is_time_frames_valid === 1)
+			return 1e4 * error;
+		if (is_time_frames_valid === 0)
+			return 1e4 / error;
+		if (is_time_frames_valid === -1)
+			return 1e1 / error;
+		return 1;
 	}
 
 	/** Function that calculates error for LocationItem */
@@ -272,7 +324,7 @@ export class AlgorithmService {
 		// making for digits before comma for similarity
 		similarity *= this.ITEM_SIMILARITY_MULTIPLIER;
 
-		// checking for being close to previous fixed point or start position
+		// checking for being close to previous fixed point
 		let prev_index = 0;
 		for (let index = 0; index < categoryIndex; index++) {
 			if (this.keys[index].type !== "fixed") continue;
@@ -404,12 +456,12 @@ export class AlgorithmService {
 				let sort_places: { place: Place, index: number, similarity: number, categoriesSum: number }[] = []; // array with places and their similarities
 				for (const point of points) {
 					if (!isNaN(point.place.longitude) && !isNaN(point.place.latitude)) {
-						const pre_similarity = await this.calculatePreSimilarity(point, index);
+						const [pre_similarity, categoriesSum] = await this.calculatePreSimilarity(point, index);
 						sort_places.push({
 							place: point.place,
 							index: point.index,
 							similarity: pre_similarity,
-							categoriesSum: pre_similarity,
+							categoriesSum: categoriesSum,
 						});
 					}
 				}
@@ -452,7 +504,7 @@ export class AlgorithmService {
 					place.similarity = await this.calculateSimilarity({
 						place: place.place,
 						index: place.index,
-					}, index, place.similarity, distancesMatrix);
+					}, index, place.categoriesSum, distancesMatrix);
 				}
 
 				// sorting places by their similarity
