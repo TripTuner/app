@@ -14,4 +14,7 @@ export interface Config {
     mosDataKey: string
     timepadKey: string
     parseEventsCount: number
+    RouterKey: string;
+	RouterUrl: string;
+    openaiAPIKey: string
 }

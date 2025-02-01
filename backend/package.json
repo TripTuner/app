@@ -24,6 +24,7 @@
     "koa-redis": "^4.0.1",
     "lodash": "^4.17.21",
     "mongoose": "^8.9.3",
+    "openai": "^4.81.0",
     "pg": "^8.13.1",
     "redis": "^4.7.0",
     "reflect-metadata": "^0.2.2",

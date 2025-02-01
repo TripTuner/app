@@ -10,14 +10,16 @@
  * Do not edit the class manually.
  */
 import { PlaceDataInterface } from "./placeDataInterface";
+import { EventPlace } from "./eventPlace";
+import { Place } from "./place";
 
 
-export interface Place {
+export interface PathCreate200ResponseInner {
 	/**
 	 * A class representation of the BSON ObjectId type.
 	 */
 	_id?: string;
-	name?: string;
+	name: string;
 	type: number;
 	longitude: number;
 	latitude: number;
@@ -30,5 +32,8 @@ export interface Place {
 	address?: string | null;
 	data?: PlaceDataInterface | null;
 	categories?: Array<string>;
+	description: string;
+	start_time: string;
+	finish_time: string;
 }
 

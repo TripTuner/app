@@ -12,6 +12,9 @@
 
 
 export interface EventPlace {
+	/**
+	 * A class representation of the BSON ObjectId type.
+	 */
 	_id?: string;
 	name: string;
 	description: string;

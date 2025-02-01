@@ -11,13 +11,8 @@
  */
 
 
-export interface Category {
-	/**
-	 * A class representation of the BSON ObjectId type.
-	 */
-	_id?: string;
-	name: string;
-	svg: string;
-	places: Array<string>;
+export interface CreatePathModel {
+	prompt: string;
+	startPosition: Array<number>;
 }
 

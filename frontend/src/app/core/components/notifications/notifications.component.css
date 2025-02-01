@@ -34,7 +34,10 @@
 		align-items:         center;
 		flex-direction:      row;
 		justify-content:     space-between;
+		position: relative;
+		overflow: hidden;
 		padding:             10px 16px;
+		cursor:   pointer;
 		transition-duration: .3s;
 		transform:           translateX(100%);
 		opacity:             0;
@@ -43,11 +46,19 @@
 		background:          var(--background-secondary);
 		gap:                 0;
 
+		&:hover {
+			opacity: .3;
+		}
+
 		p:nth-child(1) {
 			width: 100%;
+			min-width:   calc(var(--notification-width) - 60px - 32px);
+			white-space: nowrap;
+			word-break:  keep-all;
 		}
 
 		p:nth-child(2) {
+			width: fit-content;
 			height:          100%;
 			display:         flex;
 			flex-direction:  column;
@@ -57,6 +68,16 @@
 			text-align:      center;
 			vertical-align:  center;
 			color:           var(--blue-60);
+		}
+
+		div {
+			width:      0;
+			height:     3px;
+			position:   absolute;
+			bottom:     0;
+			left:       0;
+			background: white;
+			all:        unset;
 		}
 	}
 }

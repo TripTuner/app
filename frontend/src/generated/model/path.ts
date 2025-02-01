@@ -11,13 +11,15 @@
  */
 
 
-export interface Category {
+export interface Path {
 	/**
 	 * A class representation of the BSON ObjectId type.
 	 */
 	_id?: string;
-	name: string;
-	svg: string;
-	places: Array<string>;
+	/**
+	 * A class representation of the BSON ObjectId type.
+	 */
+	user?: string;
+	segments: Array<string>;
 }
 

@@ -11,24 +11,26 @@
  */
 /* tslint:disable:no-unused-variable member-ordering */
 
-import {
-	HttpClient,
-	HttpContext,
-	HttpEvent,
-	HttpHeaders,
-	HttpParameterCodec,
-	HttpParams,
-	HttpResponse,
-} from "@angular/common/http";
 import { Inject, Injectable, Optional } from "@angular/core";
-import { Observable } from "rxjs";
-import { Configuration } from "../configuration";
+import {
+	HttpClient, HttpHeaders, HttpParams,
+	HttpResponse, HttpEvent, HttpParameterCodec, HttpContext,
+} from "@angular/common/http";
 import { CustomHttpParameterCodec } from "../encoder";
+import { Observable } from "rxjs";
 
 // @ts-ignore
 import { Category } from "../model/category";
 // @ts-ignore
+import { CreatePathModel } from "../model/createPathModel";
+// @ts-ignore
 import { EventPlace } from "../model/eventPlace";
+// @ts-ignore
+import { Path } from "../model/path";
+// @ts-ignore
+import { PathCreate200ResponseInner } from "../model/pathCreate200ResponseInner";
+// @ts-ignore
+import { PathSegment } from "../model/pathSegment";
 // @ts-ignore
 import { Place } from "../model/place";
 // @ts-ignore
@@ -40,6 +42,8 @@ import { UserRegister } from "../model/userRegister";
 
 // @ts-ignore
 import { BASE_PATH, COLLECTION_FORMATS } from "../variables";
+import { Configuration } from "../configuration";
+
 
 
 @Injectable({
@@ -47,10 +51,10 @@ import { BASE_PATH, COLLECTION_FORMATS } from "../variables";
 })
 export class BackendApiService {
 
+	protected basePath = "http://localhost";
 	public defaultHeaders = new HttpHeaders();
 	public configuration = new Configuration();
 	public encoder: HttpParameterCodec;
-	protected basePath = "http://localhost";
 
 	constructor(protected httpClient: HttpClient, @Optional() @Inject(BASE_PATH) basePath: string | string[], @Optional() configuration: Configuration) {
 		if (configuration) {
@@ -69,6 +73,43 @@ export class BackendApiService {
 		this.encoder = this.configuration.encoder || new CustomHttpParameterCodec();
 	}
 
+
+	// @ts-ignore
+	private addToHttpParams(httpParams: HttpParams, value: any, key?: string): HttpParams {
+		if (typeof value === "object" && value instanceof Date === false) {
+			httpParams = this.addToHttpParamsRecursive(httpParams, value);
+		} else {
+			httpParams = this.addToHttpParamsRecursive(httpParams, value, key);
+		}
+		return httpParams;
+	}
+
+	private addToHttpParamsRecursive(httpParams: HttpParams, value?: any, key?: string): HttpParams {
+		if (value == null) {
+			return httpParams;
+		}
+
+		if (typeof value === "object") {
+			if (Array.isArray(value)) {
+				( value as any[] ).forEach(elem => httpParams = this.addToHttpParamsRecursive(httpParams, elem, key));
+			} else if (value instanceof Date) {
+				if (key != null) {
+					httpParams = httpParams.append(key, ( value as Date ).toISOString().substr(0, 10));
+				} else {
+					throw Error("key may not be null if value is Date");
+				}
+			} else {
+				Object.keys(value).forEach(k => httpParams = this.addToHttpParamsRecursive(
+					httpParams, value[k], key != null ? `${ key }.${ k }` : k));
+			}
+		} else if (key != null) {
+			httpParams = httpParams.append(key, value);
+		} else {
+			throw Error("key may not be null if value is not object or array");
+		}
+		return httpParams;
+	}
+
 	/**
 	 * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
 	 * @param reportProgress flag to report request and response progress.
@@ -77,17 +118,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<Array<Category>>;
-
 	public categoriesGetAll(observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<Array<Category>>>;
-
 	public categoriesGetAll(observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<Array<Category>>>;
-
 	public categoriesGetAll(observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -146,17 +184,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<Array<Category>>;
-
 	public categoriesGetByPlaceId(placeId: string, observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<Array<Category>>>;
-
 	public categoriesGetByPlaceId(placeId: string, observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<Array<Category>>>;
-
 	public categoriesGetByPlaceId(placeId: string, observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -225,17 +260,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<Array<EventPlace>>;
-
 	public eventPlacesGetAll(observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<Array<EventPlace>>>;
-
 	public eventPlacesGetAll(observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<Array<EventPlace>>>;
-
 	public eventPlacesGetAll(observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -294,17 +326,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<EventPlace>;
-
 	public eventPlacesGetById(eventId: number, observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<EventPlace>>;
-
 	public eventPlacesGetById(eventId: number, observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<EventPlace>>;
-
 	public eventPlacesGetById(eventId: number, observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -374,17 +403,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<string>;
-
 	public login(userLogin: UserLogin, observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<string>>;
-
 	public login(userLogin: UserLogin, observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<string>>;
-
 	public login(userLogin: UserLogin, observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -448,6 +474,304 @@ export class BackendApiService {
 	}
 
 	/**
+	 * @param createPathModel
+	 * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+	 * @param reportProgress flag to report request and response progress.
+	 */
+	public pathCreate(createPathModel: CreatePathModel, observe?: "body", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<Array<PathCreate200ResponseInner>>;
+	public pathCreate(createPathModel: CreatePathModel, observe?: "response", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpResponse<Array<PathCreate200ResponseInner>>>;
+	public pathCreate(createPathModel: CreatePathModel, observe?: "events", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpEvent<Array<PathCreate200ResponseInner>>>;
+	public pathCreate(createPathModel: CreatePathModel, observe: any = "body", reportProgress: boolean = false, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<any> {
+		if (createPathModel === null || createPathModel === undefined) {
+			throw new Error("Required parameter createPathModel was null or undefined when calling pathCreate.");
+		}
+
+		let localVarHeaders = this.defaultHeaders;
+
+		let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+		if (localVarHttpHeaderAcceptSelected === undefined) {
+			// to determine the Accept header
+			const httpHeaderAccepts: string[] = [
+				"application/json",
+			];
+			localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+		}
+		if (localVarHttpHeaderAcceptSelected !== undefined) {
+			localVarHeaders = localVarHeaders.set("Accept", localVarHttpHeaderAcceptSelected);
+		}
+
+		let localVarHttpContext: HttpContext | undefined = options && options.context;
+		if (localVarHttpContext === undefined) {
+			localVarHttpContext = new HttpContext();
+		}
+
+
+		// to determine the Content-Type header
+		const consumes: string[] = [
+			"application/json",
+		];
+		const httpContentTypeSelected: string | undefined = this.configuration.selectHeaderContentType(consumes);
+		if (httpContentTypeSelected !== undefined) {
+			localVarHeaders = localVarHeaders.set("Content-Type", httpContentTypeSelected);
+		}
+
+		let responseType_: "text" | "json" | "blob" = "json";
+		if (localVarHttpHeaderAcceptSelected) {
+			if (localVarHttpHeaderAcceptSelected.startsWith("text")) {
+				responseType_ = "text";
+			} else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+				responseType_ = "json";
+			} else {
+				responseType_ = "blob";
+			}
+		}
+
+		let localVarPath = `/path/create`;
+		return this.httpClient.request<Array<PathCreate200ResponseInner>>("post", `${ this.configuration.basePath }${ localVarPath }`,
+			{
+				context: localVarHttpContext,
+				body: createPathModel,
+				responseType: <any>responseType_,
+				withCredentials: this.configuration.withCredentials,
+				headers: localVarHeaders,
+				observe: observe,
+				reportProgress: reportProgress,
+			},
+		);
+	}
+
+	/**
+	 * @param pathId
+	 * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+	 * @param reportProgress flag to report request and response progress.
+	 */
+	public pathGetById(pathId: string, observe?: "body", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<Path>;
+	public pathGetById(pathId: string, observe?: "response", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpResponse<Path>>;
+	public pathGetById(pathId: string, observe?: "events", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpEvent<Path>>;
+	public pathGetById(pathId: string, observe: any = "body", reportProgress: boolean = false, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<any> {
+		if (pathId === null || pathId === undefined) {
+			throw new Error("Required parameter pathId was null or undefined when calling pathGetById.");
+		}
+
+		let localVarHeaders = this.defaultHeaders;
+
+		let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+		if (localVarHttpHeaderAcceptSelected === undefined) {
+			// to determine the Accept header
+			const httpHeaderAccepts: string[] = [
+				"application/json",
+			];
+			localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+		}
+		if (localVarHttpHeaderAcceptSelected !== undefined) {
+			localVarHeaders = localVarHeaders.set("Accept", localVarHttpHeaderAcceptSelected);
+		}
+
+		let localVarHttpContext: HttpContext | undefined = options && options.context;
+		if (localVarHttpContext === undefined) {
+			localVarHttpContext = new HttpContext();
+		}
+
+
+		let responseType_: "text" | "json" | "blob" = "json";
+		if (localVarHttpHeaderAcceptSelected) {
+			if (localVarHttpHeaderAcceptSelected.startsWith("text")) {
+				responseType_ = "text";
+			} else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+				responseType_ = "json";
+			} else {
+				responseType_ = "blob";
+			}
+		}
+
+		let localVarPath = `/path/${ this.configuration.encodeParam({
+			name: "pathId",
+			value: pathId,
+			in: "path",
+			style: "simple",
+			explode: false,
+			dataType: "string",
+			dataFormat: undefined,
+		}) }`;
+		return this.httpClient.request<Path>("get", `${ this.configuration.basePath }${ localVarPath }`,
+			{
+				context: localVarHttpContext,
+				responseType: <any>responseType_,
+				withCredentials: this.configuration.withCredentials,
+				headers: localVarHeaders,
+				observe: observe,
+				reportProgress: reportProgress,
+			},
+		);
+	}
+
+	/**
+	 * @param pathId
+	 * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+	 * @param reportProgress flag to report request and response progress.
+	 */
+	public pathSegmentsGetById(pathId: string, observe?: "body", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<Array<PathSegment>>;
+	public pathSegmentsGetById(pathId: string, observe?: "response", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpResponse<Array<PathSegment>>>;
+	public pathSegmentsGetById(pathId: string, observe?: "events", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpEvent<Array<PathSegment>>>;
+	public pathSegmentsGetById(pathId: string, observe: any = "body", reportProgress: boolean = false, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<any> {
+		if (pathId === null || pathId === undefined) {
+			throw new Error("Required parameter pathId was null or undefined when calling pathSegmentsGetById.");
+		}
+
+		let localVarHeaders = this.defaultHeaders;
+
+		let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+		if (localVarHttpHeaderAcceptSelected === undefined) {
+			// to determine the Accept header
+			const httpHeaderAccepts: string[] = [
+				"application/json",
+			];
+			localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+		}
+		if (localVarHttpHeaderAcceptSelected !== undefined) {
+			localVarHeaders = localVarHeaders.set("Accept", localVarHttpHeaderAcceptSelected);
+		}
+
+		let localVarHttpContext: HttpContext | undefined = options && options.context;
+		if (localVarHttpContext === undefined) {
+			localVarHttpContext = new HttpContext();
+		}
+
+
+		let responseType_: "text" | "json" | "blob" = "json";
+		if (localVarHttpHeaderAcceptSelected) {
+			if (localVarHttpHeaderAcceptSelected.startsWith("text")) {
+				responseType_ = "text";
+			} else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+				responseType_ = "json";
+			} else {
+				responseType_ = "blob";
+			}
+		}
+
+		let localVarPath = `/path/${ this.configuration.encodeParam({
+			name: "pathId",
+			value: pathId,
+			in: "path",
+			style: "simple",
+			explode: false,
+			dataType: "string",
+			dataFormat: undefined,
+		}) }/segments`;
+		return this.httpClient.request<Array<PathSegment>>("get", `${ this.configuration.basePath }${ localVarPath }`,
+			{
+				context: localVarHttpContext,
+				responseType: <any>responseType_,
+				withCredentials: this.configuration.withCredentials,
+				headers: localVarHeaders,
+				observe: observe,
+				reportProgress: reportProgress,
+			},
+		);
+	}
+
+	/**
+	 * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
+	 * @param reportProgress flag to report request and response progress.
+	 */
+	public pathsGetAll(observe?: "body", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<Array<Path>>;
+	public pathsGetAll(observe?: "response", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpResponse<Array<Path>>>;
+	public pathsGetAll(observe?: "events", reportProgress?: boolean, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<HttpEvent<Array<Path>>>;
+	public pathsGetAll(observe: any = "body", reportProgress: boolean = false, options?: {
+		httpHeaderAccept?: "application/json",
+		context?: HttpContext
+	}): Observable<any> {
+
+		let localVarHeaders = this.defaultHeaders;
+
+		let localVarHttpHeaderAcceptSelected: string | undefined = options && options.httpHeaderAccept;
+		if (localVarHttpHeaderAcceptSelected === undefined) {
+			// to determine the Accept header
+			const httpHeaderAccepts: string[] = [
+				"application/json",
+			];
+			localVarHttpHeaderAcceptSelected = this.configuration.selectHeaderAccept(httpHeaderAccepts);
+		}
+		if (localVarHttpHeaderAcceptSelected !== undefined) {
+			localVarHeaders = localVarHeaders.set("Accept", localVarHttpHeaderAcceptSelected);
+		}
+
+		let localVarHttpContext: HttpContext | undefined = options && options.context;
+		if (localVarHttpContext === undefined) {
+			localVarHttpContext = new HttpContext();
+		}
+
+
+		let responseType_: "text" | "json" | "blob" = "json";
+		if (localVarHttpHeaderAcceptSelected) {
+			if (localVarHttpHeaderAcceptSelected.startsWith("text")) {
+				responseType_ = "text";
+			} else if (this.configuration.isJsonMime(localVarHttpHeaderAcceptSelected)) {
+				responseType_ = "json";
+			} else {
+				responseType_ = "blob";
+			}
+		}
+
+		let localVarPath = `/path/all`;
+		return this.httpClient.request<Array<Path>>("get", `${ this.configuration.basePath }${ localVarPath }`,
+			{
+				context: localVarHttpContext,
+				responseType: <any>responseType_,
+				withCredentials: this.configuration.withCredentials,
+				headers: localVarHeaders,
+				observe: observe,
+				reportProgress: reportProgress,
+			},
+		);
+	}
+
+	/**
 	 * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
 	 * @param reportProgress flag to report request and response progress.
 	 */
@@ -455,17 +779,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<string>;
-
 	public ping(observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<string>>;
-
 	public ping(observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<string>>;
-
 	public ping(observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -523,17 +844,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<Array<Place>>;
-
 	public placesGetAll(observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<Array<Place>>>;
-
 	public placesGetAll(observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<Array<Place>>>;
-
 	public placesGetAll(observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -592,17 +910,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<Array<Place>>;
-
 	public placesGetByCategoryId(categoryId: string, observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<Array<Place>>>;
-
 	public placesGetByCategoryId(categoryId: string, observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<Array<Place>>>;
-
 	public placesGetByCategoryId(categoryId: string, observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -668,22 +983,19 @@ export class BackendApiService {
 	 * @param observe set whether or not to return the data Observable as the body, response or events. defaults to returning the body.
 	 * @param reportProgress flag to report request and response progress.
 	 */
-	public placesGetById(placeId: number, observe?: "body", reportProgress?: boolean, options?: {
+	public placesGetById(placeId: string, observe?: "body", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<Place>;
-
-	public placesGetById(placeId: number, observe?: "response", reportProgress?: boolean, options?: {
+	public placesGetById(placeId: string, observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<Place>>;
-
-	public placesGetById(placeId: number, observe?: "events", reportProgress?: boolean, options?: {
+	public placesGetById(placeId: string, observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<Place>>;
-
-	public placesGetById(placeId: number, observe: any = "body", reportProgress: boolean = false, options?: {
+	public placesGetById(placeId: string, observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<any> {
@@ -728,8 +1040,8 @@ export class BackendApiService {
 			in: "path",
 			style: "simple",
 			explode: false,
-			dataType: "number",
-			dataFormat: "double",
+			dataType: "string",
+			dataFormat: undefined,
 		}) }`;
 		return this.httpClient.request<Place>("get", `${ this.configuration.basePath }${ localVarPath }`,
 			{
@@ -751,17 +1063,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<UserPublic>;
-
 	public profile(observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<UserPublic>>;
-
 	public profile(observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<UserPublic>>;
-
 	public profile(observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -826,17 +1135,14 @@ export class BackendApiService {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<string>;
-
 	public register(userRegister: UserRegister, observe?: "response", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpResponse<string>>;
-
 	public register(userRegister: UserRegister, observe?: "events", reportProgress?: boolean, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
 	}): Observable<HttpEvent<string>>;
-
 	public register(userRegister: UserRegister, observe: any = "body", reportProgress: boolean = false, options?: {
 		httpHeaderAccept?: "application/json",
 		context?: HttpContext
@@ -897,42 +1203,6 @@ export class BackendApiService {
 				reportProgress: reportProgress,
 			},
 		);
-	}
-
-	// @ts-ignore
-	private addToHttpParams(httpParams: HttpParams, value: any, key?: string): HttpParams {
-		if (typeof value === "object" && value instanceof Date === false) {
-			httpParams = this.addToHttpParamsRecursive(httpParams, value);
-		} else {
-			httpParams = this.addToHttpParamsRecursive(httpParams, value, key);
-		}
-		return httpParams;
-	}
-
-	private addToHttpParamsRecursive(httpParams: HttpParams, value?: any, key?: string): HttpParams {
-		if (value == null) {
-			return httpParams;
-		}
-
-		if (typeof value === "object") {
-			if (Array.isArray(value)) {
-				( value as any[] ).forEach(elem => httpParams = this.addToHttpParamsRecursive(httpParams, elem, key));
-			} else if (value instanceof Date) {
-				if (key != null) {
-					httpParams = httpParams.append(key, ( value as Date ).toISOString().substr(0, 10));
-				} else {
-					throw Error("key may not be null if value is Date");
-				}
-			} else {
-				Object.keys(value).forEach(k => httpParams = this.addToHttpParamsRecursive(
-					httpParams, value[k], key != null ? `${ key }.${ k }` : k));
-			}
-		} else if (key != null) {
-			httpParams = httpParams.append(key, value);
-		} else {
-			throw Error("key may not be null if value is not object or array");
-		}
-		return httpParams;
 	}
 
 }

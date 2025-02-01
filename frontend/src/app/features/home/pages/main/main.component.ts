@@ -286,7 +286,7 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 			for (const point of points)
 				coordinates.push([point.latitude, point.longitude]);
 			// fetching path from OSM API
-			const response = await fetch("https://api.openrouteservice.org/v2/directions/foot-walking/geojson", {
+			const response = await fetch(`${ environment.RouteUrl }/v2/directions/foot-walking/geojson`, {
 				method: "POST",
 				headers: {
 					"Authorization": environment.RouteKey,
