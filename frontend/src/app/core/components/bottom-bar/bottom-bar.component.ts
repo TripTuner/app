@@ -70,7 +70,9 @@ function placeCaretAt(editor: HTMLDivElement, pos: number) {
 		position -= length;
 		index++;
 	}
-	if (children[index].nodeValue === null)
+	if (children[index] === undefined)
+		return;
+	else if (children[index].nodeValue === null)
 		range.setStart(children[index].childNodes[0], position);
 	else
 		range.setStart(children[index], position);
@@ -139,7 +141,7 @@ function getCaretPosition(editor: HTMLDivElement) {
 								 (input)="handlePromptInput()"
 								 (click)="handleCaretPositionChanges($event)"
 								 role="textbox" contenteditable="true" #promptInput></div>
-							<!-- 							<span class="message-placeholder" #promptPlaceholder>Prompt...</span> -->
+							<span class="message-placeholder" #promptPlaceholder>Prompt...</span>
 						</div>
 					</div>
 
@@ -582,6 +584,13 @@ export class BottomBarComponent implements AfterViewInit {
 
 		// highlighting the segments in the line with spans
 		const highlightedString = this.highlightEditorText(editorText);
+
+		// showing placeholder
+		console.log(editorText);
+		if (editorText === '\n' || editorText === '')
+			this.showPromptPlaceholder();
+		else
+			this.hidePromptPlaceholder();
 
 		this.promptText = editorText;
 		editor.innerHTML = highlightedString;
