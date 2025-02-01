@@ -11,11 +11,9 @@ import {
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { filter } from "rxjs";
 import { Category, EventPlace, Place } from "../../../../generated";
-import { MapClickEntityModel } from "../../models/map-click-entity.model";
 import { PlaceSearchPipe } from "../../pipes/place-search.pipe";
 import { MapInteractionsService } from "../../services/map-interactions.service";
 import { NotificationsService } from "../../services/notifications.service";
-import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
 import { SlideCategoriesComponent } from "../slide-categories.component";
 
 /**
@@ -67,19 +65,19 @@ function placeCaretAt(editor: HTMLDivElement, pos: number) {
 	let [index, position] = [0, pos];
 	while (index < children.length) {
 		//@ts-ignore
-		const length = (children[index].nodeValue || children[index].innerText).length;
+		const length = ( children[index].nodeValue || children[index].innerText ).length;
 		if (position <= length) break;
 		position -= length;
 		index++;
 	}
 	if (children[index].nodeValue === null)
-		range.setStart(children[index].childNodes[0], position)
+		range.setStart(children[index].childNodes[0], position);
 	else
-		range.setStart(children[index], position)
-	range.collapse(true)
+		range.setStart(children[index], position);
+	range.collapse(true);
 
-	sel.removeAllRanges()
-	sel.addRange(range)
+	sel.removeAllRanges();
+	sel.addRange(range);
 }
 
 /** Returns caret position in editor */
@@ -241,7 +239,7 @@ export class BottomBarComponent implements AfterViewInit {
 	/** Search text for searching pipe */
 	searchText: string = "";
 	/** Bool param if last typed button to prompt input is valid */
-	typedKey: string = '';
+	typedKey: string = "";
 	/** Prompt text */
 	promptText: string = "123#abacaba 4567";
 
@@ -273,7 +271,8 @@ export class BottomBarComponent implements AfterViewInit {
 		this.mapInteractionService.pathInformationState.subscribe(state => {
 			if (state === 1) {
 				this.closeMainContainer();
-			} else if (state === -2 && this.mapInteractionService.chosenMapPoint.value === null) {
+			}
+			else if (state === -2 && this.mapInteractionService.chosenMapPoint.value === null) {
 				this.openMainContainer();
 			}
 		});
@@ -337,7 +336,8 @@ export class BottomBarComponent implements AfterViewInit {
 			this.mainAddonContainer.nativeElement.style.display = "flex";
 			setTimeout(() => this.mainAddonContainer.nativeElement.style.maxHeight = "100vh");
 			setTimeout(() => this.stickPositionButton.nativeElement.style.opacity = "1", 300);
-		} else {
+		}
+		else {
 			this.mainAddonContainer.nativeElement.style.maxHeight = "0";
 			this.stickPositionButton.nativeElement.style.opacity = "0";
 			setTimeout(() => this.mainAddonContainer.nativeElement.style.display = "none", 300);
@@ -434,6 +434,13 @@ export class BottomBarComponent implements AfterViewInit {
 		this.promptPlaceholder.nativeElement.style.transform = "translateX(50px)";
 	}
 
+	changeInputSize() {
+		// check if we should add new line on the div and add to scroll-container size
+		const current_input_height: number = this.promptInput.nativeElement.getBoundingClientRect().height!;
+		this.promptInputScroll.nativeElement.style.height = `clamp(var(--base-height), ${ current_input_height }px, var(--base-height-max))`;
+		this.updateStickPositionButton();
+	}
+
 	/** Handler for prompt search box click event */
 	handlePromptSearchBoxClick(target: Place | EventPlace) {
 		const editor = this.promptInput.nativeElement;
@@ -441,21 +448,18 @@ export class BottomBarComponent implements AfterViewInit {
 		let index = this.searchBoxIndex;
 		let newCaretPosition = 0;
 
+		const currentValue = editorText;
+		editorText = currentValue.slice(0, this.leftIndex[index] + 1);
+		editorText += target.name;
+		if (currentValue.slice(this.rightIndex[index] + 1).length === 0 || currentValue.slice(this.rightIndex[index] + 1)[0] !== " ")
+			editorText += " ";
+		editorText += currentValue.slice(this.rightIndex[index] + 1);
+
 		this.chosenElements[index] = target;
 		const length = target.name?.length!;
 		this.rightIndex[index] = this.leftIndex[index] + length;
 		newCaretPosition = this.rightIndex[index] + 2;
 
-		const currentValue = editorText;
-		editorText = currentValue.slice(0, this.leftIndex[index] + 1);
-		editorText += target.name;
-		if (currentValue.slice(this.rightIndex[index] + 1).length === 0 || currentValue.slice(this.rightIndex[index] + 1)[0] !== ' ')
-			editorText += ' ';
-		editorText += currentValue.slice(this.rightIndex[index] + 1)
-
-		console.log(editorText);
-		console.log(this.leftIndex);
-		console.log(this.rightIndex);
 
 		// highlighting the segments in the line with spans
 		const highlightedString = this.highlightEditorText(editorText);
@@ -463,6 +467,9 @@ export class BottomBarComponent implements AfterViewInit {
 		this.promptText = editorText;
 		editor.innerHTML = highlightedString;
 		placeCaretAt(editor, newCaretPosition);
+
+		this.hideSearchBox();
+		this.changeInputSize();
 	}
 
 	/** Handler for prompt input key button down event */
@@ -471,7 +478,7 @@ export class BottomBarComponent implements AfterViewInit {
 	}
 
 	handleCaretPositionChanges(event: any) {
-		if (event.key === undefined || ( event.key.slice(0, 5) === 'Arrow' )) {
+		if (event.key === undefined || ( event.key.slice(0, 5) === "Arrow" )) {
 			const editor = this.promptInput.nativeElement;
 			const editorText = editor.innerText;
 			const caretPosition = getCaretPosition(editor);
@@ -480,15 +487,16 @@ export class BottomBarComponent implements AfterViewInit {
 				if (this.leftIndex[i] + 1 <= caretPosition && caretPosition <= this.rightIndex[i] + 1)
 					index = i;
 
-			if (index !== -1 && this.chosenElements[index]===null) {
-				if (editorText.charAt(this.leftIndex[index]) === '#')
+			if (index !== -1 && this.chosenElements[index] === null) {
+				if (editorText.charAt(this.leftIndex[index]) === "#")
 					this.searchArray = this.mapInteractionService.places;
 				else
 					this.searchArray = this.mapInteractionService.places; // change to event places
 				this.searchText = editorText.slice(this.leftIndex[index] + 1, this.rightIndex[index] + 1);
 				this.searchBoxIndex = index;
 				this.showSearchBox();
-			} else
+			}
+			else
 				this.hideSearchBox();
 		}
 	}
@@ -500,17 +508,17 @@ export class BottomBarComponent implements AfterViewInit {
 		let newCaretPosition = caretPosition;
 		let editorText = editor.innerText;
 
-		if (this.typedKey === 'Backspace' || this.typedKey === 'Delete') {
+		if (this.typedKey === "Backspace" || this.typedKey === "Delete") {
 			// we are looking for a segment that will be affected by the current change
 			let index = -1;
 			for (let i = 0; i < this.leftIndex.length; i++)
-				if (this.leftIndex[i] + (this.typedKey === 'Backspace' ? 1 : 0) <= caretPosition && caretPosition <= this.rightIndex[i])
+				if (this.leftIndex[i] + ( this.typedKey === "Backspace" ? 0 : 0 ) <= caretPosition && caretPosition <= this.rightIndex[i])
 					index = i;
 
 			// removing this segment
 			if (index !== -1) {
 				const currentValue = editorText;
-				editorText = currentValue.slice(0,this.leftIndex[index]);
+				editorText = currentValue.slice(0, this.leftIndex[index]);
 				editorText += currentValue.slice(this.rightIndex[index]);
 				this.hideSearchBox();
 				newCaretPosition = this.leftIndex[index];
@@ -519,7 +527,7 @@ export class BottomBarComponent implements AfterViewInit {
 				this.chosenElements.splice(index, 1);
 			}
 		}
-		else if (this.typedKey === 'Enter') {
+		else if (this.typedKey === "Enter") {
 			// TODO make calls to API with this prompt
 			editorText = this.promptText;
 		}
@@ -528,11 +536,12 @@ export class BottomBarComponent implements AfterViewInit {
 			this.rightIndex.push(caretPosition - 1);
 			this.chosenElements.push(null);
 
-			if (editorText.charAt(caretPosition - 1) === '#')
+			if (editorText.charAt(caretPosition - 1) === "#")
 				this.searchArray = this.mapInteractionService.places;
 			else
 				this.searchArray = this.mapInteractionService.places; // change to event places
-			this.searchText = '';
+
+			this.searchText = "";
 			this.searchBoxIndex = this.leftIndex.length - 1;
 			this.showSearchBox();
 		}
@@ -553,11 +562,21 @@ export class BottomBarComponent implements AfterViewInit {
 		// updating position of left and right indexes
 		let lastIndex = 0;
 		for (let index = 0; index < editorText.length; index++) {
-			if (editorText.charAt(index) === '#' || editorText.charAt(index) === '@') {
+			if (editorText.charAt(index) === "#" || editorText.charAt(index) === "@") {
 				const delta = index - this.leftIndex[lastIndex];
 				this.leftIndex[lastIndex] += delta;
 				this.rightIndex[lastIndex] += delta;
 				lastIndex++;
+			}
+		}
+
+		// removing all invalid indexes
+		for (let index = 0; index < this.leftIndex.length; index++) {
+			if (editorText.length <= this.leftIndex[index] || (editorText.charAt(this.leftIndex[index]) !== "#" && editorText.charAt(this.leftIndex[index]) !== "@")) {
+				this.leftIndex.splice(index, 1);
+				this.rightIndex.splice(index, 1);
+				this.chosenElements.splice(index, 1);
+				index--;
 			}
 		}
 
@@ -567,10 +586,12 @@ export class BottomBarComponent implements AfterViewInit {
 		this.promptText = editorText;
 		editor.innerHTML = highlightedString;
 		placeCaretAt(editor, newCaretPosition);
+
+		this.changeInputSize();
 	}
 
 	highlightEditorText(editorText: string) {
-		let highlightedString: string = '';
+		let highlightedString: string = "";
 		let lastIndex = 0;
 		// highlighting segments
 		for (let index = 0; index < this.leftIndex.length; index++) {
@@ -578,8 +599,8 @@ export class BottomBarComponent implements AfterViewInit {
 			highlightedString += editorText.slice(lastIndex, this.leftIndex[index]);
 
 			// adding highlighted string
-			const styles = 'border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;'
-			highlightedString += `<span style="${styles}">${editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1)}</span>`;
+			const styles = "border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;";
+			highlightedString += `<span style="${ styles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
 
 			// updating last placed index
 			lastIndex = this.rightIndex[index] + 1;
