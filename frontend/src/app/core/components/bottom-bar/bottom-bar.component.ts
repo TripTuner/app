@@ -617,8 +617,12 @@ export class BottomBarComponent implements AfterViewInit {
 			highlightedString += editorText.slice(lastIndex, this.leftIndex[index]);
 
 			// adding highlighted string
-			const styles = "border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;";
-			highlightedString += `<span style="${ styles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
+			const hashStyles = "border-radius: var(--br-100); background: rgba(67, 70, 218, 0.5); color: var(--text-primary); padding: 0 10px;";
+			const atStyles = "border-radius: var(--br-100); background: rgba(172, 0, 230, 0.5); color: var(--text-primary); padding: 0 10px;";
+			if (editorText.charAt(this.leftIndex[index]) === '#')
+				highlightedString += `<span style="${ hashStyles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
+			else
+				highlightedString += `<span style="${ atStyles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
 
 			// updating last placed index
 			lastIndex = this.rightIndex[index] + 1;
