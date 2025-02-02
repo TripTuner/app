@@ -204,7 +204,7 @@ export class MapPointInformationComponent {
 		let lastY = event.touches[0].clientY; // initial y scroll position
 
 		/** Handler for touch end event */
-		const handleTouchEnd = (event: TouchEvent) => {
+		const handleTouchEnd = () => {
 			// sticking container height to one of the values
 			const currentTouchY = lastY;
 			const currentHeight = container.getBoundingClientRect().height;

@@ -19,41 +19,6 @@ import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.
 import { SlideCategoriesComponent } from "../slide-categories.component";
 
 /**
- * Function that splits string by last index of char in text
- *
- * @param {string} text text that should be split
- * @param {string} char char for splitting
- * @returns {string[]} string array with two strings
- */
-function splitTextByLastOccurrence(text: string, char: string): string[] {
-	const lastIndex = text.lastIndexOf(char);
-	if (lastIndex === -1) {
-		return [text, ""]; // Возвращает весь текст и пустую строку, если символ не найден
-	}
-	const part1 = text.slice(0, lastIndex);
-	const part2 = text.slice(lastIndex + char.length);
-	return [part1, part2];
-}
-
-/**
- * Function that checks that object is type of Category
- *
- * @param {any} obj object that should be checked
- * @returns {boolean} is objected type of Category
- */
-function isInstanceOfCategory(obj: any): obj is Category {
-	return (
-		typeof obj === "object" &&
-		obj !== null &&
-		( typeof obj._id === "undefined" || typeof obj._id === "string" ) &&
-		typeof obj.name === "string" &&
-		typeof obj.svg === "string" &&
-		Array.isArray(obj.places) &&
-		obj.places.every((place: any) => typeof place === "string")
-	);
-}
-
-/**
  * Function that places Caret to the end of the editor
  *
  * @param {HTMLDivElement} editor editor in which caret should be placed
@@ -371,7 +336,7 @@ export class BottomBarComponent implements AfterViewInit {
 			this.stickPositionButton.nativeElement.style.top = `${ window.innerHeight - this.container.nativeElement.getBoundingClientRect().height - 43 }px`;
 		};
 		// handler for touch end events
-		const touchEndHandler = (e: TouchEvent) => {
+		const touchEndHandler = () => {
 			if (currentHeight > maxHeight * 2 / 3) this.mapInteractionService.mainContainerState.set(1);
 			else this.mapInteractionService.mainContainerState.set(-1);
 
@@ -455,7 +420,7 @@ export class BottomBarComponent implements AfterViewInit {
 		const editor = this.promptInput.nativeElement;
 		let editorText = editor.innerText;
 		let index = this.searchBoxIndex;
-		let newCaretPosition = 0;
+		let newCaretPosition;
 
 		const currentValue = editorText;
 		editorText = currentValue.slice(0, this.leftIndex[index] + 1);
