@@ -16,7 +16,7 @@ interface LocationItem {
 	categoriesSum?: number;
 }
 
-const openai = new OpenAI({apiKey: config.openaiAPIKey, baseURL: "https://openrouter.ai/api/v1"});
+const openai = new OpenAI({ apiKey: config.openaiAPIKey, baseURL: "https://openrouter.ai/api/v1" });
 
 
 const BASE_PROMPT = "### ИНСТРУКЦИЯ ДЛЯ НЕЙРОСЕТИ\n" +
@@ -172,9 +172,9 @@ export class AlgorithmService {
 	/** Annealing temperature multiplier */
 	private readonly TEMPERATURE_MULTIPLIER = 0.9;
 	/** max elements count in items[i] */
-	private readonly MAX_ITEMS_COUNT = 50;
+	private readonly MAX_ITEMS_COUNT = 29;
 	/** maximum count of items after pre similarity calculation */
-	private readonly MAX_ITEMS_PRE_COUNT = 50;
+	private readonly MAX_ITEMS_PRE_COUNT = 29;
 	/**  */
 	private readonly ITEM_SIMILARITY_MULTIPLIER = 1e4;
 	/**  */
@@ -356,28 +356,29 @@ export class AlgorithmService {
 	}
 
 	/** Function that parses prompt into Array<PromptItem> */
-	private async parsePrompt(): Promise<PromptElement[]> {
+	private async parsePrompt() {
 		const prompted = await openai.chat.completions.create({
-			messages: [{ role: 'user', content: BASE_PROMPT.replace("{USER_INPUT}", this.prompt)}],
-			model: 'deepseek/deepseek-r1:free',
+			messages: [{ role: "user", content: BASE_PROMPT.replace("{USER_INPUT}", this.prompt) }],
+			model: "deepseek/deepseek-r1:free",
 		});
-		console.log(prompted);
-		let content = JSON.parse(prompted.choices[0].message.content!);
+		const messageContent = prompted.choices[0].message.content!;
+		let content = JSON.parse(messageContent);
 
 		let parsed: PromptElement[] = [];
 		content.forEach((el: PromptElement) => {
 			if (el.type == "route") {
 				el.parsed_elements!.forEach((par: PromptElement) => {
-					parsed.push(par)
-				})
-			} else {
-				parsed.push(el)
+					parsed.push(par);
+				});
+			}
+			else {
+				parsed.push(el);
 			}
 		});
 
 		console.log(parsed);
 
-		return parsed;
+		this.keys = parsed;
 	}
 
 	/** Function that calculates error of current placement of elements */
@@ -414,7 +415,8 @@ export class AlgorithmService {
 				}
 
 				current_time = faster_time = end;
-			} else { // it is not a point with certain time frames so we only set
+			}
+			else { // it is not a point with certain time frames so we only set
 				current_time.setMinutes(current_time.getMinutes() + ( this.keys[index].time || 0 ));
 			}
 		}
@@ -425,7 +427,7 @@ export class AlgorithmService {
 		let max_distance = 0;
 		for (let i = 1; i < items.length; i++) {
 			const meters = this.distancesMatrix[i - 1][items[i - 1].index][this.items[i - 1].length + items[i].index];
-			const kilometers = Math.max(Math.ceil(meters / 1000));
+			const kilometers = Math.max(1, Math.ceil(meters / 1000));
 			average_distance += kilometers;
 			min_distance = Math.min(min_distance, kilometers);
 			max_distance = Math.max(max_distance, kilometers);
