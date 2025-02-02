@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { filter } from "rxjs";
-import { Category, EventPlace, Place } from "../../../../generated";
+import { EventPlace, Place } from "../../../../generated";
 import { MapClickEntityModel } from "../../models/map-click-entity.model";
 import { PlaceSearchPipe } from "../../pipes/place-search.pipe";
 import { MapInteractionsService } from "../../services/map-interactions.service";
@@ -520,8 +520,45 @@ export class BottomBarComponent implements AfterViewInit {
 			}
 		}
 		else if (this.typedKey === "Enter") {
-			// TODO make calls to API with this prompt
 			editorText = this.promptText;
+
+			// checking that none of chosenElements is invalid
+			let isValid = true;
+			for (const chosenElement of this.chosenElements)
+				if (chosenElement === null) {
+					this.notificationsService.addNotification({
+						message: "выбрано некорректное место или событие",
+						type: "error",
+						timeOut: 10 * 1000,
+					});
+					isValid = false;
+				}
+
+			if (isValid) {
+				let promptText: string = "";
+				let lastIndex = 0;
+
+				// adding segments
+				for (let index = 0; index < this.leftIndex.length; index++) {
+					// adding normal string segment
+					promptText += editorText.slice(lastIndex, this.leftIndex[index]);
+
+					// adding highlighted string
+					const item = this.chosenElements[index];
+					if (isInstanceOfPlace(item))
+						promptText += `<#fixed:${ item._id }:${ item.name }>`;
+					else if (isInstanceOfEventPlace(item))
+						promptText += `<@event:${ item._id }>`;
+					else
+						promptText += `<#embedding:${ item }>`;
+
+					// updating last placed index
+					lastIndex = this.rightIndex[index] + 1;
+				}
+				promptText += editorText.slice(lastIndex);
+
+				this.mapInteractionService.generatePath(promptText);
+			}
 		}
 		else if (this.typedKey === "#" || this.typedKey === "@") {
 			// we are looking for a segment that will be affected by the current change
@@ -533,7 +570,8 @@ export class BottomBarComponent implements AfterViewInit {
 			if (index !== -1) {
 				editorText = this.promptText;
 				newCaretPosition = caretPosition - 1;
-			} else {
+			}
+			else {
 
 				this.leftIndex.push(caretPosition - 1);
 				this.rightIndex.push(caretPosition - 1);
@@ -584,7 +622,7 @@ export class BottomBarComponent implements AfterViewInit {
 
 		// removing all invalid indexes
 		for (let index = 0; index < this.leftIndex.length; index++) {
-			if (editorText.length <= this.leftIndex[index] || (editorText.charAt(this.leftIndex[index]) !== "#" && editorText.charAt(this.leftIndex[index]) !== "@")) {
+			if (editorText.length <= this.leftIndex[index] || ( editorText.charAt(this.leftIndex[index]) !== "#" && editorText.charAt(this.leftIndex[index]) !== "@" )) {
 				this.leftIndex.splice(index, 1);
 				this.rightIndex.splice(index, 1);
 				this.chosenElements.splice(index, 1);
@@ -596,7 +634,7 @@ export class BottomBarComponent implements AfterViewInit {
 		const highlightedString = this.highlightEditorText(editorText);
 
 		// showing placeholder
-		if (editorText === '\n' || editorText === '')
+		if (editorText === "\n" || editorText === "")
 			this.showPromptPlaceholder();
 		else
 			this.hidePromptPlaceholder();
@@ -619,7 +657,7 @@ export class BottomBarComponent implements AfterViewInit {
 			// adding highlighted string
 			const hashStyles = "border-radius: var(--br-100); background: rgba(67, 70, 218, 0.5); color: var(--text-primary); padding: 0 10px;";
 			const atStyles = "border-radius: var(--br-100); background: rgba(172, 0, 230, 0.5); color: var(--text-primary); padding: 0 10px;";
-			if (editorText.charAt(this.leftIndex[index]) === '#')
+			if (editorText.charAt(this.leftIndex[index]) === "#")
 				highlightedString += `<span style="${ hashStyles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
 			else
 				highlightedString += `<span style="${ atStyles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
