@@ -586,7 +586,6 @@ export class BottomBarComponent implements AfterViewInit {
 		const highlightedString = this.highlightEditorText(editorText);
 
 		// showing placeholder
-		console.log(editorText);
 		if (editorText === '\n' || editorText === '')
 			this.showPromptPlaceholder();
 		else

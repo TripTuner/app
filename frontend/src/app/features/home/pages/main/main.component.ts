@@ -59,7 +59,6 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 		});
 		/** Adding Listener for prompt input point chosen state */
 		effect(() => {
-			console.log("selectedPointOnPromptInput changes: ", this.mapInteractionService.selectedPointOnPromptInput());
 			if (this.map !== null)
 				this.displaySelectedPromptInputPoint(this.mapInteractionService.selectedPointOnPromptInput());
 		});
