@@ -22,7 +22,7 @@ export class MapInteractionsService {
 	pathPoints = new BehaviorSubject<Array<Place | EventPlace | MapPointModel> | null>(null);
 
 	/** point that was selected during typing prompt, point should be displayed on the map */
-	selectedPointOnPromptInput = signal<MapClickEntityModel | null>(null);
+	selectedPointOnPromptInput = new BehaviorSubject<MapClickEntityModel | null>(null);
 
 	/** variable that responsible for map scrolling action
 	 * ** -1 ** - map never been scrolled

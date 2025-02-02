@@ -11,9 +11,11 @@ import {
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { filter } from "rxjs";
 import { Category, EventPlace, Place } from "../../../../generated";
+import { MapClickEntityModel } from "../../models/map-click-entity.model";
 import { PlaceSearchPipe } from "../../pipes/place-search.pipe";
 import { MapInteractionsService } from "../../services/map-interactions.service";
 import { NotificationsService } from "../../services/notifications.service";
+import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
 import { SlideCategoriesComponent } from "../slide-categories.component";
 
 /**
@@ -94,6 +96,11 @@ function getCaretPosition(editor: HTMLDivElement) {
 		caretOffset = preCaretRange.toString().length;
 	}
 	return caretOffset;
+}
+
+/** swaps two elements in array */
+function swapElements(arr: any[], index1: number, index2: number): void {
+	[arr[index1], arr[index2]] = [arr[index2], arr[index1]];
 }
 
 @Component({
@@ -466,12 +473,30 @@ export class BottomBarComponent implements AfterViewInit {
 		// highlighting the segments in the line with spans
 		const highlightedString = this.highlightEditorText(editorText);
 
+		// updating prompt text and editor
 		this.promptText = editorText;
 		editor.innerHTML = highlightedString;
 		placeCaretAt(editor, newCaretPosition);
 
+		// hiding search box and updating input size
 		this.hideSearchBox();
 		this.changeInputSize();
+
+		// if we are not choosing Embedding we should show it on the map
+		if (isInstanceOfPlace(target) || isInstanceOfEventPlace(target)) {
+			const selectedPoint: MapClickEntityModel = {
+				id: "1",
+				geometry: {
+					type: "Point",
+					coordinates: [target.latitude, target.longitude],
+				},
+				properties: {
+					name: target.name,
+				},
+			};
+			this.mapInteractionService.selectedPointOnPromptInput.next(selectedPoint);
+			this.mapInteractionService.mapScrolled.set(1);
+		}
 	}
 
 	/** Handler for prompt input key button down event */
@@ -534,18 +559,38 @@ export class BottomBarComponent implements AfterViewInit {
 			editorText = this.promptText;
 		}
 		else if (this.typedKey === "#" || this.typedKey === "@") {
-			this.leftIndex.push(caretPosition - 1);
-			this.rightIndex.push(caretPosition - 1);
-			this.chosenElements.push(null);
+			// we are looking for a segment that will be affected by the current change
+			let index = -1;
+			for (let i = 0; i < this.leftIndex.length; i++)
+				if (this.leftIndex[i] < caretPosition && caretPosition <= this.rightIndex[i] + 2)
+					index = i;
 
-			if (editorText.charAt(caretPosition - 1) === "#")
-				this.searchArray = this.mapInteractionService.places;
-			else
-				this.searchArray = this.mapInteractionService.places; // change to event places
+			if (index !== -1) {
+				editorText = this.promptText;
+				newCaretPosition = caretPosition - 1;
+			} else {
 
-			this.searchText = "";
-			this.searchBoxIndex = this.leftIndex.length - 1;
-			this.showSearchBox();
+				this.leftIndex.push(caretPosition - 1);
+				this.rightIndex.push(caretPosition - 1);
+				this.chosenElements.push(null);
+
+				let lastIndex = this.leftIndex.length - 1;
+				while (lastIndex > 0 && this.leftIndex[lastIndex] < this.leftIndex[lastIndex - 1]) {
+					swapElements(this.leftIndex, lastIndex, lastIndex - 1);
+					swapElements(this.rightIndex, lastIndex, lastIndex - 1);
+					swapElements(this.chosenElements, lastIndex, lastIndex - 1);
+					lastIndex--;
+				}
+
+				if (editorText.charAt(caretPosition - 1) === "#")
+					this.searchArray = this.mapInteractionService.places;
+				else
+					this.searchArray = this.mapInteractionService.places; // TODO change to event places
+
+				this.searchText = "";
+				this.searchBoxIndex = this.leftIndex.length - 1;
+				this.showSearchBox();
+			}
 		}
 		else {
 			// we are looking for a segment that will be affected by the current change

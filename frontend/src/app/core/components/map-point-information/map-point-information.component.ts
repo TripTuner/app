@@ -370,7 +370,7 @@ export class MapPointInformationComponent {
 			this.container.nativeElement.style.display = "none";
 			this.container.nativeElement.style.transitionDuration = "0s";
 
-			if (this.mapInteractionsService.pathPoints !== null)
+			if (this.mapInteractionsService.pathPoints.value !== null)
 				this.mapInteractionsService.pathInformationState.next(1);
 		}, 400);
 	}
