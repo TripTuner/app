@@ -307,8 +307,8 @@ export class AlgorithmService {
 		}
 
 		/** adding Pythagorean and Manhattan distances to answer */
-		const prevDistance = ( pythagoreanPrevDistance + manhattanPrevDistance ) / 2;
-		const nextDistance = ( pythagoreanNextDistance + manhattanNextDistance ) / 2;
+		const prevDistance = Math.max(1, ( pythagoreanPrevDistance + manhattanPrevDistance ) / 2);
+		const nextDistance = Math.max(1, ( pythagoreanNextDistance + manhattanNextDistance ) / 2);
 		similarity = similarity * ( 1e5 / ( prevDistance + nextDistance ) );
 
 		// returning the answer;
