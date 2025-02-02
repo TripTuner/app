@@ -93,6 +93,7 @@ const BASE_PROMPT = "### ИНСТРУКЦИЯ ДЛЯ НЕЙРОСЕТИ\n" +
 	"\n" +
 	"5. **Формат ответа**:\n" +
 	"   - Сохраняй исходный порядок элементов относительно текста запроса в итовых данных.\n" +
+	"   - Ответ должен быть предоставлен в формате json по указанной спецификации в виде обычного текста (без форматирования ```json...```)\n" +
 	"\n" +
 	"---\n" +
 	"\n" +
@@ -102,7 +103,6 @@ const BASE_PROMPT = "### ИНСТРУКЦИЯ ДЛЯ НЕЙРОСЕТИ\n" +
 	"---\n" +
 	"\n" +
 	"### ОЖИДАЕМЫЙ ОТВЕТ (шаблон)\n" +
-	"```json\n" +
 	"[\n" +
 	"    {\n" +
 	"      \"type\": \"embeding\",\n" +
@@ -121,7 +121,6 @@ const BASE_PROMPT = "### ИНСТРУКЦИЯ ДЛЯ НЕЙРОСЕТИ\n" +
 	"      ]\n" +
 	"    }\n" +
 	"  ]\n" +
-	"```\n" +
 	"\n" +
 	"---\n" +
 	"\n" +
@@ -132,9 +131,7 @@ const BASE_PROMPT = "### ИНСТРУКЦИЯ ДЛЯ НЕЙРОСЕТИ\n" +
 	"\n" +
 	"### ОЖИДАЕМЫЙ ОТВЕТ (шаблон)\n" +
 	"\n" +
-	"```json\n" +
 	"[{\"type\":\"route\",\"raw_prompt\":\"Романтическая прогулка по москве\",\"generated_prompt\":\"Прогулка может включать посещение парка с живописными видами и завершится ужином в романтическом ресторане\",\"parsed_elements\":[{\"type\":\"category\",\"raw_prompt\":\"парк с живописными видами\",\"categories\":{\"Парк\":100}},{\"type\":\"category\",\"raw_prompt\":\"ужином в романтическом ресторане\",\"categories\":{\"Ресторан\":100}}]},{\"type\":\"category\",\"raw_prompt\":\"с посещением аквапарка\",\"categories\":{\"Аквапарк\":100}}]\n" +
-	"```\n" +
 	"\n" +
 	"---\n" +
 	"\n" +
@@ -145,9 +142,7 @@ const BASE_PROMPT = "### ИНСТРУКЦИЯ ДЛЯ НЕЙРОСЕТИ\n" +
 	"\n" +
 	"### ОЖИДАЕМЫЙ ОТВЕТ (шаблон)\n" +
 	"\n" +
-	"```json\n" +
 	"[{\"type\":\"category\",\"raw_prompt\":\"Сходить в кино с другом\",\"categories\":{\"Кинотеатр\":100}},{\"type\":\"category\",\"raw_prompt\":\"посетить кафе с коворкингом\",\"categories\":{\"Кафе\":60, \"Коворкинг\": 70}}]\n" +
-	"```\n" +
 	"\n" +
 	"### ВХОДНЫЕ ДАННЫЕ\n" +
 	"\n" +
@@ -366,6 +361,7 @@ export class AlgorithmService {
 			messages: [{ role: 'user', content: BASE_PROMPT.replace("{USER_INPUT}", this.prompt)}],
 			model: 'deepseek/deepseek-r1:free',
 		});
+		console.log(prompted);
 		let content = JSON.parse(prompted.choices[0].message.content!);
 
 		let parsed: PromptElement[] = [];
@@ -378,6 +374,8 @@ export class AlgorithmService {
 				parsed.push(el)
 			}
 		});
+
+		console.log(parsed);
 
 		return parsed;
 	}
