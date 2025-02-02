@@ -187,7 +187,6 @@ export class AlgorithmService {
 
 	constructor(prompt: string, startPosition: number[]) {
 		this.prompt = prompt;
-		console.log(this.prompt);
 		this.startPosition = startPosition;
 	}
 

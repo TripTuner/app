@@ -204,7 +204,7 @@ export class MapPointInformationComponent {
 		let lastY = event.touches[0].clientY; // initial y scroll position
 
 		/** Handler for touch end event */
-		const handleTouchEnd = (event: TouchEvent) => {
+		const handleTouchEnd = () => {
 			// sticking container height to one of the values
 			const currentTouchY = lastY;
 			const currentHeight = container.getBoundingClientRect().height;
@@ -370,7 +370,7 @@ export class MapPointInformationComponent {
 			this.container.nativeElement.style.display = "none";
 			this.container.nativeElement.style.transitionDuration = "0s";
 
-			if (this.mapInteractionsService.pathPoints !== null)
+			if (this.mapInteractionsService.pathPoints.value !== null)
 				this.mapInteractionsService.pathInformationState.next(1);
 		}, 400);
 	}

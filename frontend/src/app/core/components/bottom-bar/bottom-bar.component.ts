@@ -10,7 +10,7 @@ import {
 } from "@angular/core";
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { filter } from "rxjs";
-import { Category, EventPlace, Place } from "../../../../generated";
+import { EventPlace, Place } from "../../../../generated";
 import { MapClickEntityModel } from "../../models/map-click-entity.model";
 import { PlaceSearchPipe } from "../../pipes/place-search.pipe";
 import { MapInteractionsService } from "../../services/map-interactions.service";
@@ -19,53 +19,53 @@ import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.
 import { SlideCategoriesComponent } from "../slide-categories.component";
 
 /**
- * Function that splits string by last index of char in text
- *
- * @param {string} text text that should be split
- * @param {string} char char for splitting
- * @returns {string[]} string array with two strings
- */
-function splitTextByLastOccurrence(text: string, char: string): string[] {
-	const lastIndex = text.lastIndexOf(char);
-	if (lastIndex === -1) {
-		return [text, ""]; // Возвращает весь текст и пустую строку, если символ не найден
-	}
-	const part1 = text.slice(0, lastIndex);
-	const part2 = text.slice(lastIndex + char.length);
-	return [part1, part2];
-}
-
-/**
- * Function that checks that object is type of Category
- *
- * @param {any} obj object that should be checked
- * @returns {boolean} is objected type of Category
- */
-function isInstanceOfCategory(obj: any): obj is Category {
-	return (
-		typeof obj === "object" &&
-		obj !== null &&
-		( typeof obj._id === "undefined" || typeof obj._id === "string" ) &&
-		typeof obj.name === "string" &&
-		typeof obj.svg === "string" &&
-		Array.isArray(obj.places) &&
-		obj.places.every((place: any) => typeof place === "string")
-	);
-}
-
-/**
  * Function that places Caret to the end of the editor
  *
- * @param {HTMLDivElement} editor editor in which caret shoudl be placed
+ * @param {HTMLDivElement} editor editor in which caret should be placed
+ * @param {number} pos place where cater should be places
  */
-function placeCaretAtEnd(editor: HTMLDivElement) {
-	editor.focus();
+function placeCaretAt(editor: HTMLDivElement, pos: number) {
 	const range = document.createRange();
-	range.selectNodeContents(editor);
-	range.collapse(false);
 	const sel = window.getSelection()!;
+
+	const children = editor.childNodes;
+	let [index, position] = [0, pos];
+	while (index < children.length) {
+		//@ts-ignore
+		const length = ( children[index].nodeValue || children[index].innerText ).length;
+		if (position <= length) break;
+		position -= length;
+		index++;
+	}
+	if (children[index] === undefined)
+		return;
+	else if (children[index].nodeValue === null)
+		range.setStart(children[index].childNodes[0], position);
+	else
+		range.setStart(children[index], position);
+	range.collapse(true);
+
 	sel.removeAllRanges();
 	sel.addRange(range);
+}
+
+/** Returns caret position in editor */
+function getCaretPosition(editor: HTMLDivElement) {
+	let caretOffset = 0;
+	const selection = window.getSelection()!;
+	if (selection.rangeCount > 0) {
+		const range = selection.getRangeAt(0);
+		const preCaretRange = range.cloneRange();
+		preCaretRange.selectNodeContents(editor);
+		preCaretRange.setEnd(range.endContainer, range.endOffset);
+		caretOffset = preCaretRange.toString().length;
+	}
+	return caretOffset;
+}
+
+/** swaps two elements in array */
+function swapElements(arr: any[], index1: number, index2: number): void {
+	[arr[index1], arr[index2]] = [arr[index2], arr[index1]];
 }
 
 @Component({
@@ -107,8 +107,12 @@ function placeCaretAtEnd(editor: HTMLDivElement) {
 				<div class="content">
 					<div class="prompt-input-container">
 						<div class="prompt-input-scroll" #promptInputScroll>
-							<div dir="auto" tabindex="0" class="input allow-selection" (keydown)="handleKeyDownPromptInput($event)" (input)="handlePromptInput($event)" role="textbox" contenteditable="true" #promptInput>
-							</div>
+							<div dir="auto" tabindex="0" class="input allow-selection"
+								 (keydown)="handleKeyDownPromptInput($event)"
+								 (keyup)="handleCaretPositionChanges($event)"
+								 (input)="handlePromptInput()"
+								 (click)="handleCaretPositionChanges($event)"
+								 role="textbox" contenteditable="true" #promptInput></div>
 							<span class="message-placeholder" #promptPlaceholder>Prompt...</span>
 						</div>
 					</div>
@@ -200,7 +204,7 @@ export class BottomBarComponent implements AfterViewInit {
 	@ViewChild("stickPositionButton") stickPositionButton!: ElementRef<HTMLButtonElement>; // button that sticks our position to geolocation
 
 	@ViewChild("inputAddon") inputAddonContainer!: ElementRef<HTMLDivElement>; // container with prompt input
-	@ViewChild("promptInput") promptInput!: ElementRef<HTMLInputElement>; // prompt input element
+	@ViewChild("promptInput") promptInput!: ElementRef<HTMLDivElement>; // prompt input element
 	@ViewChild("promptPlaceholder") promptPlaceholder!: ElementRef<HTMLSpanElement>; // prompt input placeholder
 	@ViewChild("promptInputScroll") promptInputScroll!: ElementRef<HTMLDivElement>; // prompt input scroll container
 
@@ -209,12 +213,15 @@ export class BottomBarComponent implements AfterViewInit {
 	/** Search text for searching pipe */
 	searchText: string = "";
 	/** Bool param if last typed button to prompt input is valid */
-	validKeyInput: boolean = true;
+	typedKey: string = "";
 	/** Prompt text */
-	promptText: string = "";
+	promptText: string = "123#abacaba 4567";
 
-	chosenPlaces: Array<Place> = [];
-	chosenEvents: Array<EventPlace> = [];
+	leftIndex: number[] = [];
+	rightIndex: number[] = [];
+	chosenElements: Array<EventPlace | Place | null> = [];
+
+	searchBoxIndex: number = -1;
 
 	/** Current menu size */
 	menuSize: number = 228;
@@ -238,7 +245,8 @@ export class BottomBarComponent implements AfterViewInit {
 		this.mapInteractionService.pathInformationState.subscribe(state => {
 			if (state === 1) {
 				this.closeMainContainer();
-			} else if (state === -2 && this.mapInteractionService.chosenMapPoint.value === null) {
+			}
+			else if (state === -2 && this.mapInteractionService.chosenMapPoint.value === null) {
 				this.openMainContainer();
 			}
 		});
@@ -302,7 +310,8 @@ export class BottomBarComponent implements AfterViewInit {
 			this.mainAddonContainer.nativeElement.style.display = "flex";
 			setTimeout(() => this.mainAddonContainer.nativeElement.style.maxHeight = "100vh");
 			setTimeout(() => this.stickPositionButton.nativeElement.style.opacity = "1", 300);
-		} else {
+		}
+		else {
 			this.mainAddonContainer.nativeElement.style.maxHeight = "0";
 			this.stickPositionButton.nativeElement.style.opacity = "0";
 			setTimeout(() => this.mainAddonContainer.nativeElement.style.display = "none", 300);
@@ -327,7 +336,7 @@ export class BottomBarComponent implements AfterViewInit {
 			this.stickPositionButton.nativeElement.style.top = `${ window.innerHeight - this.container.nativeElement.getBoundingClientRect().height - 43 }px`;
 		};
 		// handler for touch end events
-		const touchEndHandler = (e: TouchEvent) => {
+		const touchEndHandler = () => {
 			if (currentHeight > maxHeight * 2 / 3) this.mapInteractionService.mainContainerState.set(1);
 			else this.mapInteractionService.mainContainerState.set(-1);
 
@@ -399,28 +408,44 @@ export class BottomBarComponent implements AfterViewInit {
 		this.promptPlaceholder.nativeElement.style.transform = "translateX(50px)";
 	}
 
+	changeInputSize() {
+		// check if we should add new line on the div and add to scroll-container size
+		const current_input_height: number = this.promptInput.nativeElement.getBoundingClientRect().height!;
+		this.promptInputScroll.nativeElement.style.height = `clamp(var(--base-height), ${ current_input_height }px, var(--base-height-max))`;
+		this.updateStickPositionButton();
+	}
+
 	/** Handler for prompt search box click event */
 	handlePromptSearchBoxClick(target: Place | EventPlace) {
-		// after the click search box should be hidden
+		const editor = this.promptInput.nativeElement;
+		let editorText = editor.innerText;
+		let index = this.searchBoxIndex;
+		let newCaretPosition;
+
+		const currentValue = editorText;
+		editorText = currentValue.slice(0, this.leftIndex[index] + 1);
+		editorText += target.name;
+		if (currentValue.slice(this.rightIndex[index] + 1).length === 0 || currentValue.slice(this.rightIndex[index] + 1)[0] !== " ")
+			editorText += " ";
+		editorText += currentValue.slice(this.rightIndex[index] + 1);
+
+		this.chosenElements[index] = target;
+		const length = target.name?.length!;
+		this.rightIndex[index] = this.leftIndex[index] + length;
+		newCaretPosition = this.rightIndex[index] + 2;
+
+
+		// highlighting the segments in the line with spans
+		const highlightedString = this.highlightEditorText(editorText);
+
+		// updating prompt text and editor
+		this.promptText = editorText;
+		editor.innerHTML = highlightedString;
+		placeCaretAt(editor, newCaretPosition);
+
+		// hiding search box and updating input size
 		this.hideSearchBox();
-
-		const editor = this.promptInput.nativeElement; // editor container
-		const text = editor.innerText; // text from the editor
-		const split_char = ( isInstanceOfEventPlace(target) ? "@" : "#" ); // char on which text should be split
-		// splitting the text with char and getting text before the typed name
-		let [current_value, search_value] = splitTextByLastOccurrence(text, split_char);
-		current_value += "#" + String(target.name) + "#";
-		this.promptText = current_value;
-
-		let regex;
-		// searching and highlighting Places with regular expression
-		regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)#/g;
-		current_value = current_value.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
-		// searching and highlighting Events with regular expression
-		regex = /@([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)@/g;
-		current_value = current_value.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">@$1@</span>");
-		// setting new value to editor
-		editor.innerHTML = current_value;
+		this.changeInputSize();
 
 		// if we are not choosing Embedding we should show it on the map
 		if (isInstanceOfPlace(target) || isInstanceOfEventPlace(target)) {
@@ -434,140 +459,214 @@ export class BottomBarComponent implements AfterViewInit {
 					name: target.name,
 				},
 			};
-			this.mapInteractionService.selectedPointOnPromptInput.set(selectedPoint);
+			this.mapInteractionService.selectedPointOnPromptInput.next(selectedPoint);
 			this.mapInteractionService.mapScrolled.set(1);
 		}
-
-		// check if we should add new line on the div and add to scroll-container size
-		const current_input_height: number = this.promptInput.nativeElement.getBoundingClientRect().height!;
-		this.promptInputScroll.nativeElement.style.height = `clamp(var(--base-height), ${ current_input_height }px, var(--base-height-max))`;
-		this.updateStickPositionButton();
-		// placing caret on the end of the editor
-		placeCaretAtEnd(editor);
-
-		if (isInstanceOfEventPlace(target))
-			this.chosenEvents.push(target);
-		else
-			this.chosenPlaces.push(target);
 	}
 
 	/** Handler for prompt input key button down event */
 	handleKeyDownPromptInput(event: any) {
-		// the only invalid key is Enter
-		this.validKeyInput = event.key !== "Enter";
+		this.typedKey = event.key;
+	}
+
+	handleCaretPositionChanges(event: any) {
+		if (event.key === undefined || ( event.key.slice(0, 5) === "Arrow" )) {
+			const editor = this.promptInput.nativeElement;
+			const editorText = editor.innerText;
+			const caretPosition = getCaretPosition(editor);
+			let index = -1;
+			for (let i = 0; i < this.leftIndex.length; i++)
+				if (this.leftIndex[i] + 1 <= caretPosition && caretPosition <= this.rightIndex[i] + 1)
+					index = i;
+
+			if (index !== -1 && this.chosenElements[index] === null) {
+				if (editorText.charAt(this.leftIndex[index]) === "#")
+					this.searchArray = this.mapInteractionService.places;
+				else
+					this.searchArray = this.mapInteractionService.places; // change to event places
+				this.searchText = editorText.slice(this.leftIndex[index] + 1, this.rightIndex[index] + 1);
+				this.searchBoxIndex = index;
+				this.showSearchBox();
+			}
+			else
+				this.hideSearchBox();
+		}
 	}
 
 	/** Handler for prompt input event */
-	handlePromptInput(event: any) {
-		/** Function that counts the amount of specific chars in the string */
-		function countChars(str: string, char: string) {
-			return str.split(char).length - 1;
-		}
+	handlePromptInput() {
+		const editor = this.promptInput.nativeElement;
+		const caretPosition = getCaretPosition(editor);
+		let newCaretPosition = caretPosition;
+		let editorText = editor.innerText;
 
-		const editor = this.promptInput.nativeElement; // editor container
-		let text = editor.innerText; // text from editor
+		if (this.typedKey === "Backspace" || this.typedKey === "Delete") {
+			// we are looking for a segment that will be affected by the current change
+			let index = -1;
+			for (let i = 0; i < this.leftIndex.length; i++)
+				if (this.leftIndex[i] + ( this.typedKey === "Backspace" ? 0 : 0 ) <= caretPosition && caretPosition <= this.rightIndex[i])
+					index = i;
 
-		// checking if last typed the valid key to input
-		if (!this.validKeyInput) {
-			event.preventDefault();
-			text = this.promptText;
-		}
-
-		this.promptText = text; // updating prompt text to the last state
-
-		let regex, highlightedText = text;
-		// searching and highlighting places in the text
-		regex = /#([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)#/g;
-		highlightedText = highlightedText.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
-		// searching and highlighting events in the text
-		regex = /@([A-Za-zа-яА-ЯёЁ0-9\s«»,."'():№\u002d-]+)@/g;
-		highlightedText = highlightedText.replace(regex, "<span style=\"border-radius: var(--br-100); background: rgba(67, 70, 218, 0.3); color: var(--text-primary); padding: 0 10px;\">#$1#</span>");
-		// placing highlighted text to the editor
-		editor.innerHTML = highlightedText;
-
-		if (!this.validKeyInput) {
-			let promptText = this.promptText;
-
-			// we should check that we have same amount places in prompt as in the chosen chosenPlaces
-			let split_text = promptText.split("#");
-			if (split_text.length !== this.chosenPlaces.length * 2 && split_text.length !== this.chosenPlaces.length * 2 + 1) {
-				this.notificationsService.addNotification({
-					message: "Указано некорректное место",
-					timeOut: 5000,
-					type: "error",
-				});
-				return;
+			// removing this segment
+			if (index !== -1) {
+				const currentValue = editorText;
+				editorText = currentValue.slice(0, this.leftIndex[index]);
+				editorText += currentValue.slice(this.rightIndex[index]);
+				this.hideSearchBox();
+				newCaretPosition = this.leftIndex[index];
+				this.leftIndex.splice(index, 1);
+				this.rightIndex.splice(index, 1);
+				this.chosenElements.splice(index, 1);
 			}
+		}
+		else if (this.typedKey === "Enter") {
+			editorText = this.promptText;
 
-			for (let i = 1; i < split_text.length; i += 2) {
-				const place = this.chosenPlaces[Math.floor(i / 2)];
-				if (isInstanceOfPlace(place))
-					split_text[i] = `<#fixed:${ place._id }:${ place.name }`;
+			// checking that none of chosenElements is invalid
+			let isValid = true;
+			for (const chosenElement of this.chosenElements)
+				if (chosenElement === null) {
+					this.notificationsService.addNotification({
+						message: "выбрано некорректное место или событие",
+						type: "error",
+						timeOut: 10 * 1000,
+					});
+					isValid = false;
+				}
+
+			if (isValid) {
+				let promptText: string = "";
+				let lastIndex = 0;
+
+				// adding segments
+				for (let index = 0; index < this.leftIndex.length; index++) {
+					// adding normal string segment
+					promptText += editorText.slice(lastIndex, this.leftIndex[index]);
+
+					// adding highlighted string
+					const item = this.chosenElements[index];
+					if (isInstanceOfPlace(item))
+						promptText += `<#fixed:${ item._id }:${ item.name }>`;
+					else if (isInstanceOfEventPlace(item))
+						promptText += `<@event:${ item._id }>`;
+					else
+						promptText += `<#embedding:${ item }>`;
+
+					// updating last placed index
+					lastIndex = this.rightIndex[index] + 1;
+				}
+				promptText += editorText.slice(lastIndex);
+
+				this.mapInteractionService.generatePath(promptText);
+			}
+		}
+		else if (this.typedKey === "#" || this.typedKey === "@") {
+			// we are looking for a segment that will be affected by the current change
+			let index = -1;
+			for (let i = 0; i < this.leftIndex.length; i++)
+				if (this.leftIndex[i] < caretPosition && caretPosition <= this.rightIndex[i] + 2)
+					index = i;
+
+			if (index !== -1) {
+				editorText = this.promptText;
+				newCaretPosition = caretPosition - 1;
+			}
+			else {
+
+				this.leftIndex.push(caretPosition - 1);
+				this.rightIndex.push(caretPosition - 1);
+				this.chosenElements.push(null);
+
+				let lastIndex = this.leftIndex.length - 1;
+				while (lastIndex > 0 && this.leftIndex[lastIndex] < this.leftIndex[lastIndex - 1]) {
+					swapElements(this.leftIndex, lastIndex, lastIndex - 1);
+					swapElements(this.rightIndex, lastIndex, lastIndex - 1);
+					swapElements(this.chosenElements, lastIndex, lastIndex - 1);
+					lastIndex--;
+				}
+
+				if (editorText.charAt(caretPosition - 1) === "#")
+					this.searchArray = this.mapInteractionService.places;
 				else
-					split_text[i] = `<#embedding:${ place }:${ place }`; // TODO
+					this.searchArray = this.mapInteractionService.places; // TODO change to event places
+
+				this.searchText = "";
+				this.searchBoxIndex = this.leftIndex.length - 1;
+				this.showSearchBox();
 			}
+		}
+		else {
+			// we are looking for a segment that will be affected by the current change
+			let index = -1;
+			for (let i = 0; i < this.leftIndex.length; i++)
+				if (this.leftIndex[i] < caretPosition && caretPosition <= this.rightIndex[i] + 2)
+					index = i;
 
-			promptText = split_text.join("");
-
-			// we should check that we have same amount place || event events in prompt as in the chosenEvents
-			split_text = promptText.split("@");
-			if (split_text.length !== this.chosenEvents.length * 2 && split_text.length !== this.chosenEvents.length * 2 + 1) {
-				this.notificationsService.addNotification({
-					message: "Указано некорректное событие",
-					timeOut: 5000,
-					type: "error",
-				});
-				return;
+			// updating this segment
+			if (index !== -1) {
+				this.rightIndex[index]++;
+				this.searchText = editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1);
 			}
-
-			for (let i = 1; i < split_text.length; i += 2) {
-				const event = this.chosenEvents[Math.floor(i / 2)];
-				split_text[i] = `<@event:${ event._id }`;
-			}
-
-			promptText = split_text.join("");
-
-			this.mapInteractionService.generatePath(promptText);
-			return;
 		}
 
-		if (text === "\n" || text === "") { // checking if text is empty
+		// updating position of left and right indexes
+		let lastIndex = 0;
+		for (let index = 0; index < editorText.length; index++) {
+			if (editorText.charAt(index) === "#" || editorText.charAt(index) === "@") {
+				const delta = index - this.leftIndex[lastIndex];
+				this.leftIndex[lastIndex] += delta;
+				this.rightIndex[lastIndex] += delta;
+				lastIndex++;
+			}
+		}
+
+		// removing all invalid indexes
+		for (let index = 0; index < this.leftIndex.length; index++) {
+			if (editorText.length <= this.leftIndex[index] || ( editorText.charAt(this.leftIndex[index]) !== "#" && editorText.charAt(this.leftIndex[index]) !== "@" )) {
+				this.leftIndex.splice(index, 1);
+				this.rightIndex.splice(index, 1);
+				this.chosenElements.splice(index, 1);
+				index--;
+			}
+		}
+
+		// highlighting the segments in the line with spans
+		const highlightedString = this.highlightEditorText(editorText);
+
+		// showing placeholder
+		if (editorText === "\n" || editorText === "")
 			this.showPromptPlaceholder();
-			this.hideSearchBox();
-			this.promptText = "";
-			editor.innerHTML = "";
-		} else {
+		else
 			this.hidePromptPlaceholder();
 
-			// counting hashes and ats and checking that we are typing name of place or event
-			const count_hash = countChars(text, "#");
-			const count_at = countChars(text, "@");
-			let split_char = ""; // char with which text will be split
+		this.promptText = editorText;
+		editor.innerHTML = highlightedString;
+		placeCaretAt(editor, newCaretPosition);
 
-			if (count_hash % 2 == 1) { // now we are searching Places with #
-				split_char = "#";
-				this.searchArray = this.mapInteractionService.places;
-			} else if (count_at % 2 == 1) { // now we are searching Events with @
-				split_char = "@";
-				this.searchArray = this.mapInteractionService.places; // TODO change to events array
-			}
+		this.changeInputSize();
+	}
 
-			if (split_char !== "") { // we are typing Event or Place name
-				this.showSearchBox();
-				// getting split values with split_char
-				const [current_value, search_value] = splitTextByLastOccurrence(text, split_char);
-				// updating search text with new typed value
-				this.searchText = search_value;
-			} else { // we are not typing neither Event nor Place name
-				this.hideSearchBox();
-			}
+	highlightEditorText(editorText: string) {
+		let highlightedString: string = "";
+		let lastIndex = 0;
+		// highlighting segments
+		for (let index = 0; index < this.leftIndex.length; index++) {
+			// adding normal string segment
+			highlightedString += editorText.slice(lastIndex, this.leftIndex[index]);
+
+			// adding highlighted string
+			const hashStyles = "border-radius: var(--br-100); background: rgba(67, 70, 218, 0.5); color: var(--text-primary); padding: 0 10px;";
+			const atStyles = "border-radius: var(--br-100); background: rgba(172, 0, 230, 0.5); color: var(--text-primary); padding: 0 10px;";
+			if (editorText.charAt(this.leftIndex[index]) === "#")
+				highlightedString += `<span style="${ hashStyles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
+			else
+				highlightedString += `<span style="${ atStyles }">${ editorText.slice(this.leftIndex[index], this.rightIndex[index] + 1) }</span>`;
+
+			// updating last placed index
+			lastIndex = this.rightIndex[index] + 1;
 		}
-
-		// placing caret in the end of the editor
-		placeCaretAtEnd(editor);
-		// check if we should add new line on the div and add to scroll-container size
-		const current_input_height: number = this.promptInput.nativeElement.getBoundingClientRect().height!;
-		this.promptInputScroll.nativeElement.style.height = `clamp(var(--base-height), ${ current_input_height }px, var(--base-height-max))`;
-		this.updateStickPositionButton();
+		highlightedString += editorText.slice(lastIndex);
+		// returns highlighted result
+		return highlightedString;
 	}
 }

@@ -55,7 +55,6 @@ export const saveNewCategory = async function (category: Category): Promise<Cate
 	try {
 		return await repository.save(category);
 	} catch (error) {
-		console.log(error);
 		throw ( new errors.InternalServerError() );
 	}
 };

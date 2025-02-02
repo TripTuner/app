@@ -58,10 +58,9 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 				this.geolocationChange();
 		});
 		/** Adding Listener for prompt input point chosen state */
-		effect(() => {
-			console.log("selectedPointOnPromptInput changes: ", this.mapInteractionService.selectedPointOnPromptInput());
+		this.mapInteractionService.selectedPointOnPromptInput.subscribe(() => {
 			if (this.map !== null)
-				this.displaySelectedPromptInputPoint(this.mapInteractionService.selectedPointOnPromptInput());
+				this.displaySelectedPromptInputPoint(this.mapInteractionService.selectedPointOnPromptInput.value);
 		});
 		/** Adding Listener for route points change */
 		this.mapInteractionService.pathPoints.subscribe(path => {

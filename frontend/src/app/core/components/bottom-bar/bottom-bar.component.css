@@ -184,12 +184,6 @@
 					unicode-bidi:       plaintext;
 					caret-color:        var(--text-primary);
 					-webkit-appearance: none;
-
-					.place {
-						padding: 0 10px;
-
-
-					}
 				}
 			}
 		}

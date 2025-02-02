@@ -941,7 +941,6 @@ export const initPlaces = async function () {
 
         loggerProgressBar.stop();
     } catch (error) {
-        console.log(error);
         throw ( new errors.InternalServerError() );
     }
 
@@ -958,8 +957,6 @@ const setPlaceToJSON = async function (id: number) {
     for (const feature of response.features) {
         types.add(feature.properties.attributes.TypeObject);
     }
-
-    console.log(types);
 
     //fs.writeFile(
     //    path,
