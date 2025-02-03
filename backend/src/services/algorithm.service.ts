@@ -246,9 +246,9 @@ export class AlgorithmService {
 		categoryIndex: number,
 	): Promise<number[]> {
 		function getDistances(coords: number[][]): number[] {
-			for (let coord of coords)
-				for (let number of coord)
-					number = Math.ceil(number * 1000);
+			for (let i = 0; i < 2; i++)
+				for (let j = 0; j < 2; j++)
+					coords[i][j] = Math.ceil(Number(coords[i][j]) * 1e3);
 			const pythagoreanDistance = Math.sqrt(( coords[0][0] - coords[1][0] ) * ( coords[0][0] - coords[1][0] ) + ( coords[0][1] - coords[1][1] ) * ( coords[0][1] - coords[1][1] ));
 			const manhattanDistance = Math.abs(coords[0][0] - coords[1][0]) + Math.abs(coords[0][1] - coords[1][1]);
 			return [pythagoreanDistance, manhattanDistance];
@@ -258,13 +258,13 @@ export class AlgorithmService {
 		const promptElement = this.keys[categoryIndex];
 
 		/** calculating categories similarity */
-			// getting all user categories
+			// getting all item categories
 		const itemCategories: string[] = [];
 		for (const objectId of item.place.categories!) {
 			const id = objectId.toString();
 			for (const category of this.categories)
 				if (category._id?.toString() === id) {
-					itemCategories.push(category.name);
+					itemCategories.push(category.name.toLowerCase());
 					break;
 				}
 		}
@@ -272,7 +272,7 @@ export class AlgorithmService {
 		// adding percentage to similarity
 		for (const key of Object.keys(promptElement.categories!)) {
 			// if found we should add this category percentage
-			if (itemCategories.includes(key)) {
+			if (itemCategories.includes(key.toLowerCase())) {
 				similarity += promptElement.categories![key];
 				categoriesSum += promptElement.categories![key];
 			}
@@ -281,35 +281,38 @@ export class AlgorithmService {
 		/** calculating the Pythagorean and Manhattan distances to the previous fixed point */
 		let pythagoreanPrevDistance = 0;
 		let manhattanPrevDistance = 0;
-		let prev_index = -1;
-		for (let index = 0; index < categoryIndex; index++) {
-			if (this.keys[index].type !== "fixed") continue;
-			prev_index = index;
-		}
 		// if we found previous fixed point
-		if (prev_index !== -1) {
-			const coords = [[item.place.latitude, item.place.longitude], [this.items[prev_index][0].location.latitude, this.items[prev_index][0].location.longitude]];
+		if (categoryIndex < 0) {
+			for (const itemElement of this.items[categoryIndex - 1]) {
+				const coords = [[item.place.latitude, item.place.longitude], [itemElement.location.latitude, itemElement.location.longitude]];
+				const [currentPythagoreanPrevDistance, currentManhattanPrevDistance] = getDistances(coords);
+				pythagoreanPrevDistance = Math.min(pythagoreanPrevDistance, currentPythagoreanPrevDistance);
+				manhattanPrevDistance = Math.min(manhattanPrevDistance, currentManhattanPrevDistance);
+			}
+		}
+		else {
+			const coords = [[item.place.latitude, item.place.longitude], [this.startPosition[0], this.startPosition[1]]];
 			[pythagoreanPrevDistance, manhattanPrevDistance] = getDistances(coords);
 		}
 
 		/** calculating the Pythagorean and Manhattan distances to the next fixed point */
-		let next_index = -1;
 		let pythagoreanNextDistance = 0;
 		let manhattanNextDistance = 0;
-		for (let index = this.keys.length - 1; index > categoryIndex; index--) {
-			if (this.keys[index].type !== "fixed") continue;
-			next_index = this.items[index][0].index;
-		}
 		// if next point exists
-		if (next_index !== -1) {
-			const coords = [[item.place.latitude, item.place.longitude], [this.items[next_index][0].location.latitude, this.items[next_index][0].location.longitude]];
-			[pythagoreanNextDistance, manhattanNextDistance] = getDistances(coords);
+		for (let next_index = categoryIndex + 1; next_index < this.items.length; next_index++) {
+			if (this.keys[next_index].type !== "fixed" || this.keys[next_index].type !== 'event') continue;
+			for (const itemElement of this.items[categoryIndex + 1]) {
+				const coords = [[item.place.latitude, item.place.longitude], [itemElement.location.latitude, itemElement.location.longitude]];
+				[pythagoreanNextDistance, manhattanNextDistance] = getDistances(coords);
+			}
+			break;
 		}
 
 		/** adding Pythagorean and Manhattan distances to answer */
-		const prevDistance = Math.max(1, ( pythagoreanPrevDistance + manhattanPrevDistance ) / 2);
-		const nextDistance = Math.max(1, ( pythagoreanNextDistance + manhattanNextDistance ) / 2);
-		similarity = similarity * ( 1e5 / ( prevDistance + nextDistance ) );
+		const prevDistance = ( pythagoreanPrevDistance + manhattanPrevDistance ) / 2;
+		const nextDistance = ( pythagoreanNextDistance + manhattanNextDistance ) / 2;
+		const distance = prevDistance + nextDistance;
+		similarity = similarity * ( 1e5 / ( Math.max(1, distance) ) );
 
 		// returning the answer;
 		return [similarity, categoriesSum];
@@ -361,6 +364,8 @@ export class AlgorithmService {
 			messages: [{ role: "user", content: BASE_PROMPT.replace("{USER_INPUT}", this.prompt) }],
 			model: 'deepseek/deepseek-r1',
 		});
+		console.log(prompted);
+
 		const messageContent = prompted.choices[0].message.content!;
 		let content = JSON.parse(messageContent);
 
@@ -631,6 +636,9 @@ export class AlgorithmService {
 				// sorting places by their pre-similarity
 				sort_places.sort((a, b) => b.similarity - a.similarity);
 				sort_places = sort_places.slice(0, this.MAX_ITEMS_PRE_COUNT);
+
+				if (sort_places[0].categoriesSum === 0)
+					throw ( new errors.InternalServerError("sorted places are invalid") );
 
 				// configurations matrix with locations
 				let currentLastIndex = lastIndex;
