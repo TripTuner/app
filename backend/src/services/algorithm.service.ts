@@ -359,7 +359,7 @@ export class AlgorithmService {
 	private async parsePrompt(): Promise<PromptElement[]> {
 		const prompted = await openai.chat.completions.create({
 			messages: [{ role: 'user', content: BASE_PROMPT.replace("{USER_INPUT}", this.prompt)}],
-			model: 'deepseek/deepseek-r1:free',
+			model: 'deepseek/deepseek-r1',
 		});
 		console.log(prompted);
 		let content = JSON.parse(prompted.choices[0].message.content!);
