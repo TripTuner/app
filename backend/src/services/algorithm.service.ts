@@ -16,7 +16,7 @@ interface LocationItem {
 	categoriesSum?: number;
 }
 
-const openai = new OpenAI({ apiKey: config.openaiAPIKey, baseURL: "https://openrouter.ai/api/v1" });
+const openai = new OpenAI({apiKey: config.openaiAPIKey, baseURL: "https://openrouter.ai/api/v1"});
 
 
 const BASE_PROMPT = "### ИНСТРУКЦИЯ ДЛЯ НЕЙРОСЕТИ\n" +
@@ -359,7 +359,7 @@ export class AlgorithmService {
 	private async parsePrompt() {
 		const prompted = await openai.chat.completions.create({
 			messages: [{ role: "user", content: BASE_PROMPT.replace("{USER_INPUT}", this.prompt) }],
-			model: "deepseek/deepseek-r1:free",
+			model: 'deepseek/deepseek-r1',
 		});
 		const messageContent = prompted.choices[0].message.content!;
 		let content = JSON.parse(messageContent);
