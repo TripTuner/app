@@ -1,6 +1,6 @@
 import { Component, ElementRef, ViewChild, ViewEncapsulation } from "@angular/core";
-import { NotificationModel } from "../../models/notification.model";
-import { NotificationsService } from "../../services/notifications.service";
+import { NotificationModel } from "../../../core/models/notification.model";
+import { NotificationsService } from "../../../core/services/notifications.service";
 
 @Component({
 	selector: "Notifications",

@@ -1,9 +1,9 @@
 import { Component, ElementRef, ViewChild } from "@angular/core";
 import { EventPlace, Place } from "../../../../generated";
-import MapPointModel from "../../models/map-point.model";
-import { BypassHtmlSanitizerPipe } from "../../pipes/doom-sanitizer.pipe";
-import { MapInteractionsService } from "../../services/map-interactions.service";
-import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
+import MapPointModel from "../../../core/models/map-point.model";
+import { BypassHtmlSanitizerPipe } from "../../../core/pipes/doom-sanitizer.pipe";
+import { MapInteractionsService } from "../../../core/services/map-interactions.service";
+import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../../core/services/utils.service";
 
 @Component({
 	selector: "MapPointInformation",

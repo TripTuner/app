@@ -1,10 +1,10 @@
 import { Component, ElementRef, ViewChild } from "@angular/core";
 import { environment } from "../../../../environments/environment";
 import { EventPlace, Place } from "../../../../generated";
-import MapPointModel from "../../models/map-point.model";
-import { MapInteractionsService } from "../../services/map-interactions.service";
-import { NotificationsService } from "../../services/notifications.service";
-import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
+import MapPointModel from "../../../core/models/map-point.model";
+import { MapInteractionsService } from "../../../core/services/map-interactions.service";
+import { NotificationsService } from "../../../core/services/notifications.service";
+import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../../core/services/utils.service";
 
 @Component({
 	selector: "PathInformation",
