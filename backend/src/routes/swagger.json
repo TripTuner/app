@@ -7,14 +7,14 @@
 		"requestBodies": {},
 		"responses": {},
 		"schemas": {
-          "ObjectId": {
-            "type": "string",
-            "description": "A class representation of the BSON ObjectId type."
-          },
+			"ObjectId": {
+				"type": "string",
+				"description": "A class representation of the BSON ObjectId type."
+			},
 			"Category": {
 				"properties": {
 					"_id": {
-                      "$ref": "#/components/schemas/ObjectId"
+						"$ref": "#/components/schemas/ObjectId"
 					},
 					"name": {
 						"type": "string"
@@ -24,7 +24,7 @@
 					},
 					"places": {
 						"items": {
-                          "$ref": "#/components/schemas/ObjectId"
+							"$ref": "#/components/schemas/ObjectId"
 						},
 						"type": "array"
 					}
@@ -40,7 +40,7 @@
 			"EventPlace": {
 				"properties": {
 					"_id": {
-                      "$ref": "#/components/schemas/ObjectId"
+						"$ref": "#/components/schemas/ObjectId"
 					},
 					"name": {
 						"type": "string"
@@ -74,57 +74,57 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-          "Path": {
-            "properties": {
-              "_id": {
-                "$ref": "#/components/schemas/ObjectId"
-              },
-              "user": {
-                "$ref": "#/components/schemas/ObjectId"
-              },
-              "segments": {
-                "items": {
-                  "$ref": "#/components/schemas/ObjectId"
-                },
-                "type": "array"
-              }
-            },
-            "required": [
-              "segments"
-            ],
-            "type": "object",
-            "additionalProperties": false
-          },
-          "PathSegment": {
-            "properties": {
-              "_id": {
-                "$ref": "#/components/schemas/ObjectId"
-              },
-              "path": {
-                "$ref": "#/components/schemas/ObjectId"
-              },
-              "place": {
-                "$ref": "#/components/schemas/ObjectId"
-              },
-              "type": {
-                "type": "string",
-                "enum": [
-                  "fixed",
-                  "embedding",
-                  "category",
-                  "event",
-                  "route"
-                ]
-              }
-            },
-            "required": [
-              "path",
-              "place",
-              "type"
-            ],
-            "type": "object",
-            "additionalProperties": false
-          },
+			"Path": {
+				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/ObjectId"
+					},
+					"user": {
+						"$ref": "#/components/schemas/ObjectId"
+					},
+					"segments": {
+						"items": {
+							"$ref": "#/components/schemas/ObjectId"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"segments"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
+			"PathSegment": {
+				"properties": {
+					"_id": {
+						"$ref": "#/components/schemas/ObjectId"
+					},
+					"path": {
+						"$ref": "#/components/schemas/ObjectId"
+					},
+					"place": {
+						"$ref": "#/components/schemas/ObjectId"
+					},
+					"type": {
+						"type": "string",
+						"enum": [
+							"fixed",
+							"embedding",
+							"category",
+							"event",
+							"route"
+						]
+					}
+				},
+				"required": [
+					"path",
+					"place",
+					"type"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"PlaceDataInterface": {
 				"properties": {
 					"hasFoodPoint": {
@@ -178,7 +178,7 @@
 			"Place": {
 				"properties": {
 					"_id": {
-                      "$ref": "#/components/schemas/ObjectId"
+						"$ref": "#/components/schemas/ObjectId"
 					},
 					"name": {
 						"type": "string"
@@ -232,7 +232,7 @@
 					},
 					"categories": {
 						"items": {
-                          "$ref": "#/components/schemas/ObjectId"
+							"$ref": "#/components/schemas/ObjectId"
 						},
 						"type": "array"
 					}
@@ -245,26 +245,26 @@
 				"type": "object",
 				"additionalProperties": false
 			},
-          "CreatePathModel": {
-            "properties": {
-              "prompt": {
-                "type": "string"
-              },
-              "startPosition": {
-                "items": {
-                  "type": "number",
-                  "format": "double"
-                },
-                "type": "array"
-              }
-            },
-            "required": [
-              "prompt",
-              "startPosition"
-            ],
-            "type": "object",
-            "additionalProperties": false
-          },
+			"CreatePathModel": {
+				"properties": {
+					"prompt": {
+						"type": "string"
+					},
+					"startPosition": {
+						"items": {
+							"type": "number",
+							"format": "double"
+						},
+						"type": "array"
+					}
+				},
+				"required": [
+					"prompt",
+					"startPosition"
+				],
+				"type": "object",
+				"additionalProperties": false
+			},
 			"UserRegister": {
 				"properties": {
 					"email": {
@@ -436,26 +436,25 @@
 						"name": "event_id",
 						"required": true,
 						"schema": {
-							"format": "double",
-							"type": "number"
+							"type": "string"
 						}
 					}
 				]
 			}
 		},
-      "/path/all": {
+		"/path/all": {
 			"get": {
-              "operationId": "pathsGetAll",
+				"operationId": "pathsGetAll",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-                                  "items": {
-                                    "$ref": "#/components/schemas/Path"
-                                  },
-                                  "type": "array"
+									"items": {
+										"$ref": "#/components/schemas/Path"
+									},
+									"type": "array"
 								}
 							}
 						}
@@ -468,50 +467,16 @@
 				"parameters": []
 			}
 		},
-      "/path/{path_id}": {
+		"/path/{path_id}": {
 			"get": {
-              "operationId": "pathGetById",
+				"operationId": "pathGetById",
 				"responses": {
 					"200": {
 						"description": "Ok",
 						"content": {
 							"application/json": {
 								"schema": {
-                                  "$ref": "#/components/schemas/Path"
-								}
-							}
-						}
-					}
-				},
-				"tags": [
-					"BackendApi"
-				],
-				"security": [],
-              "parameters": [
-                {
-                  "in": "path",
-                  "name": "path_id",
-                  "required": true,
-                  "schema": {
-                    "type": "string"
-                  }
-                }
-              ]
-			}
-		},
-      "/path/{path_id}/segments": {
-			"get": {
-              "operationId": "pathSegmentsGetById",
-				"responses": {
-					"200": {
-						"description": "Ok",
-						"content": {
-							"application/json": {
-								"schema": {
-                                  "items": {
-                                    "$ref": "#/components/schemas/PathSegment"
-                                  },
-                                  "type": "array"
+									"$ref": "#/components/schemas/Path"
 								}
 							}
 						}
@@ -524,18 +489,18 @@
 				"parameters": [
 					{
 						"in": "path",
-                      "name": "path_id",
+						"name": "path_id",
 						"required": true,
 						"schema": {
-                          "type": "string"
+							"type": "string"
 						}
 					}
 				]
 			}
 		},
-      "/path/create": {
-        "post": {
-          "operationId": "pathCreate",
+		"/path/{path_id}/segments": {
+			"get": {
+				"operationId": "pathSegmentsGetById",
 				"responses": {
 					"200": {
 						"description": "Ok",
@@ -543,14 +508,7 @@
 							"application/json": {
 								"schema": {
 									"items": {
-                                      "anyOf": [
-                                        {
-                                          "$ref": "#/components/schemas/Place"
-                                        },
-                                        {
-                                          "$ref": "#/components/schemas/EventPlace"
-                                        }
-                                      ]
+										"$ref": "#/components/schemas/PathSegment"
 									},
 									"type": "array"
 								}
@@ -562,131 +520,172 @@
 					"BackendApi"
 				],
 				"security": [],
-          "parameters": [],
-          "requestBody": {
-            "required": true,
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreatePathModel"
-                }
+				"parameters": [
+					{
+						"in": "path",
+						"name": "path_id",
+						"required": true,
+						"schema": {
+							"type": "string"
 						}
 					}
-          }
+				]
 			}
 		},
-      "/ping/ping": {
-        "get": {
-          "operationId": "ping",
-          "responses": {
-            "200": {
-              "description": "Ok",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "type": "string"
-                  }
-                }
-              }
-            }
-          },
-          "tags": [
-            "BackendApi"
-          ],
-          "security": [],
-          "parameters": []
-        }
-      },
-      "/places/all": {
-        "get": {
-          "operationId": "placesGetAll",
-          "responses": {
-            "200": {
-              "description": "Ok",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "items": {
-                      "$ref": "#/components/schemas/Place"
-                    },
-                    "type": "array"
-                  }
-                }
-              }
-            }
-          },
-          "tags": [
-            "BackendApi"
-          ],
-          "security": [],
-          "parameters": []
-        }
-      },
-      "/places/id/{place_id}": {
-        "get": {
-          "operationId": "placesGetById",
-          "responses": {
-            "200": {
-              "description": "Ok",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Place"
-                  }
-                }
-              }
-            }
-          },
-          "tags": [
-            "BackendApi"
-          ],
-          "security": [],
-          "parameters": [
-            {
-              "in": "path",
-              "name": "place_id",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ]
-        }
-      },
-      "/places/id/category/{category_id}": {
-        "get": {
-          "operationId": "placesGetByCategoryId",
-          "responses": {
-            "200": {
-              "description": "Ok",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "items": {
-                      "$ref": "#/components/schemas/Place"
-                    },
-                    "type": "array"
-                  }
-                }
-              }
-            }
-          },
-          "tags": [
-            "BackendApi"
-          ],
-          "security": [],
-          "parameters": [
-            {
-              "in": "path",
-              "name": "category_id",
-              "required": true,
-              "schema": {
-                "type": "string"
-              }
-            }
-          ]
-        }
-      },
+		"/path/create": {
+			"post": {
+				"operationId": "pathCreate",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"anyOf": [
+											{
+												"$ref": "#/components/schemas/Place"
+											},
+											{
+												"$ref": "#/components/schemas/EventPlace"
+											}
+										]
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/CreatePathModel"
+							}
+						}
+					}
+				}
+			}
+		},
+		"/ping/ping": {
+			"get": {
+				"operationId": "ping",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "string"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/places/all": {
+			"get": {
+				"operationId": "placesGetAll",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Place"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
+		"/places/id/{place_id}": {
+			"get": {
+				"operationId": "placesGetById",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Place"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "place_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/places/id/category/{category_id}": {
+			"get": {
+				"operationId": "placesGetByCategoryId",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Place"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"tags": [
+					"BackendApi"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "category_id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
 		"/auth/register": {
 			"post": {
 				"operationId": "register",

@@ -1,6 +1,8 @@
 import { AfterViewInit, Component, effect, ElementRef, OnDestroy, ViewChild } from "@angular/core";
+import { Router } from "@angular/router";
 import { environment } from "../../../../../environments/environment";
 import { EventPlace, Place } from "../../../../../generated";
+import { ApiService } from "../../../../core/services/api.service";
 import {
 	MapPointInformationComponent,
 } from "../../../../pop-up-menus/components/map-point-information/map-point-information.component";
@@ -45,6 +47,8 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 	};
 
 	constructor(
+		private apiService: ApiService,
+		private router: Router,
 		private mapInteractionService: MapInteractionsService,
 	) {
 		/** Adding Listener for MapScrolling changes */
@@ -85,10 +89,24 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 	ngAfterViewInit() {
 		/** when ymaps ready we create the map */
 		this.initMap().then();
+		/** getting points from route */
+		this.getPointsFromRoute();
 	}
 
 	ngOnDestroy() {
 		this.map.destroy();
+	}
+
+	/** Gets path points from route url */
+	private async getPointsFromRoute() {
+		const route = this.router.url.split('?')[1].split('&');
+		if (route.length < 2) return;
+		const points = route.map(item => item.split('='));
+		let places = [];
+		for (const point of points)
+			places.push(await (this.apiService.getPlaceById(point[1])));
+		if (places.length > 0)
+			this.mapInteractionService.pathPoints.next(places);
 	}
 
 	/** Function that centers map according to `lastPosition` */

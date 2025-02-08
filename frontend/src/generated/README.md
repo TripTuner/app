@@ -46,9 +46,11 @@ __Note for Windows users:__ The Angular CLI has troubles to use linked npm packa
 Please refer to this issue https://github.com/angular/angular-cli/issues/8284 for a solution / workaround.
 Published packages are not effected by this issue.
 
+
 #### General usage
 
 In your Angular project:
+
 
 ```
 // without configuring providers
@@ -148,6 +150,7 @@ export class AppModule {
 }
 ```
 
+
 ### Set service base path
 If different than the generated base path, during app bootstrap, you can provide the base path to your service.
 
@@ -171,6 +174,7 @@ import { BASE_PATH } from '';
 })
 export class AppModule {}
 ```
+
 
 #### Using @angular/cli
 First extend your `src/environments/*.ts` files by adding the corresponding base path:

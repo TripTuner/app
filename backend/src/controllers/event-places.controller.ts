@@ -16,7 +16,7 @@ export class EventPlaces extends Controller {
     @Tags("BackendApi")
     @OperationId('eventPlacesGetById')
     public async getById(
-        @Path() event_id: number
+        @Path() event_id: string
     ): Promise<EventPlace> {
         return await EventPlaceService.findEvent({ where: { _id: event_id } });
     }

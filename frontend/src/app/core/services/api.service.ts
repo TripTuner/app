@@ -40,6 +40,18 @@ export class ApiService {
 		}
 	}
 
+	async getPlaceById(id: string): Promise<Place | EventPlace> {
+		try {
+			return await firstValueFrom(this.api.placesGetById(id));
+		} catch (error) {
+			try {
+				return await firstValueFrom(this.api.eventPlacesGetById(id));
+			} catch (error) {
+				throw ( 'Not found' );
+			}
+		}
+	}
+
 	async createPath(prompt: string, startPosition: number[]): Promise<Array<Place | EventPlace>> {
 		const testPrompt: Array<any> = [
 			{ type: "category", categories: { "Кафе": 90, "Ресторан": 60, "Бар": 50 } },
