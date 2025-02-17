@@ -8,7 +8,6 @@ import { BottomBarComponent } from "./core/components/bottom-bar/bottom-bar.comp
 	imports: [
 		BottomBarComponent,
 		RouterOutlet,
-
 	],
     styles: `
         .container {
