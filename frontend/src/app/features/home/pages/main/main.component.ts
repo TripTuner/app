@@ -99,7 +99,9 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 
 	/** Gets path points from route url */
 	private async getPointsFromRoute() {
-		const route = this.router.url.split('?')[1].split('&');
+		let route: string[] | string = this.router.url.split('?')[1];
+		if (route === undefined) return;
+		route = route.split('&');
 		if (route.length < 2) return;
 		const points = route.map(item => item.split('='));
 		let places = [];

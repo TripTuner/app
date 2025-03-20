@@ -1,6 +1,7 @@
 import { Component, ElementRef, ViewChild } from "@angular/core";
 import { environment } from "../../../../environments/environment";
 import { EventPlace, Place } from "../../../../generated";
+import { MoveableDirective } from "../../../../libs/moveable.directive";
 import MapPointModel from "../../../core/models/map-point.model";
 import { MapInteractionsService } from "../../../core/services/map-interactions.service";
 import { NotificationsService } from "../../../core/services/notifications.service";
@@ -8,10 +9,12 @@ import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../../core/service
 
 @Component({
 	selector: "PathInformation",
-	imports: [],
+	imports: [
+		MoveableDirective,
+	],
 	styleUrl: "./path-information.component.css",
 	template: `
-		<div (touchstart)="handleTouchStart($event)" class="container" #container>
+		<div moveable [callback]="closeCallback.bind({}, this.notificationsService, this.notificationCallback.bind({}, this.mapInteractionsService, this.path))" class="container" #container>
 			<div class="content">
 				<!-- container with the arrow -->
 				<div class="arrow-container">
@@ -113,8 +116,8 @@ export class PathInformationComponent {
 	protected readonly isInstanceOfPlace = isInstanceOfPlace;
 
 	constructor(
-		private notificationsService: NotificationsService,
-		private mapInteractionsService: MapInteractionsService,
+		public notificationsService: NotificationsService,
+		public mapInteractionsService: MapInteractionsService,
 	) {
 		/** Listener for path Points change */
 		this.mapInteractionsService.pathPoints.subscribe(path => {
@@ -204,112 +207,30 @@ export class PathInformationComponent {
 		}
 	}
 
-	/** Handler for container touch start event */
-	handleTouchStart(event: TouchEvent) {
-		this.MIN_HEIGHT = this.separatorElement.nativeElement.offsetTop;
-
-		const container = this.container.nativeElement; // container element
-		const startTouchY = event.changedTouches[0].clientY;
-		let deltaWithOutScroll = 0;
-		let lastY = event.touches[0].clientY; // initial y scroll position
-
-		/** Handler for touch end event */
-		const handleTouchEnd = (event: TouchEvent) => {
-			// sticking container height to one of the values
-			const currentTouchY = lastY;
-			const currentHeight = container.getBoundingClientRect().height;
-			container.style.transitionDuration = ".3s";
-			setTimeout(() => {
-				if (startTouchY < currentTouchY) { // scrolling to bottom ⬇ and we want to minimize container height
-					if (deltaWithOutScroll >= this.MIN_INTERACTION_DELTA)
-						container.style.maxHeight = `${ this.MIN_HEIGHT }px`;
-					else if (currentHeight >= this.INITIAL_HEIGHT + ( this.MAX_HEIGHT - this.INITIAL_HEIGHT ) / 2)
-						container.style.maxHeight = `${ this.MAX_HEIGHT }px`;
-					else
-						container.style.maxHeight = `${ this.INITIAL_HEIGHT }px`;
-				} else { // scrolling to top ⬆ and we want container to expand
-					if (currentHeight > this.INITIAL_HEIGHT + ( this.MAX_HEIGHT - this.INITIAL_HEIGHT ) / 2)
-						container.style.maxHeight = `${ this.MAX_HEIGHT }px`;
-					else if (deltaWithOutScroll >= this.MIN_INTERACTION_DELTA)
-						container.style.maxHeight = `${ this.INITIAL_HEIGHT }px`;
-					else {
-						if (currentHeight > this.MIN_HEIGHT + ( this.INITIAL_HEIGHT - this.MIN_HEIGHT ) / 2)
-							container.style.maxHeight = `${ this.INITIAL_HEIGHT }px`;
-						else
-							container.style.maxHeight = `${ this.MIN_HEIGHT }px`;
-					}
-				}
-			});
-			setTimeout(() => container.style.transitionDuration = "0s", 300);
-
-			// removing event listeners
-			container.removeEventListener("touchmove", handleTouchMove);
-			container.removeEventListener("touchend", handleTouchEnd);
-		};
-		/** Handler for touch move event */
-		const handleTouchMove = (event: TouchEvent) => {
-			const currentY = event.touches[0].clientY;
-			let delta = lastY - currentY;
-
-			if (delta > 0) { // scrolling to top ⬆
-				/* we should first add maxHeight of the container
-				* then if it is 100vh we should scroll the content */
-				const currentHeight = container.getBoundingClientRect().height;
-				const currentScroll = container.scrollTop;
-				let addToHeight = Math.min(delta, this.MAX_HEIGHT - currentHeight);
-
-				if (addToHeight > 0) { // we should add to maxHeight of the container
-					container.style.maxHeight = `${ currentHeight + addToHeight }px`;
-					delta -= addToHeight;
-					deltaWithOutScroll += addToHeight;
-				}
-
-				if (delta > 0) { // we should scroll the content
-					container.scrollTo({ top: currentScroll + delta });
-				}
-			} else { // scrolling to bottom ⬇
-				/* here first we should scroll content till the top
-				* then we decrease container maxHeight */
-				delta = Math.abs(delta);
-				const currentHeight = container.getBoundingClientRect().height;
-				const currentScroll = container.scrollTop;
-				let addToScroll = Math.min(delta, currentScroll);
-
-				if (addToScroll > 0) { // we should scroll the content
-					container.scrollTo({ top: currentScroll - addToScroll });
-					delta -= addToScroll;
-				}
-
-				if (delta > 0) { // we should add to maxHeight of the container
-					container.style.maxHeight = `${ Math.max(this.MIN_HEIGHT, currentHeight - delta) }px`;
-					deltaWithOutScroll += delta;
-				}
-			}
-
-			lastY = currentY;
-		};
-
-		container.addEventListener("touchmove", handleTouchMove);
-		container.addEventListener("touchend", handleTouchEnd);
-	}
-
 	/** Opens information about the point on the path */
 	openPointInformation(point: Place | EventPlace | MapPointModel) {
 		this.mapInteractionsService.chosenMapPoint.next(point);
 	}
 
-	/** Closes path point */
-	close() {
-		this.mapInteractionsService.pathInformationState.next(-1);
-		const callback = (service: MapInteractionsService, path: any) => {
-			service.pathPoints.next(path);
-		};
-		this.notificationsService.addNotification({
+	closeCallback(notificationsService: NotificationsService, callback: any) {
+		notificationsService.addNotification({
 			timeOut: 5000,
 			message: "Маршрут закрыт",
 			type: "info",
-			callback: callback.bind({}, this.mapInteractionsService, this.path),
+			callback: callback,
 		});
+	}
+
+	notificationCallback(service: MapInteractionsService, path: any) {
+		service.pathPoints.next(path);
+	}
+
+	/** Closes path point */
+	close() {
+		this.mapInteractionsService.pathInformationState.next(-1);
+
+		this.closeCallback(this.notificationsService, this.notificationCallback.bind({}, this.mapInteractionsService, this.path));
+
 		setTimeout(() => {
 			this.mapInteractionsService.pathPoints.next(null);
 		}, 400);

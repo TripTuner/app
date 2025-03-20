@@ -1,5 +1,6 @@
 import { Component, ElementRef, ViewChild } from "@angular/core";
 import { EventPlace, Place } from "../../../../generated";
+import { MoveableDirective } from "../../../../libs/moveable.directive";
 import MapPointModel from "../../../core/models/map-point.model";
 import { BypassHtmlSanitizerPipe } from "../../../core/pipes/doom-sanitizer.pipe";
 import { MapInteractionsService } from "../../../core/services/map-interactions.service";
@@ -10,139 +11,140 @@ import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../../core/service
 	standalone: true,
 	imports: [
 		BypassHtmlSanitizerPipe,
+		MoveableDirective,
 	],
-	styleUrls: ["./map-point-information.component.css", "../path-information/path-information.component.css"],
+	styleUrls: ["./map-point-information.component.css"],
 	template: `
-		<div (touchstart)="handleTouchStart($event)" class="container" #container>
-			<div class="content">
-				<!-- container with the arrow -->
-				<div class="flex flex-row justify-center w-full">
-					<svg width="30" height="3" fill="#6F6F6F">
-						<path d="M0 1.5C0 0.671573 0.671573 0 1.5 0H28.5C29.3284 0 30 0.671573 30 1.5V1.5C30 2.32843 29.3284 3 28.5 3H1.5C0.671573 3 0 2.32843 0 1.5V1.5Z"></path>
-					</svg>
-				</div>
-				<!-- container with the information about the point -->
-				<div class="router">
-					<!-- point name and address -->
-					@if (point !== null) {
-						<div class="main-header">
-							<p class="name allow-selection">{{ point.name }}</p>
-							<div>
-								<svg (click)="close()" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-									<path d="M17.707 16.293a1 1 0 0 1-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L10.586 12 6.293 7.707a1 1 0 0 1 1.414-1.414L12 10.586l4.293-4.293a1 1 0 1 1 1.414 1.414L13.414 12l4.293 4.293z"></path>
-								</svg>
-							</div>
-						</div>
-						@if (isInstanceOfPlace(point)) {
-							<p class="address allow-selection">{{ point.address }}</p>
-						}
-					}
-					<!-- router routes -->
-					@if (isInstanceOfPlace(point)) {
-						<div class="routes">
-							<p (click)="route = 'Обзор'" [class.chosen]="route === 'Обзор'">Обзор</p>
-							<p (click)="route = 'Особенности'" [class.chosen]="route === 'Особенности'">Особенности</p>
-						</div>
-					}
-					<!-- router content -->
-					<div class="router-content">
-						@if (route === 'Обзор') {
-							@if (isInstanceOfPlace(point)) {
-								@if (point.email !== null || point.website !== null || point.phone !== null) {
-									<div class="block">
-										<div class="header-container">
-											<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-												<path d="M20.186 19.742c1.15-1.15.883-2.424.404-2.707-.336-.198-4.749-2.684-4.749-2.684-.344-.216-.686-.106-.893.142l-.005-.004-1.626 1.625a.674.674 0 0 1-.824.1 14.052 14.052 0 0 1-2.632-2.075 14.054 14.054 0 0 1-2.074-2.632.674.674 0 0 1 .1-.824L9.51 9.057l-.004-.005c.243-.203.361-.544.143-.893 0 0-2.487-4.413-2.685-4.75-.283-.478-1.556-.745-2.707.405-2.566 2.568-1.081 8.207 3.32 12.608 4.398 4.399 10.04 5.887 12.608 3.32z"></path>
-											</svg>
-											<p class="header">Контакты</p>
-										</div>
-										<div class="block-info">
-											@if (point.phone !== null) {
-												<a [href]="getPhoneNumber(point.phone!)" class="phone">+7 {{
-														point.phone
-													}}</a>
-											}
-											@if (point.email !== null) {
-												<a [href]="'mailto:' + point.email!" class="email">{{ point.email }}</a>
-											}
-											@if (point.website !== null) {
-												<a [href]="'https://' + point.website!" class="website">{{
-														point.website
-													}}</a>
-											}
-										</div>
-									</div>
-								}
+        <div style="height: 100vh;" moveable [maxHeight]="maxHeight" [callback]="hideCallback.bind({}, this.mapInteractionsService)" class="container" #container>
+            <div class="content">
+                <!-- container with the arrow -->
+                <div class="flex flex-row justify-center w-full">
+                    <svg width="30" height="3" fill="#6F6F6F">
+                        <path d="M0 1.5C0 0.671573 0.671573 0 1.5 0H28.5C29.3284 0 30 0.671573 30 1.5V1.5C30 2.32843 29.3284 3 28.5 3H1.5C0.671573 3 0 2.32843 0 1.5V1.5Z"></path>
+                    </svg>
+                </div>
+                <!-- container with the information about the point -->
+                <div class="router">
+                    <!-- point name and address -->
+                    @if (point !== null) {
+                        <div class="main-header">
+                            <p class="name allow-selection">{{ point.name }}</p>
+                            <div>
+                                <svg (click)="close()" width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.707 16.293a1 1 0 0 1-1.414 1.414L12 13.414l-4.293 4.293a1 1 0 0 1-1.414-1.414L10.586 12 6.293 7.707a1 1 0 0 1 1.414-1.414L12 10.586l4.293-4.293a1 1 0 1 1 1.414 1.414L13.414 12l4.293 4.293z"></path>
+                                </svg>
+                            </div>
+                        </div>
+                        @if (isInstanceOfPlace(point)) {
+                            <p class="address allow-selection">{{ point.address }}</p>
+                        }
+                    }
+                    <!-- router routes -->
+                    @if (isInstanceOfPlace(point)) {
+                        <div class="routes">
+                            <p (click)="route = 'Обзор'" [class.chosen]="route === 'Обзор'">Обзор</p>
+                            <p (click)="route = 'Особенности'" [class.chosen]="route === 'Особенности'">Особенности</p>
+                        </div>
+                    }
+                    <!-- router content -->
+                    <div class="router-content">
+                        @if (route === 'Обзор') {
+                            @if (isInstanceOfPlace(point)) {
+                                @if (point.email !== null || point.website !== null || point.phone !== null) {
+                                    <div class="block">
+                                        <div class="header-container">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M20.186 19.742c1.15-1.15.883-2.424.404-2.707-.336-.198-4.749-2.684-4.749-2.684-.344-.216-.686-.106-.893.142l-.005-.004-1.626 1.625a.674.674 0 0 1-.824.1 14.052 14.052 0 0 1-2.632-2.075 14.054 14.054 0 0 1-2.074-2.632.674.674 0 0 1 .1-.824L9.51 9.057l-.004-.005c.243-.203.361-.544.143-.893 0 0-2.487-4.413-2.685-4.75-.283-.478-1.556-.745-2.707.405-2.566 2.568-1.081 8.207 3.32 12.608 4.398 4.399 10.04 5.887 12.608 3.32z"></path>
+                                            </svg>
+                                            <p class="header">Контакты</p>
+                                        </div>
+                                        <div class="block-info">
+                                            @if (point.phone !== null) {
+                                                <a [href]="getPhoneNumber(point.phone!)" class="phone">+7 {{
+                                                        point.phone
+                                                    }}</a>
+                                            }
+                                            @if (point.email !== null) {
+                                                <a [href]="'mailto:' + point.email!" class="email">{{ point.email }}</a>
+                                            }
+                                            @if (point.website !== null) {
+                                                <a [href]="'https://' + point.website!" class="website">{{
+                                                        point.website
+                                                    }}</a>
+                                            }
+                                        </div>
+                                    </div>
+                                }
 
-								@if (point.schedule !== null || point.data?.time !== undefined) {
-									<div class="block">
-										<div class="header-container">
-											<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-												<path fill-rule="evenodd" clip-rule="evenodd" d="M12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.523-11.775a.25.25 0 0 0-.25-.225h-.545a.25.25 0 0 0-.25.227l-.476 4.203c-.028.433.22.856.645 1.022l3.205 1.21a.3.3 0 0 0 .374-.14l.286-.537a.3.3 0 0 0-.1-.39l-2.417-1.714-.472-3.654v-.002z"></path>
-											</svg>
-											<p class="header">
-												Часы работы
-											</p>
-										</div>
-										<div class="block-info">
-											@if (checkIfOpenedToday(point)) {
-												@if (point.schedule !== null) {
-													@for (day of point.schedule; track point) {
-														<div class="flex flex-row justify-between items-center">
-															<p style="text-transform: capitalize">{{
-																	day.DayOfWeek
-																}}</p>
-															<p>{{ day.Hours.split('-').join(' - ') }}</p>
-														</div>
-													}
-												} @else {
-													<p>открыто</p>
-												}
-											} @else {
-												<p class="text-red-700">Сегодня не работает</p>
-											}
-										</div>
-									</div>
-								}
-							} @else if (isInstanceOfEventPlace(point)) {
-							} @else if (point !== null) {
+                                @if (point.schedule !== null || point.data?.time !== undefined) {
+                                    <div class="block">
+                                        <div class="header-container">
+                                            <svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M12 20a8 8 0 1 1 0-16 8 8 0 0 1 0 16zm.523-11.775a.25.25 0 0 0-.25-.225h-.545a.25.25 0 0 0-.25.227l-.476 4.203c-.028.433.22.856.645 1.022l3.205 1.21a.3.3 0 0 0 .374-.14l.286-.537a.3.3 0 0 0-.1-.39l-2.417-1.714-.472-3.654v-.002z"></path>
+                                            </svg>
+                                            <p class="header">
+                                                Часы работы
+                                            </p>
+                                        </div>
+                                        <div class="block-info">
+                                            @if (checkIfOpenedToday(point)) {
+                                                @if (point.schedule !== null) {
+                                                    @for (day of point.schedule; track point) {
+                                                        <div class="flex flex-row justify-between items-center">
+                                                            <p style="text-transform: capitalize">{{
+                                                                    day.DayOfWeek
+                                                                }}</p>
+                                                            <p>{{ day.Hours.split('-').join(' - ') }}</p>
+                                                        </div>
+                                                    }
+                                                } @else {
+                                                    <p>открыто</p>
+                                                }
+                                            } @else {
+                                                <p class="text-red-700">Сегодня не работает</p>
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                            } @else if (isInstanceOfEventPlace(point)) {
+                            } @else if (point !== null) {
 
-							}
-						} @else if (route === 'Особенности') {
-							@if (isInstanceOfPlace(point)) {
-								<div class="flex flex-row items-center flex-wrap" style="gap: 10px;">
-									@for (key of getKeys(point.data!); track point) {
-										<div class="flex flex-row items-center feature-svg-container" style="gap: 5px;">
-											<div [innerHtml]="pointDataSvg[key] | bypassHtmlSanitizer"></div>
-											<p>{{ pointDataNames[key] }}</p>
-										</div>
-									}
-								</div>
-							}
-						}
-					</div>
-				</div>
-				<!-- container with buttons -->
-				<div class="buttons-container">
-					<div class="scroll-content">
-						<button (click)="AddPointToPath()" class="solid-btn">Добавить</button>
-						<button class="void-btn">
-							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-								<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-								<path d="M12 5l0 14"/>
-								<path d="M5 12l14 0"/>
-							</svg>
-						</button>
-						<button class="void-btn">
-							<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-								<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-								<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/>
-							</svg>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
+                            }
+                        } @else if (route === 'Особенности') {
+                            @if (isInstanceOfPlace(point)) {
+                                <div class="flex flex-row items-center flex-wrap" style="gap: 10px;">
+                                    @for (key of getKeys(point.data!); track point) {
+                                        <div class="flex flex-row items-center feature-svg-container" style="gap: 5px;">
+                                            <div [innerHtml]="pointDataSvg[key] | bypassHtmlSanitizer"></div>
+                                            <p>{{ pointDataNames[key] }}</p>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+                <!-- container with buttons -->
+                <div class="buttons-container">
+                    <div class="scroll-content">
+                        <button (click)="AddPointToPath()" class="solid-btn">Добавить</button>
+                        <button class="void-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M12 5l0 14"/>
+                                <path d="M5 12l14 0"/>
+                            </svg>
+                        </button>
+                        <button class="void-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                                <path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 	`,
 })
 export class MapPointInformationComponent {
@@ -174,17 +176,16 @@ export class MapPointInformationComponent {
 
 	/** Container */
 	@ViewChild("container") container!: ElementRef<HTMLDivElement>;
+
 	protected readonly isInstanceOfPlace = isInstanceOfPlace;
 	protected readonly isInstanceOfEventPlace = isInstanceOfEventPlace;
-	/** Maximum height of the container */
-	private readonly MAX_HEIGHT = window.innerHeight;
-	/** Minimum height of the container */
-	private MIN_HEIGHT: number = 0;
-	/** Minimum deltaY to interact with the container */
-	private MIN_INTERACTION_DELTA: number = 100;
+
+	protected get maxHeight() {
+		return window.innerHeight * 0.7;
+	}
 
 	constructor(
-		private mapInteractionsService: MapInteractionsService,
+		public mapInteractionsService: MapInteractionsService,
 	) {
 		/** Adding listener for point changes */
 		this.mapInteractionsService.chosenMapPoint.subscribe(point => {
@@ -194,97 +195,6 @@ export class MapPointInformationComponent {
 			else
 				this.Show();
 		});
-	}
-
-	/** Handler for container touch start event */
-	handleTouchStart(event: TouchEvent) {
-		const container = this.container.nativeElement; // container element
-		const startTouchY = event.changedTouches[0].clientY;
-		let deltaWithOutScroll = 0;
-		let lastY = event.touches[0].clientY; // initial y scroll position
-
-		/** Handler for touch end event */
-		const handleTouchEnd = () => {
-			// sticking container height to one of the values
-			const currentTouchY = lastY;
-			const currentHeight = container.getBoundingClientRect().height;
-			container.style.transitionDuration = ".3s";
-			setTimeout(() => {
-				if (startTouchY < currentTouchY) { // scrolling to bottom ⬇ and we want to minimize container height
-					if (deltaWithOutScroll >= this.MIN_INTERACTION_DELTA)
-						this.Hide();
-					else {
-						if (currentHeight <= 100)
-							this.Hide();
-						else
-							container.style.maxHeight = `${ this.MAX_HEIGHT }px`;
-					}
-				} else { // scrolling to top ⬆ and we want container to expand
-					if (deltaWithOutScroll >= this.MIN_INTERACTION_DELTA)
-						container.style.maxHeight = `${ this.MAX_HEIGHT }px`;
-					else {
-						if (currentHeight <= 100)
-							this.Hide();
-						else
-							container.style.maxHeight = `${ this.MAX_HEIGHT }px`;
-					}
-				}
-			});
-			setTimeout(() => {
-				container.style.transitionDuration = "0s";
-				if (container.getBoundingClientRect().height === 0)
-					this.Hide();
-			}, 300);
-
-			// removing event listeners
-			container.removeEventListener("touchmove", handleTouchMove);
-			container.removeEventListener("touchend", handleTouchEnd);
-		};
-		/** Handler for touch move event */
-		const handleTouchMove = (event: TouchEvent) => {
-			const currentY = event.touches[0].clientY;
-			let delta = lastY - currentY;
-
-			if (delta > 0) { // scrolling to top ⬆
-				/* we should first add maxHeight of the container
-				* then if it is 100vh we should scroll the content */
-				const currentHeight = container.getBoundingClientRect().height;
-				const currentScroll = container.scrollTop;
-				let addToHeight = Math.min(delta, this.MAX_HEIGHT - currentHeight);
-
-				if (addToHeight > 0) { // we should add to maxHeight of the container
-					container.style.maxHeight = `${ currentHeight + addToHeight }px`;
-					delta -= addToHeight;
-					deltaWithOutScroll += addToHeight;
-				}
-
-				if (delta > 0) { // we should scroll the content
-					container.scrollTo({ top: currentScroll + delta });
-				}
-			} else { // scrolling to bottom ⬇
-				/* here first we should scroll content till the top
-				* then we decrease container maxHeight */
-				delta = Math.abs(delta);
-				const currentHeight = container.getBoundingClientRect().height;
-				const currentScroll = container.scrollTop;
-				let addToScroll = Math.min(delta, currentScroll);
-
-				if (addToScroll > 0) { // we should scroll the content
-					container.scrollTo({ top: currentScroll - addToScroll });
-					delta -= addToScroll;
-				}
-
-				if (delta > 0) { // we should add to maxHeight of the container
-					container.style.maxHeight = `${ Math.max(this.MIN_HEIGHT, currentHeight - delta) }px`;
-					deltaWithOutScroll += delta;
-				}
-			}
-
-			lastY = currentY;
-		};
-
-		container.addEventListener("touchmove", handleTouchMove);
-		container.addEventListener("touchend", handleTouchEnd);
 	}
 
 	/** Adds this.point to current path */
@@ -351,7 +261,7 @@ export class MapPointInformationComponent {
 			this.container.nativeElement.style.display = "flex";
 			this.container.nativeElement.style.transitionDuration = ".3s";
 			setTimeout(() => {
-				this.container.nativeElement.style.maxHeight = `50vh`;
+				this.container.nativeElement.style.maxHeight = `${ this.maxHeight }px`;
 			}, 100);
 			setTimeout(() => {
 				this.container.nativeElement.style.transitionDuration = "0s";
@@ -370,8 +280,13 @@ export class MapPointInformationComponent {
 			this.container.nativeElement.style.display = "none";
 			this.container.nativeElement.style.transitionDuration = "0s";
 
-			if (this.mapInteractionsService.pathPoints.value !== null)
-				this.mapInteractionsService.pathInformationState.next(1);
+			this.hideCallback(this.mapInteractionsService);
 		}, 400);
+	}
+
+	hideCallback(mapInteractionsService: MapInteractionsService) {
+		console.log(mapInteractionsService);
+		if (mapInteractionsService.pathPoints.value !== null)
+			mapInteractionsService.pathInformationState.next(1);
 	}
 }

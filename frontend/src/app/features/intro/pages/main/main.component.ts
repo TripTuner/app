@@ -1,38 +1,40 @@
-import { Component, ElementRef, QueryList, ViewChildren } from "@angular/core";
+import { Component, effect, ElementRef, signal, ViewChild } from "@angular/core";
 import { Router } from "@angular/router";
+import { MoveableDirective } from "../../../../../libs/moveable.directive";
+import { MapInteractionsService } from "../../../../core/services/map-interactions.service";
 
 @Component({
 	selector: "intro-main",
 	standalone: true,
-	imports: [],
+	imports: [
+		MoveableDirective,
+	],
 	templateUrl: "./main.component.html",
 	styleUrl: "./main.component.css",
 })
 export default class MainComponent {
-	@ViewChildren("card") cards!: QueryList<ElementRef<HTMLDivElement>>;
+	@ViewChild("circle") circle!: ElementRef<HTMLDivElement>;
+
+	disabled = signal(false);
+
+	state = signal<boolean>(false);
+
+	finish = signal(false);
 
 	constructor(
 		private router: Router,
-	) {}
-
-	next(index: number) {
-		if (index === this.cards.length - 1)
-			this.Login();
-		else {
-			const prev = this.cards.get(index)!.nativeElement;
-			const next = this.cards.get(index + 1)!.nativeElement;
-
-			prev.style.left = '-100vw';
-			next.style.left = '0vw';
-		}
-	}
-
-	prev(index: number) {
-
-	}
-
-	Login() {
-		// TODO make route to login page
-		this.router.navigate(["/home"]).then();
+		private mapInteractionsService: MapInteractionsService,
+	) {
+		effect(() => {
+			const location = this.mapInteractionsService.userLocation();
+			this.disabled.set(location !== null);
+		});
+		effect(() => {
+			const state = this.state();
+			if (!state) return;
+			setTimeout(() => {
+				this.finish.set(true);
+			}, 300);
+		});
 	}
 }

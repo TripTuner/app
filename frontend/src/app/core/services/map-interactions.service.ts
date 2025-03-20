@@ -1,5 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable, signal } from "@angular/core";
+import { Geolocation } from "@capacitor/geolocation";
 import { BehaviorSubject, firstValueFrom } from "rxjs";
 import { Category, EventPlace, Place } from "../../../generated";
 import GeolocationModel from "../models/geolocation.model";
@@ -60,7 +61,8 @@ export class MapInteractionsService {
 		private readonly apiService: ApiService,
 		private readonly http: HttpClient,
 	) {
-		navigator.geolocation.watchPosition((pos: any) => {
+		Geolocation.watchPosition({}, (pos: any) => {
+			if (pos === null) return;
 			this.userPosition.set({ longitude: pos.coords.longitude, latitude: pos.coords.latitude });
 			this.updateCity().then();
 		});

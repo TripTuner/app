@@ -9,6 +9,4 @@ const config: CapacitorConfig = {
     },
 };
 
-const path =  "/opt/android-studio-2024.1.2/android-studio/bin/studio.sh"
-
 export default config;

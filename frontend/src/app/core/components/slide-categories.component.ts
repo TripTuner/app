@@ -1,4 +1,5 @@
 import { Component, Input } from "@angular/core";
+import { DomSanitizer } from "@angular/platform-browser";
 import { Category } from "../../../generated";
 import { MapInteractionsService } from "../services/map-interactions.service";
 
@@ -52,7 +53,7 @@ import { MapInteractionsService } from "../services/map-interactions.service";
                          [class.active]="mapInteractions.checkCategoryChosen(category)"
                          class="card"
                     >
-						<div [innerHTML]="category.svg"></div>
+						<div [innerHTML]="sanitizer.bypassSecurityTrustHtml(category.svg)"></div>
                         <p>{{ category.name }}</p>
                     </div>
                 }
@@ -67,7 +68,8 @@ export class SlideCategoriesComponent {
     @Input({ alias: 'flexWrap' }) flexWrap: boolean = false;
 
     constructor(
-        public mapInteractions: MapInteractionsService
+        public mapInteractions: MapInteractionsService,
+		public sanitizer: DomSanitizer,
     ) {}
 
 	/**

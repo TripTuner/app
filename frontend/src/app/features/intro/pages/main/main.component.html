@@ -1,33 +1,24 @@
-<div class="container">
-	<div class="card visible" #card>
-		<img src="intro/background.png" alt="">
+<div class="container" [class.finish]="finish()">
 
-		<div class="content">
-			<p class="header">TripTuner</p>
-			<p class="text">планируйте свои прогулки с нами</p>
-		</div>
+    <img class="background" alt="" src="intro/background.avif">
 
-		<div class="w-full flex flex-col gap-5 items-center">
-			<button class="void" (click)="next(0)">Смотреть обучение</button>
-			<button class="solid" (click)="Login()">Войти</button>
-		</div>
-	</div>
+    <div>
+        <p class="text-3xl font-semibold leading-[2.5rem]">Дайте нам прокачать <br> ваш маршрут</p>
+        <p class="text-lg font-normal text-text-secondary mt-[0px]">Создавайте маршруты и путешествуйте вместе</p>
+    </div>
 
-	<div class="card hidden" #card>
-		<div class="content">
-			<p class="text-text-primary text-2xl text-center">Это краткое обучение для понимания основ TripTuner</p>
-			<p>1. Построение маршрута<br></p>
-		</div>
+    <div class="btn">
+        <div moveable [state]="state" [class.disabled]="!disabled()" [valid]="disabled" [isPopup]="false" [minHeight]="70" [maxHeight]="160" class="circle-content">
+            <div class="circle" #circle>
+                @if (!disabled()) {
+                    <svg viewBox="25 25 50 50">
+                        <circle r="20" cy="50" cx="50"></circle>
+                    </svg>
+                } @else {
+                    <p>GO</p>
+                }
+            </div>
+        </div>
+    </div>
 
-		<div class="w-full flex flex-row gap-5 justify-between items-center nav-buttons">
-			<button class="" style="width: 71px;">
-				<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-x">
-					<path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-					<path d="M18 6l-12 12"/>
-					<path d="M6 6l12 12"/>
-				</svg>
-			</button>
-			<button (click)="next(1)" style="width: 71px;">➡</button>
-		</div>
-	</div>
 </div>
