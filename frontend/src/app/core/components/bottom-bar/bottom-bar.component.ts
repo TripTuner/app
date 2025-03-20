@@ -180,7 +180,7 @@ function swapElements(arr: any[], index1: number, index2: number): void {
             </div>
         </div>
 
-        <button (click)="this.mapInteractionService.mapScrolled.set(-1)" class="stick-position-marker" [style.background-color]="mapInteractionService.mapScrolled() === -1 ? 'var(--blue-60)' : 'var(--neutral-1)'" #stickPositionButton>
+        <button (click)="stickUserPosition()" class="stick-position-marker" [style.background-color]="mapInteractionService.mapScrolled() === -1 ? 'var(--blue-60)' : 'var(--neutral-1)'" #stickPositionButton>
             <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
                 <path d="M19.37 15.7965C19.2479 15.7479 19.1174 15.7239 18.9859 15.7257C18.8545 15.7276 18.7247 15.7553 18.604 15.8073C18.4833 15.8593 18.374 15.9345 18.2824 16.0288C18.1908 16.123 18.1186 16.2344 18.07 16.3565C18.0214 16.4786 17.9974 16.6091 17.9992 16.7406C18.001 16.872 18.0288 17.0018 18.0808 17.1225C18.1328 17.2432 18.208 17.3525 18.3023 17.4441C18.3965 17.5358 18.5079 17.6079 18.63 17.6565C20.09 18.2365 21 19.1365 21 20.0065C21 21.4265 18.54 23.0065 15 23.0065C11.46 23.0065 9 21.4265 9 20.0065C9 19.1365 9.91 18.2365 11.37 17.6565C11.6166 17.5584 11.8142 17.3663 11.9192 17.1225C12.0243 16.8787 12.0281 16.6032 11.93 16.3565C11.8319 16.1099 11.6398 15.9123 11.396 15.8073C11.1522 15.7023 10.8767 15.6984 10.63 15.7965C8.36 16.6965 7 18.2665 7 20.0065C7 22.8065 10.51 25.0065 15 25.0065C19.49 25.0065 23 22.8065 23 20.0065C23 18.2665 21.64 16.6965 19.37 15.7965ZM14 12.8665V20.0065C14 20.2717 14.1054 20.5261 14.2929 20.7136C14.4804 20.9012 14.7348 21.0065 15 21.0065C15.2652 21.0065 15.5196 20.9012 15.7071 20.7136C15.8946 20.5261 16 20.2717 16 20.0065V12.8665C16.9427 12.6231 17.7642 12.0443 18.3106 11.2385C18.857 10.4327 19.0908 9.45533 18.9681 8.48951C18.8454 7.5237 18.3747 6.63578 17.6442 5.99219C16.9137 5.3486 15.9736 4.99353 15 4.99353C14.0264 4.99353 13.0863 5.3486 12.3558 5.99219C11.6253 6.63578 11.1546 7.5237 11.0319 8.48951C10.9092 9.45533 11.143 10.4327 11.6894 11.2385C12.2358 12.0443 13.0573 12.6231 14 12.8665ZM15 7.00651C15.3956 7.00651 15.7822 7.12381 16.1111 7.34357C16.44 7.56334 16.6964 7.87569 16.8478 8.24115C16.9991 8.6066 17.0387 9.00873 16.9616 9.39669C16.8844 9.78466 16.6939 10.141 16.4142 10.4207C16.1345 10.7004 15.7781 10.8909 15.3902 10.9681C15.0022 11.0453 14.6001 11.0057 14.2346 10.8543C13.8692 10.7029 13.5568 10.4466 13.3371 10.1177C13.1173 9.78876 13 9.40208 13 9.00651C13 8.47608 13.2107 7.96737 13.5858 7.5923C13.9609 7.21723 14.4696 7.00651 15 7.00651Z"/>
             </svg>
@@ -305,7 +305,7 @@ export class BottomBarComponent implements AfterViewInit {
 			filter((event: any) => event instanceof NavigationEnd),
 		).subscribe(() => {
 			this.routeChangeHandler();
-		}); // TODO save geolocation to localstorage with time
+		});
 	}
 
 	closeMainContainer() {
@@ -329,6 +329,11 @@ export class BottomBarComponent implements AfterViewInit {
 			this.container.nativeElement.style.transitionDuration = "0s";
 			this.stickPositionButton.nativeElement.style.top = `${ window.innerHeight - this.MIN_HEIGHT - 43 }px`;
 		}, 400);
+	}
+
+	stickUserPosition() {
+		this.mapInteractionService.chosenMapPoint.next(null);
+		this.mapInteractionService.mapScrolled.set(-1)
 	}
 
 	/** Function that listens to route change */
@@ -357,22 +362,6 @@ export class BottomBarComponent implements AfterViewInit {
 			this.stickPositionButton.nativeElement.style.opacity = "0";
 			setTimeout(() => this.mainAddonContainer.nativeElement.style.display = "none", 300);
 		}
-	}
-
-	/** Function that hides `mainContainer` */
-	hideMainContainer() {
-		if (this.mainContainer === undefined) return;
-		setTimeout(() => {
-			this.container.nativeElement.style.maxHeight = "168px";
-		});
-	}
-
-	/** Function that shows `mainContainer` */
-	showMainContainer() {
-		if (this.mainContainer === undefined) return;
-		setTimeout(() => {
-			this.container.nativeElement.style.maxHeight = "100vh";
-		});
 	}
 
 	/** Function that shows the search box */
