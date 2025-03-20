@@ -202,6 +202,7 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 	 * @param {MapClickEventModel | undefined} event map click event
 	 */
 	private async handleMapClick(event: MapClickEventModel | undefined) {
+		console.log('click');
 		if (event?.type === "marker") { // we clicked on the marker on the map
 			const element = event.entity.element;
 			const text = element.innerText;
@@ -219,6 +220,8 @@ export default class MainComponent implements AfterViewInit, OnDestroy {
 				longitude: event.entity.geometry.coordinates[1],
 				isLiked: false,
 			});
+		} else {
+			this.mapInteractionService.chosenMapPoint.next(null);
 		}
 	}
 

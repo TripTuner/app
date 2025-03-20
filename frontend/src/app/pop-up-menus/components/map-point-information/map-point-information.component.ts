@@ -192,7 +192,6 @@ export class MapPointInformationComponent {
 		/** Adding listener for point changes */
 		this.mapInteractionsService.chosenMapPoint.subscribe(point => {
 			this.point = point;
-			console.log('setting new state - ', this.point !== null)
 			this.state.set(this.point !== null);
 		});
 		/** effect for moveable state */
