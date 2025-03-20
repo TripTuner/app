@@ -1,4 +1,4 @@
-import { Directive, ElementRef, inject, Input, OnDestroy, signal, WritableSignal } from "@angular/core";
+import { Directive, effect, ElementRef, inject, Input, OnDestroy, signal, WritableSignal } from "@angular/core";
 import { AppComponent } from "../app/app.component";
 
 @Directive({
@@ -34,6 +34,8 @@ export class MoveableDirective implements OnDestroy {
 	@Input({ required: false, alias: "state" })
 	stateSignal: WritableSignal<boolean> = signal<boolean>(false);
 
+	private stateSignalChangeTime: Date = new Date();
+
 	private timeouts: any[] = [];
 
 	constructor() {
@@ -41,6 +43,14 @@ export class MoveableDirective implements OnDestroy {
 		this.element.addEventListener("touchstart", (ev: TouchEvent) => this.handleTouchStart(this.element, ev), {
 			passive: false, // some browsers default this to true. It needs to be false for 'event.preventDefault()' to work
 			capture: true,
+		});
+
+		effect(() => {
+			const state = this.stateSignal();
+			if (this.ifLocalStateChange())
+				return;
+			if (state) this.Open(this.element);
+			else this.Hide(this.element);
 		});
 	}
 
@@ -50,6 +60,17 @@ export class MoveableDirective implements OnDestroy {
 			passive: false,
 			capture: true,
 		});
+	}
+
+	ifLocalStateChange() {
+		const date = new Date();
+		const delay = date.getTime() - this.stateSignalChangeTime.getTime();
+		return delay <= 100;
+	}
+
+	changeState(state: boolean) {
+		this.stateSignalChangeTime = new Date();
+		this.stateSignal.set(state);
 	}
 
 	/** Handles container touch start event */
@@ -88,7 +109,7 @@ export class MoveableDirective implements OnDestroy {
 				}
 
 				if (delta > 0 && this.popup) { // we should scroll the content
-					this.stateSignal.set(true);
+					this.changeState(true);
 					container.scrollTo({ top: currentScroll + delta });
 				}
 			}
@@ -105,7 +126,6 @@ export class MoveableDirective implements OnDestroy {
 				}
 
 				if (delta > 0) { // we should add to maxHeight of the container
-					this.stateSignal.set(false);
 					height = Math.max(this.MIN_HEIGHT, currentHeight - delta);
 					container.style.maxHeight = `${ height }px`;
 					deltaWithOutScroll += delta;
@@ -197,7 +217,7 @@ export class MoveableDirective implements OnDestroy {
 	private Open(container: HTMLElement) {
 		if (container === undefined) return;
 
-		this.stateSignal.set(true);
+		this.changeState(true);
 		if (this.popup)
 			AppComponent.bottomBarState.set({ percent: 1, state: true });
 
@@ -222,7 +242,7 @@ export class MoveableDirective implements OnDestroy {
 	private Hide(container: HTMLElement) {
 		if (container === undefined) return;
 
-		this.stateSignal.set(false);
+		this.changeState(false);
 		if (this.popup)
 			AppComponent.bottomBarState.set({ percent: 0, state: true });
 
@@ -239,8 +259,6 @@ export class MoveableDirective implements OnDestroy {
 					container.style.display = "none";
 				container.style.transitionDuration = "0s";
 				//this.timeouts = this.timeouts.splice(0, 1);
-
-				this.callback();
 			}, 300),
 		);
 	}

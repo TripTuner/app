@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from "@angular/core";
+import { booleanAttribute, Component, effect, ElementRef, signal, ViewChild } from "@angular/core";
 import { EventPlace, Place } from "../../../../generated";
 import { MoveableDirective } from "../../../../libs/moveable.directive";
 import MapPointModel from "../../../core/models/map-point.model";
@@ -15,7 +15,7 @@ import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../../core/service
 	],
 	styleUrls: ["./map-point-information.component.css"],
 	template: `
-        <div style="height: 100vh;" moveable [maxHeight]="maxHeight" [callback]="hideCallback.bind({}, this.mapInteractionsService)" class="container" #container>
+        <div style="height: 100vh;" moveable [state]="state" [maxHeight]="maxHeight" class="container" #container>
             <div class="content">
                 <!-- container with the arrow -->
                 <div class="flex flex-row justify-center w-full">
@@ -180,6 +180,8 @@ export class MapPointInformationComponent {
 	protected readonly isInstanceOfPlace = isInstanceOfPlace;
 	protected readonly isInstanceOfEventPlace = isInstanceOfEventPlace;
 
+	state = signal<boolean>(false);
+
 	protected get maxHeight() {
 		return window.innerHeight * 0.7;
 	}
@@ -190,11 +192,18 @@ export class MapPointInformationComponent {
 		/** Adding listener for point changes */
 		this.mapInteractionsService.chosenMapPoint.subscribe(point => {
 			this.point = point;
-			if (this.point === null)
-				this.Hide();
-			else
-				this.Show();
+			console.log('setting new state - ', this.point !== null)
+			this.state.set(this.point !== null);
 		});
+		/** effect for moveable state */
+		effect(() => {
+			const state = this.state();
+
+			if (state) {
+			} else {
+				this.hideCallback(this.mapInteractionsService);
+			}
+		})
 	}
 
 	/** Adds this.point to current path */
@@ -203,7 +212,7 @@ export class MapPointInformationComponent {
 		if (path === null) path = [];
 		path.push(this.point!);
 		this.mapInteractionsService.setNewPath(path);
-		this.Hide();
+		this.state.set(false);
 	}
 
 	/** Closes map point information container */
@@ -250,42 +259,7 @@ export class MapPointInformationComponent {
 		return result;
 	}
 
-	/** Shows content of the MapPointInformation */
-	private Show() {
-		let timeOut = 0;
-		if (this.mapInteractionsService.pathInformationState.value == 2) {
-			timeOut = 500;
-			this.mapInteractionsService.pathInformationState.next(-1);
-		}
-		setTimeout(() => {
-			this.container.nativeElement.style.display = "flex";
-			this.container.nativeElement.style.transitionDuration = ".3s";
-			setTimeout(() => {
-				this.container.nativeElement.style.maxHeight = `${ this.maxHeight }px`;
-			}, 100);
-			setTimeout(() => {
-				this.container.nativeElement.style.transitionDuration = "0s";
-			}, 400);
-		}, timeOut);
-	}
-
-	/** Hides MapPointInformation content */
-	private Hide() {
-		if (this.container === undefined) return;
-		this.container.nativeElement.style.transitionDuration = ".3s";
-		setTimeout(() => {
-			this.container.nativeElement.style.maxHeight = "0vh";
-		}, 100);
-		setTimeout(() => {
-			this.container.nativeElement.style.display = "none";
-			this.container.nativeElement.style.transitionDuration = "0s";
-
-			this.hideCallback(this.mapInteractionsService);
-		}, 400);
-	}
-
 	hideCallback(mapInteractionsService: MapInteractionsService) {
-		console.log(mapInteractionsService);
 		if (mapInteractionsService.pathPoints.value !== null)
 			mapInteractionsService.pathInformationState.next(1);
 	}
