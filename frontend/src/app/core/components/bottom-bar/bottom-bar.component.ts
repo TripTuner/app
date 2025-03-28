@@ -18,6 +18,7 @@ import { MapInteractionsService } from "../../services/map-interactions.service"
 import { NotificationsService } from "../../services/notifications.service";
 import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../services/utils.service";
 import { SlideCategoriesComponent } from "../slide-categories.component";
+import { BottomBarContentComponent } from "./bottom-bar-content.component";
 
 /**
  * Function that places Caret to the end of the editor
@@ -73,11 +74,10 @@ function swapElements(arr: any[], index1: number, index2: number): void {
 	selector: "BottomBar",
 	standalone: true,
 	imports: [
-		RouterLink,
-		RouterLinkActive,
 		SlideCategoriesComponent,
 		PlaceSearchPipe,
 		MoveableDirective,
+		BottomBarContentComponent,
 	],
 	styleUrl: "./bottom-bar.component.css",
 	template: `
@@ -102,58 +102,9 @@ function swapElements(arr: any[], index1: number, index2: number): void {
                     </div>
                 </div>
 
-                <div class="main" #mainContainer>
-                    <div class="links" #linksContainer>
-                        <div class="roller" #rollerElement></div>
-                        <a routerLinkActive="active" name="home" routerLink="home" #routerLink>
-                            <div class="child">
-                                <svg width="20" height="21" viewBox="0 0 20 21" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <g clip-path="url(#clip0_2_179)">
-                                        <path d="M17.3833 7.475L11.6083 2.85833C10.7167 2.14167 9.275 2.14167 8.39166 2.85L2.61666 7.475C1.96666 7.99167 1.55 9.08333 1.69166 9.9L2.8 16.5333C3 17.7167 4.13333 18.675 5.33333 18.675H14.6667C15.8583 18.675 17 17.7083 17.2 16.5333L18.3083 9.9C18.4417 9.08333 18.025 7.99167 17.3833 7.475ZM10 13.4167C8.85 13.4167 7.91666 12.4833 7.91666 11.3333C7.91666 10.1833 8.85 9.25 10 9.25C11.15 9.25 12.0833 10.1833 12.0833 11.3333C12.0833 12.4833 11.15 13.4167 10 13.4167Z"/>
-                                    </g>
-                                    <defs>
-                                        <clipPath id="clip0_2_179">
-                                            <rect width="20" height="20" fill="white" transform="translate(0 0.5)"/>
-                                        </clipPath>
-                                    </defs>
-                                </svg>
-                                <p>Home</p>
-                            </div>
-                        </a> <a routerLinkActive="active" name="likes" routerLink="likes" #routerLink>
-                        <div class="child">
-                            <svg width="17" height="16" viewBox="0 0 17 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M8.5 14.0872L2.0539 7.64115C0.648699 6.23594 0.648699 3.95765 2.0539 2.55245C3.45911 1.14724 5.7374 1.14724 7.1426 2.55245L7.79289 3.20274C8.18342 3.59326 8.81658 3.59326 9.20711 3.20274L9.8574 2.55245C11.2626 1.14724 13.5409 1.14724 14.9461 2.55245C16.3513 3.95765 16.3513 6.23594 14.9461 7.64115L8.5 14.0872Z" stroke-width="2" stroke-linejoin="round"/>
-                            </svg>
-                            <p>Likes</p>
-                        </div>
-                    </a> <a routerLinkActive="active" name="build" routerLink="build" #routerLink>
-                        <div class="main-child">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M18 12.75H6C5.59 12.75 5.25 12.41 5.25 12C5.25 11.59 5.59 11.25 6 11.25H18C18.41 11.25 18.75 11.59 18.75 12C18.75 12.41 18.41 12.75 18 12.75Z" fill="white"/>
-                                <path d="M12 18.75C11.59 18.75 11.25 18.41 11.25 18V6C11.25 5.59 11.59 5.25 12 5.25C12.41 5.25 12.75 5.59 12.75 6V18C12.75 18.41 12.41 18.75 12 18.75Z" fill="white"/>
-                            </svg>
-                        </div>
-                    </a> <a routerLinkActive="active" name="community" routerLink="community" #routerLink>
-                        <div class="child">
-                            <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M16.3333 8.95833H14.6667C12.65 8.95833 11.5417 7.85 11.5417 5.83333V4.16667C11.5417 2.15 12.65 1.04167 14.6667 1.04167H16.3333C18.35 1.04167 19.4583 2.15 19.4583 4.16667V5.83333C19.4583 7.85 18.35 8.95833 16.3333 8.95833ZM14.6667 2.29167C13.35 2.29167 12.7917 2.85 12.7917 4.16667V5.83333C12.7917 7.15 13.35 7.70833 14.6667 7.70833H16.3333C17.65 7.70833 18.2083 7.15 18.2083 5.83333V4.16667C18.2083 2.85 17.65 2.29167 16.3333 2.29167H14.6667Z"/>
-                                <path d="M6.33333 18.9583H4.66666C2.65 18.9583 1.54166 17.85 1.54166 15.8333V14.1667C1.54166 12.15 2.65 11.0417 4.66666 11.0417H6.33333C8.35 11.0417 9.45833 12.15 9.45833 14.1667V15.8333C9.45833 17.85 8.35 18.9583 6.33333 18.9583ZM4.66666 12.2917C3.35 12.2917 2.79166 12.85 2.79166 14.1667V15.8333C2.79166 17.15 3.35 17.7083 4.66666 17.7083H6.33333C7.65 17.7083 8.20833 17.15 8.20833 15.8333V14.1667C8.20833 12.85 7.65 12.2917 6.33333 12.2917H4.66666Z"/>
-                                <path d="M5.5 8.95833C3.31666 8.95833 1.54166 7.18333 1.54166 5C1.54166 2.81667 3.31666 1.04167 5.5 1.04167C7.68333 1.04167 9.45833 2.81667 9.45833 5C9.45833 7.18333 7.68333 8.95833 5.5 8.95833ZM5.5 2.29167C4.00833 2.29167 2.79166 3.50833 2.79166 5C2.79166 6.49167 4.00833 7.70833 5.5 7.70833C6.99166 7.70833 8.20833 6.49167 8.20833 5C8.20833 3.50833 6.99166 2.29167 5.5 2.29167Z"/>
-                                <path d="M15.5 18.9583C13.3167 18.9583 11.5417 17.1833 11.5417 15C11.5417 12.8167 13.3167 11.0417 15.5 11.0417C17.6833 11.0417 19.4583 12.8167 19.4583 15C19.4583 17.1833 17.6833 18.9583 15.5 18.9583ZM15.5 12.2917C14.0083 12.2917 12.7917 13.5083 12.7917 15C12.7917 16.4917 14.0083 17.7083 15.5 17.7083C16.9917 17.7083 18.2083 16.4917 18.2083 15C18.2083 13.5083 16.9917 12.2917 15.5 12.2917Z"/>
-                            </svg>
-                            <p>Community</p>
-                        </div>
-                    </a> <a routerLinkActive="active" name="profile" routerLink="profile" #routerLink>
-                        <div class="child">
-                            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M10.133 9.68333C10.108 9.68333 10.0913 9.68333 10.0663 9.68333C10.0247 9.675 9.96633 9.675 9.91633 9.68333C7.49967 9.60833 5.67467 7.70833 5.67467 5.36667C5.67467 2.98333 7.61633 1.04167 9.99967 1.04167C12.383 1.04167 14.3247 2.98333 14.3247 5.36667C14.3163 7.70833 12.483 9.60833 10.158 9.68333C10.1497 9.68333 10.1413 9.68333 10.133 9.68333ZM9.99967 2.29167C8.308 2.29167 6.92467 3.675 6.92467 5.36667C6.92467 7.03333 8.22467 8.375 9.883 8.43333C9.92467 8.425 10.0413 8.425 10.1497 8.43333C11.783 8.35833 13.0663 7.01667 13.0747 5.36667C13.0747 3.675 11.6913 2.29167 9.99967 2.29167Z"/>
-                                <path d="M10.1413 18.7917C8.50801 18.7917 6.86634 18.375 5.62467 17.5417C4.46634 16.775 3.83301 15.725 3.83301 14.5833C3.83301 13.4417 4.46634 12.3833 5.62467 11.6083C8.12467 9.95 12.1747 9.95 14.658 11.6083C15.808 12.375 16.4497 13.425 16.4497 14.5667C16.4497 15.7083 15.8163 16.7667 14.658 17.5417C13.408 18.375 11.7747 18.7917 10.1413 18.7917ZM6.31634 12.6583C5.51634 13.1917 5.08301 13.875 5.08301 14.5917C5.08301 15.3 5.52467 15.9833 6.31634 16.5083C8.39134 17.9 11.8913 17.9 13.9663 16.5083C14.7663 15.975 15.1997 15.2917 15.1997 14.575C15.1997 13.8667 14.758 13.1833 13.9663 12.6583C11.8913 11.275 8.39134 11.275 6.31634 12.6583Z"/>
-                            </svg>
-                            <p>Profile</p>
-                        </div>
-                    </a>
-                    </div>
-                </div>
+				<div class="main">
+                    <BottomBarContent/>
+				</div>
             </div>
         </div>
 
@@ -188,10 +139,6 @@ function swapElements(arr: any[], index1: number, index2: number): void {
 	`,
 })
 export class BottomBarComponent implements AfterViewInit {
-	@ViewChild("linksContainer") linksContainer!: ElementRef<HTMLDivElement>; // container with routing parts
-	@ViewChildren("routerLink") routerLikes!: QueryList<ElementRef<HTMLAnchorElement>>; // All link elements in bottom bar
-	@ViewChild("rollerElement") roller!: ElementRef<HTMLDivElement>; // Roller that travels under routes
-
 	@ViewChildren("openMenu") openMenuItems!: QueryList<ElementRef<HTMLDivElement>>; // elements that should be visible when menu openes
 
 	@ViewChild("container") container!: ElementRef<HTMLDivElement>; // Main container of all elements
@@ -338,19 +285,6 @@ export class BottomBarComponent implements AfterViewInit {
 
 	/** Function that listens to route change */
 	routeChangeHandler() {
-		/** moving map customization */
-		this.routerLikes.forEach(link => {
-			if (link.nativeElement.name === this.router.url.split("/")[1]) {
-				this.roller.nativeElement.style.left = `${ link.nativeElement.offsetLeft + ( link.nativeElement.offsetWidth - 5 ) / 2 }px`;
-				if (this.roller.nativeElement.style.display === "") {
-					setTimeout(() => {
-						this.roller.nativeElement.style.display = "block";
-					}, 300);
-				}
-			}
-			return link;
-		});
-
 		/* Showing map addon if we are in the home page */
 		if (this.router.url.split("/").length === 1 || this.router.url.split("/")[1] === "") {
 			this.mainAddonContainer.nativeElement.style.display = "flex";

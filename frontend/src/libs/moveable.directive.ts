@@ -77,7 +77,7 @@ export class MoveableDirective implements OnDestroy {
 	handleTouchStart(container: HTMLElement, event: TouchEvent) {
 		if (container.scrollTop !== 0) return;
 		if (!this.valid()) return;
-		event.preventDefault();
+		//event.preventDefault();
 		this.stopAnimation(container);
 
 		const startTouchY = event.changedTouches[0].clientY;
@@ -110,6 +110,7 @@ export class MoveableDirective implements OnDestroy {
 
 				if (delta > 0 && this.popup) { // we should scroll the content
 					this.changeState(true);
+					container.style.overflowY = 'scroll';
 					container.scrollTo({ top: currentScroll + delta });
 				}
 			}
@@ -126,6 +127,7 @@ export class MoveableDirective implements OnDestroy {
 				}
 
 				if (delta > 0) { // we should add to maxHeight of the container
+					container.style.overflowY = 'hidden';
 					height = Math.max(this.MIN_HEIGHT, currentHeight - delta);
 					container.style.maxHeight = `${ height }px`;
 					deltaWithOutScroll += delta;
@@ -218,8 +220,10 @@ export class MoveableDirective implements OnDestroy {
 		if (container === undefined) return;
 
 		this.changeState(true);
-		if (this.popup)
+		if (this.popup) {
 			AppComponent.bottomBarState.set({ percent: 1, state: true });
+			container.style.overflowY = 'scroll';
+		}
 
 		container.style.transitionDuration = ".3s";
 		if (this.MIN_HEIGHT === 0)
@@ -243,8 +247,10 @@ export class MoveableDirective implements OnDestroy {
 		if (container === undefined) return;
 
 		this.changeState(false);
-		if (this.popup)
+		if (this.popup) {
 			AppComponent.bottomBarState.set({ percent: 0, state: true });
+			container.style.overflowY = 'hidden';
+		}
 
 		container.style.transitionDuration = ".3s";
 		this.timeouts.push(

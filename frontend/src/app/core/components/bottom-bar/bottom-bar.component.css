@@ -34,8 +34,9 @@
     border-radius:  var(--br-16) var(--br-16) 0 0;
     background:     var(--background-primary);
     gap:            5px;
-    overflow-y:     scroll;
+    overflow-y:     hidden;
     max-height:     233px;
+    height:         calc(100vh - 67px);
 
     .map-addon {
         width:               100%;
@@ -228,7 +229,7 @@
     height:              200px;
     max-height:          0px;
     display:             none;
-    position:            absolute;
+    position:            fixed;
     z-index:             1002;
     top:                 calc(-200px + 16px);
     transition-duration: .3s;
