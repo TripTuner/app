@@ -39,7 +39,7 @@ import MainComponent from "./features/intro/pages/main/main.component";
 	`,
     template: `
         <div class="container" #container>
-<!--             <intro-main/> -->
+            <intro-main/>
             <div class="router-container" #router>
                 <div class="router-content" #router>
                     <router-outlet/>
