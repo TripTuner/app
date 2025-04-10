@@ -14,7 +14,7 @@ import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../../core/service
 	],
 	styleUrl: "./path-information.component.css",
 	template: `
-		<div moveable [callback]="closeCallback.bind({}, this.notificationsService, this.notificationCallback.bind({}, this.mapInteractionsService, this.path))" class="container" #container>
+		<div moveable [isPopup]="false" [callback]="closeCallback.bind({}, this.notificationsService, this.notificationCallback.bind({}, this.mapInteractionsService, this.path))" class="container" #container>
 			<div class="content">
 				<!-- container with the arrow -->
 				<div class="arrow-container">

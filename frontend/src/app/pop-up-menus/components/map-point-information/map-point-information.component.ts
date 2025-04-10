@@ -15,7 +15,7 @@ import { isInstanceOfEventPlace, isInstanceOfPlace } from "../../../core/service
 	],
 	styleUrls: ["./map-point-information.component.css"],
 	template: `
-        <div style="height: 100vh;" moveable [state]="state" [maxHeight]="maxHeight" class="container" #container>
+        <div style="height: 100vh;" moveable [isPopup]="false" [state]="state" [maxHeight]="maxHeight" class="container" #container>
             <div class="content">
                 <!-- container with the arrow -->
                 <div class="flex flex-row justify-center w-full">

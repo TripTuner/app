@@ -62,7 +62,6 @@ export class MapInteractionsService {
 		private readonly http: HttpClient,
 	) {
 		Geolocation.watchPosition({}, (pos: Position | null) => {
-			console.log(pos);
 			if (pos === null) return;
 			this.userPosition.set({ longitude: pos.coords.longitude, latitude: pos.coords.latitude });
 			this.updateCity().then();

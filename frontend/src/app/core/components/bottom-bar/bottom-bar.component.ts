@@ -21,7 +21,7 @@ import { SlideCategoriesComponent } from "../slide-categories.component";
 import { BottomBarContentComponent } from "./bottom-bar-content.component";
 
 /**
- * Function that places Caret to the end of the editor
+ * places Caret to the end of the editor
  *
  * @param {HTMLDivElement} editor editor in which caret should be placed
  * @param {number} pos place where cater should be places
@@ -93,7 +93,7 @@ function swapElements(arr: any[], index1: number, index2: number): void {
                     <div class="content">
                         <div class="prompt-input-container">
                             <div class="prompt-input-scroll" #promptInputScroll>
-                                <div dir="auto" tabindex="0" class="input allow-selection" (keydown)="handleKeyDownPromptInput($event)" (keyup)="handleCaretPositionChanges($event)" (input)="handlePromptInput()" (click)="handleCaretPositionChanges($event)" role="textbox" contenteditable="true" #promptInput></div>
+                                <div dir="auto" tabindex="0" class="input allow-selection" (click)="handleClickPromptInput()" (keydown)="handleKeyDownPromptInput($event)" (keyup)="handleCaretPositionChanges($event)" (input)="handlePromptInput()" (click)="handleCaretPositionChanges($event)" role="textbox" contenteditable="true" #promptInput></div>
                                 <span class="message-placeholder" #promptPlaceholder>Prompt...</span>
                             </div>
                         </div>
@@ -103,7 +103,7 @@ function swapElements(arr: any[], index1: number, index2: number): void {
                 </div>
 
 				<div class="main">
-                    <BottomBarContent/>
+                    <BottomBarContent [searchArray]="searchArray" [searchState]="searchState" [searchText]="searchText" [handlePromptSearchBoxClick]="handlePromptSearchBoxClick"/>
 				</div>
             </div>
         </div>
@@ -156,6 +156,8 @@ export class BottomBarComponent implements AfterViewInit {
 
 	/** Array with search values */
 	searchArray = signal<Array<any>>([]);
+	/** state for bottom bar content */
+	searchState = signal<boolean>(false);
 	/** Search text for searching pipe */
 	searchText: string = "";
 	/** Bool param if last typed button to prompt input is valid */
@@ -283,7 +285,7 @@ export class BottomBarComponent implements AfterViewInit {
 		this.mapInteractionService.mapScrolled.set(-1)
 	}
 
-	/** Function that listens to route change */
+	/** listens to route change */
 	routeChangeHandler() {
 		/* Showing map addon if we are in the home page */
 		if (this.router.url.split("/").length === 1 || this.router.url.split("/")[1] === "") {
@@ -298,30 +300,56 @@ export class BottomBarComponent implements AfterViewInit {
 		}
 	}
 
-	/** Function that shows the search box */
+	/** shows the search box */
 	showSearchBox() {
+		/* if bottom bar is opened we should just show places in the bottom bar content */
+		if (this.bottomBarState()) {
+			this.searchState.set(true);
+			return;
+		}
+		this.inputAddonContainer.nativeElement.style.bottom = `${this.container.nativeElement.getBoundingClientRect().height - 30}px`;
 		this.inputAddonContainer.nativeElement.style.display = "flex";
-		setTimeout(() => this.inputAddonContainer.nativeElement.style.maxHeight = "200px");
+		this.inputAddonContainer.nativeElement.style.transitionDuration = ".3s";
+
+		setTimeout(() => {
+			this.inputAddonContainer.nativeElement.style.maxHeight = "200px"
+		}, 100);
+		setTimeout(() => {
+			this.inputAddonContainer.nativeElement.style.transitionDuration = "0s";
+		}, 400);
 	}
 
-	/** Function that hides the search box */
+	/** hides search box */
 	hideSearchBox() {
-		this.inputAddonContainer.nativeElement.style.maxHeight = "0px";
-		setTimeout(() => this.inputAddonContainer.nativeElement.style.display = "none", 300);
+		/* we should remove places from bottom bar content and show default content */
+		if (this.bottomBarState()) {
+			this.searchState.set(false);
+			return;
+		}
+		this.inputAddonContainer.nativeElement.style.transitionDuration = ".3s";
+
+		setTimeout(() => {
+			this.inputAddonContainer.nativeElement.style.maxHeight = "0px";
+		}, 100);
+		setTimeout(() => {
+			this.inputAddonContainer.nativeElement.style.transitionDuration = "0s";
+			this.inputAddonContainer.nativeElement.style.display = "none";
+		}, 400);
 	}
 
-	/** Function that shows the prompt placeholder */
+	/** shows prompt placeholder */
 	showPromptPlaceholder() {
 		this.promptPlaceholder.nativeElement.style.opacity = "1";
 		this.promptPlaceholder.nativeElement.style.transform = "translateX(0)";
 	}
 
-	/** Function that hides the prompt placeholder */
+	/** hides prompt placeholder */
 	hidePromptPlaceholder() {
 		this.promptPlaceholder.nativeElement.style.opacity = "0";
 		this.promptPlaceholder.nativeElement.style.transform = "translateX(50px)";
 	}
 
+	/** changes editor input size after typing */
 	changeInputSize() {
 		// check if we should add new line on the div and add to scroll-container size
 		const current_input_height: number = this.promptInput.nativeElement.getBoundingClientRect().height!;
@@ -377,11 +405,17 @@ export class BottomBarComponent implements AfterViewInit {
 		}
 	}
 
+	/** Handler for prompt input click */
+	handleClickPromptInput() {
+		this.bottomBarState.set(true);
+	}
+
 	/** Handler for prompt input key button down event */
 	handleKeyDownPromptInput(event: any) {
 		this.typedKey = event.key;
 	}
 
+	/** Handler for caret position change */
 	handleCaretPositionChanges(event: any) {
 		if (event.key === undefined || ( event.key.slice(0, 5) === "Arrow" )) {
 			const editor = this.promptInput.nativeElement;
@@ -559,6 +593,7 @@ export class BottomBarComponent implements AfterViewInit {
 		this.changeInputSize();
 	}
 
+	/** highlights EVENTS and PLACES in editor text */
 	highlightEditorText(editorText: string) {
 		let highlightedString: string = "";
 		let lastIndex = 0;

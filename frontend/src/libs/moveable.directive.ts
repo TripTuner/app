@@ -34,42 +34,35 @@ export class MoveableDirective implements OnDestroy {
 	@Input({ required: false, alias: "state" })
 	stateSignal: WritableSignal<boolean> = signal<boolean>(false);
 
-	private stateSignalChangeTime: Date = new Date();
+	private localStateSignal: WritableSignal<boolean> = signal<boolean>(false);
 
 	private timeouts: any[] = [];
 
 	constructor() {
 		this.element = this.elementRef.nativeElement;
-		this.element.addEventListener("touchstart", (ev: TouchEvent) => this.handleTouchStart(this.element, ev), {
-			passive: false, // some browsers default this to true. It needs to be false for 'event.preventDefault()' to work
-			capture: true,
-		});
+		this.element.addEventListener("touchstart", (ev: TouchEvent) => this.handleTouchStart(this.element, ev));
 
 		effect(() => {
 			const state = this.stateSignal();
 			if (this.ifLocalStateChange())
 				return;
+			this.localStateSignal.set(state);
 			if (state) this.Open(this.element);
 			else this.Hide(this.element);
 		});
 	}
 
 	ngOnDestroy() {
-		//@ts-ignore
-		this.element.removeEventListener("touchstart", (ev: TouchEvent) => this.handleTouchStart(this.element, ev), {
-			passive: false,
-			capture: true,
-		});
+		this.element.removeEventListener("touchstart", (ev: TouchEvent) => this.handleTouchStart(this.element, ev));
 	}
 
 	ifLocalStateChange() {
-		const date = new Date();
-		const delay = date.getTime() - this.stateSignalChangeTime.getTime();
-		return delay <= 100;
+		return this.localStateSignal() === this.stateSignal();
 	}
 
 	changeState(state: boolean) {
-		this.stateSignalChangeTime = new Date();
+		console.log('setting new value to localStateSignal');
+		this.localStateSignal.set(state);
 		this.stateSignal.set(state);
 	}
 
@@ -78,17 +71,22 @@ export class MoveableDirective implements OnDestroy {
 		if (container.scrollTop !== 0) return;
 		if (!this.valid()) return;
 		//event.preventDefault();
-		this.stopAnimation(container);
+		//this.stopAnimation(container);
 
-		const startTouchY = event.changedTouches[0].clientY;
+		const startTouchY = event.touches[0].clientY;
+		console.log('touch start');
 		const timeStart = new Date(); // touch start
 		let lastY = startTouchY;
 		let deltaWithOutScroll = 0; // height change without scroll effecting
 		let direction = "";
+		let moving = false;
 
 		/** handles touch move event */
 		const handleTouchMove = (ev: TouchEvent) => {
+			if (moving) return;
+			moving = true;
 			const currentY = ev.touches[0].clientY; // touch position
+			console.log('touch move');
 			const currentHeight = container.getBoundingClientRect().height; // container height
 			const currentScroll = container.scrollTop; // container scroll
 
@@ -140,6 +138,7 @@ export class MoveableDirective implements OnDestroy {
 			}
 
 			lastY = currentY;
+			moving = false;
 		};
 		/** handles touch end event */
 		const handleTouchEnd = (ev: TouchEvent) => {
