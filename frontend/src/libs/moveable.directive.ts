@@ -71,7 +71,7 @@ export class MoveableDirective implements OnDestroy {
 		if (container.scrollTop !== 0) return;
 		if (!this.valid()) return;
 		//event.preventDefault();
-		//this.stopAnimation(container);
+		this.stopAnimation(container);
 
 		const startTouchY = event.touches[0].clientY;
 		console.log('touch start');
