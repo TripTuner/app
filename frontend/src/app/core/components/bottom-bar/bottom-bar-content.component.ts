@@ -30,7 +30,7 @@ import { SlideCategoriesComponent } from "../slide-categories.component";
         <div class="container">
 			@if (this.searchState() && searchArray().length > 0) {
                 @for (item of searchArray() | placeSearch:this.searchText; track [searchArray(), searchText]) {
-                    <div class="card" (click)="handlePromptSearchBoxClick(item)">
+                    <div class="card" (click)="chosenPoint.set(item)">
                         <p class="name">{{ item.name }}</p>
                         @if (item.address !== null) {
                             <p class="address">{{ item.address }}</p>
@@ -123,5 +123,5 @@ export class BottomBarContentComponent {
 	@Input() searchState!: WritableSignal<boolean>;
 	@Input() searchArray!: WritableSignal<Array<any>>;
 	@Input() searchText!: string;
-	@Input() handlePromptSearchBoxClick!: any;
+	@Input() chosenPoint!: WritableSignal<EventPlace | Place | null>;
 }

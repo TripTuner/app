@@ -6,7 +6,7 @@ import {
 	QueryList,
 	signal,
 	ViewChild,
-	ViewChildren,
+	ViewChildren, WritableSignal,
 } from "@angular/core";
 import { NavigationEnd, Router, RouterLink, RouterLinkActive } from "@angular/router";
 import { filter } from "rxjs";
@@ -103,7 +103,7 @@ function swapElements(arr: any[], index1: number, index2: number): void {
                 </div>
 
 				<div class="main">
-                    <BottomBarContent [searchArray]="searchArray" [searchState]="searchState" [searchText]="searchText" [handlePromptSearchBoxClick]="handlePromptSearchBoxClick"/>
+                    <BottomBarContent [searchArray]="searchArray" [searchState]="searchState" [searchText]="searchText" [chosenPoint]="chosenPoint"/>
 				</div>
             </div>
         </div>
@@ -113,23 +113,6 @@ function swapElements(arr: any[], index1: number, index2: number): void {
         </div>
 
         <div class="background" #openMenu></div>
-
-        <div class="input-addon" #inputAddon>
-            <div class="scroll-container">
-                <div class="scroll-content">
-                    @for (item of searchArray() | placeSearch:this.searchText; track mapInteractionService.places) {
-                        <div class="card" (click)="handlePromptSearchBoxClick(item)">
-                            <p class="name">{{ item.name }}</p>
-                            @if (item.address !== null) {
-                                <p class="address">{{ item.address }}</p>
-                            }
-                        </div>
-                    } @empty {
-                        <p>Ничего не найдено</p>
-                    }
-                </div>
-            </div>
-        </div>
 
         <button (click)="stickUserPosition()" class="stick-position-marker" [style.background-color]="mapInteractionService.mapScrolled() === -1 ? 'var(--blue-60)' : 'var(--neutral-1)'" #stickPositionButton>
             <svg width="30" height="30" viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg">
@@ -149,7 +132,6 @@ export class BottomBarComponent implements AfterViewInit {
 
 	@ViewChild("stickPositionButton") stickPositionButton!: ElementRef<HTMLButtonElement>; // button that sticks our position to geolocation
 
-	@ViewChild("inputAddon") inputAddonContainer!: ElementRef<HTMLDivElement>; // container with prompt input
 	@ViewChild("promptInput") promptInput!: ElementRef<HTMLDivElement>; // prompt input element
 	@ViewChild("promptPlaceholder") promptPlaceholder!: ElementRef<HTMLSpanElement>; // prompt input placeholder
 	@ViewChild("promptInputScroll") promptInputScroll!: ElementRef<HTMLDivElement>; // prompt input scroll container
@@ -158,6 +140,8 @@ export class BottomBarComponent implements AfterViewInit {
 	searchArray = signal<Array<any>>([]);
 	/** state for bottom bar content */
 	searchState = signal<boolean>(false);
+	/** chosen point */
+	chosenPoint = signal<EventPlace | Place | null>(null);
 	/** Search text for searching pipe */
 	searchText: string = "";
 	/** Bool param if last typed button to prompt input is valid */
@@ -237,6 +221,15 @@ export class BottomBarComponent implements AfterViewInit {
 				);
 			}
 		});
+		// effect for chosen point
+		effect(() => {
+			const point = this.chosenPoint();
+			if (point !== null) {
+				this.chosenPoint.set(null);
+				this.handlePromptSearchBoxClick(point);
+				this.bottomBarState.set(false);
+			}
+		});
 		// Listener for path information container opening
 		this.mapInteractionService.pathInformationState.subscribe(state => {
 			if (state === 1) {
@@ -302,39 +295,12 @@ export class BottomBarComponent implements AfterViewInit {
 
 	/** shows the search box */
 	showSearchBox() {
-		/* if bottom bar is opened we should just show places in the bottom bar content */
-		if (this.bottomBarState()) {
-			this.searchState.set(true);
-			return;
-		}
-		this.inputAddonContainer.nativeElement.style.bottom = `${this.container.nativeElement.getBoundingClientRect().height - 30}px`;
-		this.inputAddonContainer.nativeElement.style.display = "flex";
-		this.inputAddonContainer.nativeElement.style.transitionDuration = ".3s";
-
-		setTimeout(() => {
-			this.inputAddonContainer.nativeElement.style.maxHeight = "200px"
-		}, 100);
-		setTimeout(() => {
-			this.inputAddonContainer.nativeElement.style.transitionDuration = "0s";
-		}, 400);
+		this.searchState.set(true);
 	}
 
 	/** hides search box */
 	hideSearchBox() {
-		/* we should remove places from bottom bar content and show default content */
-		if (this.bottomBarState()) {
-			this.searchState.set(false);
-			return;
-		}
-		this.inputAddonContainer.nativeElement.style.transitionDuration = ".3s";
-
-		setTimeout(() => {
-			this.inputAddonContainer.nativeElement.style.maxHeight = "0px";
-		}, 100);
-		setTimeout(() => {
-			this.inputAddonContainer.nativeElement.style.transitionDuration = "0s";
-			this.inputAddonContainer.nativeElement.style.display = "none";
-		}, 400);
+		this.searchState.set(false);
 	}
 
 	/** shows prompt placeholder */
@@ -407,12 +373,13 @@ export class BottomBarComponent implements AfterViewInit {
 
 	/** Handler for prompt input click */
 	handleClickPromptInput() {
-		this.bottomBarState.set(true);
+		//this.bottomBarState.set(true);
 	}
 
 	/** Handler for prompt input key button down event */
 	handleKeyDownPromptInput(event: any) {
 		this.typedKey = event.key;
+		//this.bottomBarState.set(true);
 	}
 
 	/** Handler for caret position change */
@@ -509,6 +476,7 @@ export class BottomBarComponent implements AfterViewInit {
 		}
 		else if (this.typedKey === "#" || this.typedKey === "@") {
 			// we are looking for a segment that will be affected by the current change
+			this.bottomBarState.set(true);
 			let index = -1;
 			for (let i = 0; i < this.leftIndex.length; i++)
 				if (this.leftIndex[i] < caretPosition && caretPosition <= this.rightIndex[i] + 2)
